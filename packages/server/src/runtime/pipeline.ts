@@ -49,15 +49,16 @@ export function textResponder(
 }
 
 export async function buildContext(req: Request): Promise<ApiContext> {
-  const url = new URL(req.url);
   let parsedBody: any = undefined;
   const ct = req.headers.get("content-type") || "";
   if (req.method !== "GET" && req.method !== "HEAD") {
     if (/application\/json/i.test(ct)) {
       try {
         parsedBody = await req.json();
-      } catch {
+      } catch (e: any) {
+        // Invalid JSON -> surface 400 downstream
         parsedBody = undefined;
+        (req as any)["__bjsx_body_error"] = e?.message || "Invalid JSON";
       }
     } else if (/text\//i.test(ct)) {
       parsedBody = await req.text();

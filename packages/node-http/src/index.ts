@@ -1,5 +1,4 @@
-import { render } from "@workspace/server";
-import type { JSXElement } from "@workspace/server";
+import { render, type JSXElement } from "@workspace/server";
 import * as http from "node:http";
 import { Readable } from "node:stream";
 
@@ -20,35 +19,23 @@ function nodeRequestToFetch(req: http.IncomingMessage): Request {
   return new Request(url, { method, headers, body } as RequestInit);
 }
 
-async function writeFetchResponse(
-  res: http.ServerResponse,
-  response: Response
-) {
+async function writeFetchResponse(res: http.ServerResponse, response: Response) {
   res.statusCode = response.status;
   res.statusMessage = response.statusText;
   response.headers.forEach((value, key) => {
     res.setHeader(key, value);
   });
-  const body = response.body;
-  if (!body) {
+
+  // For simplicity, buffer the body. Adequate for prototype; can stream later.
+  if (response.body) {
+    const buf = Buffer.from(await response.arrayBuffer());
+    if (!res.hasHeader("content-length")) {
+      res.setHeader("content-length", String(buf.byteLength));
+    }
+    res.end(buf);
+  } else {
     res.end();
-    return;
   }
-  const reader = body.getReader();
-  function pump() {
-    reader
-      .read()
-      .then(({ done, value }) => {
-        if (done) {
-          res.end();
-          return;
-        }
-        res.write(Buffer.from(value));
-        pump();
-      })
-      .catch(() => res.end());
-  }
-  pump();
 }
 
 export function createNodeApp() {
@@ -57,11 +44,10 @@ export function createNodeApp() {
 
   return {
     serve(element: JSXElement) {
-      handler = render(element as any);
+      handler = render(element);
     },
     listen(port: number, cb?: () => void) {
-      if (!handler)
-        throw new Error("serve(element) must be called before listen()");
+      if (!handler) throw new Error("serve(element) must be called before listen()");
       server = http.createServer(async (req, res) => {
         try {
           const request = nodeRequestToFetch(req);

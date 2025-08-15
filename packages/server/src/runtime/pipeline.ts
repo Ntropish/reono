@@ -36,6 +36,18 @@ export function jsonResponder(
   return new Response(JSON.stringify(data), { ...initObj, headers });
 }
 
+export function textResponder(
+  data: string,
+  init?: number | ResponseInit
+): Response {
+  const initObj: ResponseInit =
+    typeof init === "number" ? { status: init } : (init ?? {});
+  const headers = new Headers(initObj.headers);
+  if (!headers.has("content-type"))
+    headers.set("content-type", "text/plain; charset=utf-8");
+  return new Response(data, { ...initObj, headers });
+}
+
 export async function buildContext(req: Request): Promise<ApiContext> {
   const url = new URL(req.url);
   let parsedBody: any = undefined;
@@ -55,22 +67,21 @@ export async function buildContext(req: Request): Promise<ApiContext> {
     }
   }
 
+  let ctx!: ApiContext;
   function json(data: unknown, init?: number | ResponseInit): Response {
-    return jsonResponder(data, init);
+    const r = jsonResponder(data, init);
+    ctx.res = r;
+    return r;
   }
 
-  // Temporary Response holder until adapter writes it
-  const res = new Response();
-
-  return {
+  ctx = {
     params: {},
     body: parsedBody,
     json,
     req,
-    res,
-    query: url.searchParams,
-    headers: req.headers,
   };
+
+  return ctx;
 }
 
 export function applyValidation(match: Match, ctx: ApiContext): void {
@@ -78,14 +89,5 @@ export function applyValidation(match: Match, ctx: ApiContext): void {
   if (!v) return;
   if (v.params) ctx.params = v.params.parse(ctx.params);
   if (v.body) ctx.body = v.body.parse(ctx.body);
-  if (v.query)
-    ctx.query = new URLSearchParams(
-      v.query.parse(Object.fromEntries(ctx.query ?? []))
-    );
-  if (v.headers)
-    ctx.headers = new Headers(
-      v.headers.parse(
-        Object.fromEntries((ctx.headers ?? new Headers()).entries())
-      )
-    );
+  // query and headers can be added when present on ApiContext
 }

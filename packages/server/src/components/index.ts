@@ -9,9 +9,7 @@ export type ApiContext = {
   body: any;
   json: (data: unknown, init?: number | ResponseInit) => Response;
   req: Request;
-  res: Response;
-  query?: URLSearchParams;
-  headers?: Headers;
+  res?: Response;
 };
 
 export type ApiHandler = (c: ApiContext) => unknown | Promise<unknown>;

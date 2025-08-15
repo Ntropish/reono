@@ -55,8 +55,12 @@ export function render(element: Element): Listener {
     try {
       const result = await chain(ctx, () => undefined);
       if (result instanceof Response) return result;
-      // If middleware returned void and did not write, synthesize an empty 204
-      return new Response(null, { status: 204 });
+      if (ctx.res) return ctx.res;
+      // Fallback if nothing produced a Response
+      return new Response(JSON.stringify(null), {
+        status: 200,
+        headers: { "content-type": "application/json; charset=utf-8" },
+      });
     } catch (e: any) {
       return new Response("Internal Server Error", { status: 500 });
     }

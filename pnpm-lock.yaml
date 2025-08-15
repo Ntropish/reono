@@ -26,6 +26,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@workspace/node-http':
+        specifier: workspace:*
+        version: link:../../packages/node-http
       '@workspace/server':
         specifier: workspace:*
         version: link:../../packages/server
@@ -124,6 +127,9 @@ importers:
 
   packages/node-http:
     dependencies:
+      '@workspace/server':
+        specifier: workspace:*
+        version: link:../server
       signal-polyfill:
         specifier: ^0.2.2
         version: 0.2.2

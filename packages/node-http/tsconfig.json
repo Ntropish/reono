@@ -7,8 +7,8 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "plugins": []
+    "moduleResolution": "Bundler"
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "**/*.server.tsx"]
+  "exclude": ["node_modules"]
 }

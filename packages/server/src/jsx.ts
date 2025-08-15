@@ -14,11 +14,18 @@ export function createElement(
   props: any,
   ...children: any[]
 ): ServerJSXElement {
+  const flat: any[] = [];
+  const stack = children.flat ? children.flat(Infinity) : children;
+  for (const c of stack) {
+    if (c === null || c === undefined || c === false) continue;
+    if (Array.isArray(c)) flat.push(...c);
+    else flat.push(c);
+  }
   return {
     type,
     props: {
-      ...props,
-      children,
+      ...(props ?? {}),
+      children: flat as any,
     },
   } as ServerJSXElement;
 }

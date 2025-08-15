@@ -38,3 +38,7 @@ export type ContextWithParams<S> = Omit<
 > & {
   params: InferFromSchema<S>;
 };
+
+// --- Core runtime exports ---
+export { render } from "./runtime/render";
+export type { Listener } from "./runtime/types";

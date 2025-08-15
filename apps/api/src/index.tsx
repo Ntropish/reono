@@ -1,4 +1,4 @@
-import { createNodeApp } from "@workspace/server";
+import { createNodeApp } from "@workspace/node-http";
 import App from "./app.server";
 
 const app = createNodeApp();

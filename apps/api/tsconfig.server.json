@@ -7,7 +7,7 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "plugins": []
+    "moduleResolution": "Bundler"
   },
   "include": ["**/*.server.tsx"],
   "exclude": ["node_modules"]

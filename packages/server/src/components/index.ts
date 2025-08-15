@@ -25,7 +25,8 @@ export type Element =
   | GetRouteElement
   | PutRouteElement
   | PostRouteElement
-  | DeleteRouteElement;
+  | DeleteRouteElement
+  | PatchRouteElement;
 
 export type ElementProps =
   | RouterElementProps
@@ -33,7 +34,8 @@ export type ElementProps =
   | GetRouteElementProps
   | PutRouteElementProps
   | PostRouteElementProps
-  | DeleteRouteElementProps;
+  | DeleteRouteElementProps
+  | PatchRouteElementProps;
 
 export type SchemaLike<T = unknown> = { parse: (input: unknown) => T };
 
@@ -106,4 +108,15 @@ export type DeleteRouteElementProps = {
 export type DeleteRouteElement = {
   type: "delete";
   props: DeleteRouteElementProps;
+};
+
+export type PatchRouteElementProps = {
+  path?: string | string[];
+  handler?: ApiHandler;
+  validate?: ValidateSpec;
+};
+
+export type PatchRouteElement = {
+  type: "patch";
+  props: PatchRouteElementProps;
 };

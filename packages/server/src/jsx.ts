@@ -7,6 +7,14 @@ import type {
   DeleteRouteElement,
   Element as ServerJSXElement,
   GlobalAttributes,
+  PatchRouteElement,
+  RouterElementProps,
+  UseElementProps,
+  GetRouteElementProps,
+  PutRouteElementProps,
+  PostRouteElementProps,
+  DeleteRouteElementProps,
+  PatchRouteElementProps,
 } from "./components";
 
 export function createElement(
@@ -41,12 +49,13 @@ export declare namespace JSX {
   }
 
   export interface IntrinsicElements {
-    router: RouterElement["props"];
-    use: UseElement["props"];
-    get: GetRouteElement["props"];
-    put: PutRouteElement["props"];
-    post: PostRouteElement["props"];
-    delete: DeleteRouteElement["props"];
+    router: RouterElementProps;
+    use: UseElementProps;
+    get: GetRouteElementProps;
+    put: PutRouteElementProps;
+    post: PostRouteElementProps;
+    delete: DeleteRouteElementProps;
+    patch: PatchRouteElementProps;
   }
 
   export type IntrinsicAttributes = GlobalAttributes;

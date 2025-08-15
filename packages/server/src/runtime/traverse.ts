@@ -7,6 +7,7 @@ import type {
   PostRouteElement,
   DeleteRouteElement,
   MiddlewareHandler,
+  PatchRouteElement,
 } from "../components";
 import type { FlattenResult, RouteDef, UseDef } from "./types";
 
@@ -84,12 +85,14 @@ export function traverse(root: any): FlattenResult {
       case "get":
       case "put":
       case "post":
-      case "delete": {
+      case "delete":
+      case "patch": {
         const el = node as
           | GetRouteElement
           | PutRouteElement
           | PostRouteElement
-          | DeleteRouteElement;
+          | DeleteRouteElement
+          | PatchRouteElement;
         const method = node.type.toUpperCase() as RouteDef["method"];
         const path = prefix.concat(normPath(el.props.path));
         if (el.props.handler) {

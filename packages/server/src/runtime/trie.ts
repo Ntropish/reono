@@ -93,8 +93,7 @@ export function matchTrie(
   const leaf = walk(root, 0);
   if (!leaf) return undefined;
 
-  const entry =
-    leaf.handlers.methods.get(method) ?? leaf.handlers.methods.get("GET"); // optional GET fallback
+  const entry = leaf.handlers.methods.get(method);
   if (!entry)
     return { params, handlers: [], route: undefined, validate: undefined };
   return {

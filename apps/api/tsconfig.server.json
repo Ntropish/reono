@@ -1,0 +1,14 @@
+{
+  "extends": "@workspace/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@workspace/server",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "plugins": []
+  },
+  "include": ["**/*.server.tsx"],
+  "exclude": ["node_modules"]
+}

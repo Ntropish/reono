@@ -35,6 +35,7 @@ export const getUser = (id: number) => {
 };
 
 export const getAllUsers = () => {
+  console.log("Fetching all users", users);
   return Object.values(users);
 };
 

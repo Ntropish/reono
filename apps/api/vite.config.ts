@@ -1,7 +1,6 @@
 /// <reference types="vitest" />
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
-import { resolve } from "node:path";
 
 export default defineConfig({
   build: {
@@ -23,22 +22,6 @@ export default defineConfig({
         "yargs/yargs",
         "glob",
       ],
-    },
-  },
-  resolve: {
-    alias: {
-      "@workspace/server": resolve(
-        __dirname,
-        "../../packages/server/src/index.ts"
-      ),
-      "@workspace/server/jsx-runtime": resolve(
-        __dirname,
-        "../../packages/server/src/jsx-runtime.ts"
-      ),
-      "@workspace/server/jsx-dev-runtime": resolve(
-        __dirname,
-        "../../packages/server/src/jsx-runtime.ts"
-      ),
     },
   },
   plugins: [dts()],

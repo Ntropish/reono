@@ -11,6 +11,7 @@ export type TrieHandlers = {
   >;
   // Middleware attached to this exact path level (from <use> at or above). We keep it folded into routes,
   // but this can be extended for path-scoped middleware in the future.
+  pathMiddleware: RouteDef["middleware"]; // Store middleware at path level for any method
 };
 
 export type TrieNode = {
@@ -23,7 +24,7 @@ export type TrieNode = {
 export function buildTrie(routes: RouteDef[]): TrieNode {
   const root: TrieNode = {
     static: new Map(),
-    handlers: { methods: new Map() },
+    handlers: { methods: new Map(), pathMiddleware: [] },
   };
 
   for (const r of routes) {
@@ -32,7 +33,7 @@ export function buildTrie(routes: RouteDef[]): TrieNode {
       if (seg === "*") {
         node.wildcard ??= {
           static: new Map(),
-          handlers: { methods: new Map() },
+          handlers: { methods: new Map(), pathMiddleware: [] },
         };
         node = node.wildcard;
         break; // wildcard consumes the rest
@@ -42,18 +43,24 @@ export function buildTrie(routes: RouteDef[]): TrieNode {
         if (!node.param)
           node.param = {
             name,
-            node: { static: new Map(), handlers: { methods: new Map() } },
+            node: { static: new Map(), handlers: { methods: new Map(), pathMiddleware: [] } },
           };
         node = node.param.node;
       } else {
         let next = node.static.get(seg);
         if (!next) {
-          next = { static: new Map(), handlers: { methods: new Map() } };
+          next = { static: new Map(), handlers: { methods: new Map(), pathMiddleware: [] } };
           node.static.set(seg, next);
         }
         node = next;
       }
     }
+    
+    // Store the middleware at the path level for any method to access
+    if (r.middleware && r.middleware.length > 0) {
+      node.handlers.pathMiddleware = r.middleware;
+    }
+    
     node.handlers.methods.set(r.method, {
       handler: r.handler,
       validate: r.validate,
@@ -95,12 +102,10 @@ export function matchTrie(
 
   const entry = leaf.handlers.methods.get(method);
   if (!entry) {
-    // No method handler, but still collect middleware from any available method
-    // This ensures middleware (like CORS) runs for all methods on matched paths
-    const anyMethodEntry = leaf.handlers.methods.values().next().value;
+    // No method handler, but use path-level middleware if available
     return { 
       params, 
-      handlers: anyMethodEntry?.middleware || [], 
+      handlers: leaf.handlers.pathMiddleware, 
       route: undefined, 
       validate: undefined 
     };

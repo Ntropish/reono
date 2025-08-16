@@ -316,6 +316,8 @@ export async function applyValidation(
   const v = match.validate;
   if (!v) return;
 
+  console.log("applyValidation called with:", { validate: v });
+
   try {
     // Validate params
     if (v.params) {
@@ -331,20 +333,27 @@ export async function applyValidation(
     if (v.query) {
       // Convert URLSearchParams to object for validation
       const queryObj = Object.fromEntries(ctx.query.entries());
+      console.log("Validating query:", { queryObj, schema: v.query });
       const validatedQuery = await validateWithSchema(v.query, queryObj, ctx);
-      ctx.query = new URLSearchParams(validatedQuery);
+      console.log("Query validation result:", validatedQuery);
+      // Store validated query as a special property and preserve original for backward compatibility
+      (ctx as any)._validatedQuery = validatedQuery;
+      ctx.query = new URLSearchParams(queryObj); // Keep original functionality
     }
 
     // Validate headers
     if (v.headers) {
       // Convert Headers to object for validation
       const headersObj = Object.fromEntries(ctx.headers.entries());
+      console.log("Validating headers:", { headersObj, schema: v.headers });
       const validatedHeaders = await validateWithSchema(
         v.headers,
         headersObj,
         ctx
       );
-      ctx.headers = new Headers(validatedHeaders);
+      console.log("Headers validation result:", validatedHeaders);
+      (ctx as any)._validatedHeaders = validatedHeaders;
+      ctx.headers = new Headers(headersObj); // Keep original functionality
     }
 
     // Validate cookies
@@ -356,8 +365,8 @@ export async function applyValidation(
         cookiesObj,
         ctx
       );
-      // Convert back to Map
-      ctx.cookies = new Map(Object.entries(validatedCookies));
+      (ctx as any)._validatedCookies = validatedCookies;
+      ctx.cookies = new Map(Object.entries(cookiesObj)); // Keep original functionality
     }
 
     // Run custom validation
@@ -365,6 +374,7 @@ export async function applyValidation(
       await validateWithSchema(v.custom, null, ctx);
     }
   } catch (error) {
+    console.log("Validation error:", error);
     if (error instanceof ValidationError) {
       throw error;
     }

@@ -55,13 +55,15 @@ export type ElementProps =
   | PatchRouteElementProps;
 
 // Standard Schema Support - supports multiple validation library patterns
-export type StandardSchemaResult<T = unknown> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  issues: Array<{ message: string; path?: Array<string | number> }>;
-};
+export type StandardSchemaResult<T = unknown> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      issues: Array<{ message: string; path?: Array<string | number> }>;
+    };
 
 export type StandardSchema<T = unknown> = {
   "~standard": {
@@ -71,13 +73,15 @@ export type StandardSchema<T = unknown> = {
   };
 };
 
-export type SafeParseResult<T = unknown> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: Error;
-};
+export type SafeParseResult<T = unknown> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      error: Error;
+    };
 
 export type SafeParseSchema<T = unknown> = {
   safeParse: (input: unknown) => SafeParseResult<T>;
@@ -99,7 +103,7 @@ export type ZodLikeSchema<T = unknown> = {
 export type CustomValidator = (ctx: ApiContext) => void | Promise<void>;
 
 // Union type for all supported schema formats
-export type Schema<T = unknown> = 
+export type Schema<T = unknown> =
   | StandardSchema<T>
   | SafeParseSchema<T>
   | JoiSchema<T>

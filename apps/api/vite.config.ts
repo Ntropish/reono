@@ -7,7 +7,7 @@ export default defineConfig({
     ssr: true,
     lib: {
       entry: "src/index.tsx",
-      name: "bjsx-api",
+      name: "@reono/api",
       fileName: "index",
       formats: ["es", "cjs"],
     },

@@ -54,31 +54,11 @@ export function FileUpload({
 
     const files: Array<{ key: string; file: File }> = [];
 
-    console.log("FileUpload middleware processing:", {
-      maxSize,
-      allowedTypes: allowedTypes?.join(", "),
-    });
-
-    console.log("FileUpload middleware processing:", {
-      maxSize,
-      allowedTypes: allowedTypes?.join(", "),
-    });
-
     // Process all form entries
     for (const [key, value] of ctx.body.entries()) {
       if (value instanceof File) {
-        console.log(
-          `Processing file: ${value.name}, size: ${value.size}, type: ${value.type}`
-        );
-        console.log(
-          `Processing file: ${value.name}, size: ${value.size}, type: ${value.type}`
-        );
-
         // Validate file size
         if (maxSize && value.size > maxSize) {
-          console.log(
-            `File ${value.name} rejected: size ${value.size} > limit ${maxSize}`
-          );
           return ctx.json(
             {
               error: `File ${value.name} too large. Maximum size: ${maxSize} bytes`,
@@ -99,9 +79,6 @@ export function FileUpload({
           });
 
           if (!isAllowed) {
-            console.log(
-              `File ${value.name} rejected: type ${value.type} not in allowed types: ${allowedTypes.join(", ")}`
-            );
             return ctx.json(
               {
                 error: `File type ${value.type} not allowed. Allowed types: ${allowedTypes.join(", ")}`,
@@ -111,12 +88,10 @@ export function FileUpload({
           }
         }
 
-        console.log(`File ${value.name} accepted`);
         files.push({ key, file: value });
       }
     }
 
-    console.log(`Setting ${files.length} files in state`);
     // Store validated files in context state
     ctx.state.set("uploadedFiles", files);
     ctx.state.set("uploadedFileCount", files.length);

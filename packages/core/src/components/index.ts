@@ -5,11 +5,28 @@ export type GlobalAttributes = {
 // Public context passed to route handlers by this library
 // Validation (if provided) should coerce these at runtime.
 export type ApiContext = {
-  params: Record<string, any>;
-  body: any;
+  // Request data
+  params: Record<string, any>; // Route parameters (:id, etc.)
+  body: any; // Parsed request body
+  query: URLSearchParams; // Query parameters
+  headers: Headers; // Request headers
+  cookies: Map<string, string>; // Parsed cookies
+  url: URL; // Parsed URL object
+  req: Request; // Original Request object
+  res?: Response; // Response object (if set)
+  state: Map<string, any>; // Middleware state sharing
+
+  // Response helpers
   json: (data: unknown, init?: number | ResponseInit) => Response;
-  req: Request;
-  res?: Response;
+  text: (data: string, init?: number | ResponseInit) => Response;
+  html: (data: string, init?: number | ResponseInit) => Response;
+  redirect: (url: string, status?: number) => Response;
+  stream: (stream: ReadableStream, init?: ResponseInit) => Response;
+  file: (
+    data: ArrayBuffer | Uint8Array,
+    filename?: string,
+    init?: ResponseInit
+  ) => Response;
 };
 
 export type ApiHandler = (c: ApiContext) => unknown | Promise<unknown>;

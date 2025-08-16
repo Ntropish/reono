@@ -7,7 +7,7 @@ export default defineConfig({
     ssr: true,
     lib: {
       entry: "src/index.ts",
-      name: "node-http",
+      name: "node-server",
       fileName: "index",
       formats: ["es", "cjs"],
     },

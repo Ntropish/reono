@@ -16,7 +16,7 @@
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
     "reono": "workspace:*",
-    "@reono/node-http": "workspace:*",
+    "@reono/node-server": "workspace:*",
     "vite": "^7.1.2",
     "vite-plugin-dts": "^4.5.4",
     "zod": "^3.25.76"

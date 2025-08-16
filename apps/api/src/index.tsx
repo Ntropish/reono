@@ -1,4 +1,4 @@
-import { createNodeApp } from "@reono/node-http";
+import { createNodeApp } from "@reono/node-server";
 import App from "./app.server";
 
 const app = createNodeApp();

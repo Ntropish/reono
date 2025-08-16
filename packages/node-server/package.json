@@ -1,5 +1,5 @@
 {
-  "name": "@reono/node-http",
+  "name": "@reono/node-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

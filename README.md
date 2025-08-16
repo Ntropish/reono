@@ -21,7 +21,7 @@ Declarative HTTP servers with JSX. Define routes, middleware, and validation usi
     - `src/jsx-runtime.ts` — Runtime for the React 17+ JSX transform
     - `src/runtime/` — Core: traversal, trie, pipeline, render
     - `__tests__/` — Unit tests (e.g. trie matching)
-  - `node-http/` — Node.js HTTP adapter (IncomingMessage <-> Fetch Request/Response)
+  - `node-server/` — Node.js HTTP adapter (IncomingMessage <-> Fetch Request/Response)
   - `ui/`, `eslint-config/`, `typescript-config/` — Internal packages
 
 - Root
@@ -109,7 +109,7 @@ const App = () => (
   - Handlers may return a `Response` directly; it is passed through unchanged.
   - If no handler or middleware writes a response, a default `200` with JSON `null` is returned.
 
-## Adapter: Node HTTP (`@reono/node-http`)
+## Adapter: Node HTTP (`@reono/node-server`)
 
 - `createNodeApp()` returns `{ serve(element), listen(port, cb?), close() }`.
 - `serve(element)` builds the trie and stores a fetch-compatible handler.

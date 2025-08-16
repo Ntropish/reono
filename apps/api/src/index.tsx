@@ -1,7 +1,7 @@
-import { createNodeApp } from "@reono/node-server";
+import { createApp } from "@reono/node-server";
 import App from "./app.server";
 
-const app = createNodeApp();
+const app = createApp();
 
 app.serve(<App />);
 

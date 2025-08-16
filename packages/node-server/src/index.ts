@@ -46,7 +46,7 @@ async function writeFetchResponse(
   }
 }
 
-export function createNodeApp() {
+export function createApp() {
   let server: http.Server | undefined;
   let handler: ((req: Request) => Promise<Response>) | undefined;
 

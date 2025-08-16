@@ -111,7 +111,7 @@ const App = () => (
 
 ## Adapter: Node HTTP (`@reono/node-server`)
 
-- `createNodeApp()` returns `{ serve(element), listen(port, cb?), close() }`.
+- `createApp()` returns `{ serve(element), listen(port, cb?), close() }`.
 - `serve(element)` builds the trie and stores a fetch-compatible handler.
 - `listen(port)` wires Node’s `http.createServer` to translate IncomingMessage → Fetch Request and write back the Fetch Response. Uses `Readable.toWeb(req)` for request bodies and sets `duplex: "half"` when needed. Responses currently buffer their body before writing (streaming can be added later).
 

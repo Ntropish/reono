@@ -94,8 +94,17 @@ export function matchTrie(
   if (!leaf) return undefined;
 
   const entry = leaf.handlers.methods.get(method);
-  if (!entry)
-    return { params, handlers: [], route: undefined, validate: undefined };
+  if (!entry) {
+    // No method handler, but still collect middleware from any available method
+    // This ensures middleware (like CORS) runs for all methods on matched paths
+    const anyMethodEntry = leaf.handlers.methods.values().next().value;
+    return { 
+      params, 
+      handlers: anyMethodEntry?.middleware || [], 
+      route: undefined, 
+      validate: undefined 
+    };
+  }
   return {
     params,
     handlers: entry.middleware,

@@ -83,17 +83,33 @@ describe('Scenario 1: Content Management API Integration Tests', () => {
   });
 
   describe('CORS Middleware', () => {
-    // TODO: Fix OPTIONS handling in core library
-    // Currently OPTIONS requests return 405 before middleware runs
-    it.skip('should handle OPTIONS preflight requests', async () => {
+    it('should handle OPTIONS preflight requests correctly', async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/health`, {
         method: 'OPTIONS',
+        headers: {
+          'Origin': 'https://example.com',
+          'Access-Control-Request-Method': 'GET',
+          'Access-Control-Request-Headers': 'Authorization, Content-Type',
+        },
       });
 
+      // CORS preflight should return 204 No Content
       expect(response.status).toBe(204);
+      
+      // Should have proper CORS headers
       expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
       expect(response.headers.get('Access-Control-Allow-Methods')).toContain('GET');
+      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('POST');
+      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('PUT');
+      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('DELETE');
       expect(response.headers.get('Access-Control-Allow-Headers')).toContain('Authorization');
+      expect(response.headers.get('Access-Control-Allow-Headers')).toContain('Content-Type');
+      expect(response.headers.get('Access-Control-Allow-Credentials')).toBe('true');
+      expect(response.headers.get('Access-Control-Max-Age')).toBe('86400');
+      
+      // Should have no response body for preflight
+      const text = await response.text();
+      expect(text).toBe('');
     });
 
     it('should add CORS headers to regular responses', async () => {

@@ -253,7 +253,43 @@ export async function validateWithSchema<T = unknown>(
     return input as T;
   }
 
-  // Standard schema format (~standard)
+  // Zod/parse format (parse method) - check this FIRST to avoid conflicts
+  if (
+    typeof schema === "object" &&
+    schema !== null &&
+    "parse" in schema &&
+    typeof (schema as any).parse === "function"
+  ) {
+    const zodSchema = schema as any;
+    try {
+      const result = zodSchema.parse(input);
+      return result;
+    } catch (error) {
+      throw new ValidationError(
+        error instanceof Error ? error.message : "Parse validation failed"
+      );
+    }
+  }
+
+  // SafeParse format (safeParse method) - check before standard schema
+  if (
+    typeof schema === "object" &&
+    schema !== null &&
+    "safeParse" in schema &&
+    typeof (schema as any).safeParse === "function"
+  ) {
+    const safeParseSchema = schema as any;
+    const result = safeParseSchema.safeParse(input);
+    if (result.success) {
+      return result.data;
+    } else {
+      throw new ValidationError(
+        result.error?.message || "SafeParse validation failed"
+      );
+    }
+  }
+
+  // Standard schema format (~standard) - check after specific validation library methods
   if (typeof schema === "object" && schema !== null && "~standard" in schema) {
     const standardSchema = schema as any;
     const result = standardSchema["~standard"].validate(input);
@@ -267,21 +303,13 @@ export async function validateWithSchema<T = unknown>(
     }
   }
 
-  // SafeParse format (safeParse method)
-  if (typeof schema === "object" && schema !== null && "safeParse" in schema) {
-    const safeParseSchema = schema as any;
-    const result = safeParseSchema.safeParse(input);
-    if (result.success) {
-      return result.data;
-    } else {
-      throw new ValidationError(
-        result.error?.message || "SafeParse validation failed"
-      );
-    }
-  }
-
-  // Joi format (validate method)
-  if (typeof schema === "object" && schema !== null && "validate" in schema) {
+  // Joi format (validate method) - check last
+  if (
+    typeof schema === "object" &&
+    schema !== null &&
+    "validate" in schema &&
+    typeof (schema as any).validate === "function"
+  ) {
     const joiSchema = schema as any;
     const result = joiSchema.validate(input);
     if (result.error === null) {
@@ -289,18 +317,6 @@ export async function validateWithSchema<T = unknown>(
     } else {
       throw new ValidationError(
         result.error?.message || "Joi validation failed"
-      );
-    }
-  }
-
-  // Zod/parse format (parse method) - default fallback
-  if (typeof schema === "object" && schema !== null && "parse" in schema) {
-    const zodSchema = schema as any;
-    try {
-      return zodSchema.parse(input);
-    } catch (error) {
-      throw new ValidationError(
-        error instanceof Error ? error.message : "Parse validation failed"
       );
     }
   }

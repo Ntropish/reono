@@ -34,8 +34,7 @@ async function call(method: string, path: string, init?: RequestInit) {
   return await handle(req);
 }
 
-describe("Validation and body parsing", () => {
-  it("application/json parses and validates", async () => {
+describe("Validation and body parsing", () => {  it("application/json parses and validates", async () => {
     const res = await call("POST", "/users", {
       method: "POST",
       headers: { "content-type": "application/json" },

@@ -6,15 +6,18 @@ const mockZod = {
   object: (shape: any) => ({
     parse: (input: unknown) => {
       if (typeof input === "object" && input !== null) {
+        const result: any = {};
         for (const [key, validator] of Object.entries(shape)) {
           if (!(key in input)) {
             throw new Error(`Missing required field: ${key}`);
           }
           if (typeof validator === "function") {
-            (validator as any)((input as any)[key]);
+            result[key] = (validator as any)((input as any)[key]);
+          } else {
+            result[key] = (input as any)[key];
           }
         }
-        return input;
+        return result;
       }
       throw new Error("Expected object");
     },

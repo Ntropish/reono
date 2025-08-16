@@ -36,6 +36,20 @@ export function render(element: Element): Listener {
     const ctx = await buildContext(req);
     ctx.params = match.params;
 
+    // Check for JSON parsing errors first
+    if ((req as any)["__reono_body_error"]) {
+      return new Response(
+        JSON.stringify({
+          error: "ValidationError",
+          message: (req as any)["__reono_body_error"],
+        }),
+        {
+          status: 400,
+          headers: { "content-type": "application/json; charset=utf-8" },
+        }
+      );
+    }
+
     try {
       await applyValidation(match, ctx);
     } catch (err: any) {

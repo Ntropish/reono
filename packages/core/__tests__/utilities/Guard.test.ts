@@ -76,15 +76,14 @@ describe("Guard Component", () => {
         ) => {
           c.state.set("user", { role: "admin" });
           return next();
-        },
-        children: Guard({
-          condition: (c: ApiContext) => c.state.get("user")?.role === "admin",
-          children: createElement("get", {
-            path: "admin-only",
-            handler: (c: ApiContext) => c.json({ admin: true }),
-          }),
+        }
+      }, Guard({
+        condition: (c: ApiContext) => c.state.get("user")?.role === "admin",
+        children: createElement("get", {
+          path: "admin-only",
+          handler: (c: ApiContext) => c.json({ admin: true }),
         }),
-      })
+      }))
     );
 
     handle = render(tree);

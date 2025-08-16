@@ -81,13 +81,13 @@ export function CORS({
   const preflightHandler = (ctx: ApiContext) => {
     const origin = ctx.req.headers.get("origin");
     const requestMethod = ctx.req.headers.get("access-control-request-method");
-    
+
     // Only handle preflight requests (those with Access-Control-Request-Method header)
     if (!requestMethod) {
       // This is a regular OPTIONS request, not a preflight - return 405
       return new Response("Method Not Allowed", { status: 405 });
     }
-    
+
     const allowedOrigin = origins.includes("*")
       ? "*"
       : origin && origins.includes(origin)
@@ -115,54 +115,62 @@ export function CORS({
   };
 
   // Recursively collect route paths and inject matching OPTIONS routes
-  function injectOptionsRoutes(element: Element | Element[] | undefined): Element | Element[] {
+  function injectOptionsRoutes(
+    element: Element | Element[] | undefined
+  ): Element | Element[] {
     if (!element) return [];
-    
+
     if (Array.isArray(element)) {
-      const processedElements = element.map(e => injectOptionsRoutes(e) as Element);
-      
+      const processedElements = element.map(
+        (e) => injectOptionsRoutes(e) as Element
+      );
+
       // Find all route paths in this array and add OPTIONS routes for them
       const routePaths = new Set<string>();
       for (const el of element) {
-        if (el && typeof el === 'object' && 'type' in el) {
-          if (['get', 'post', 'put', 'delete', 'patch', 'head'].includes(el.type)) {
+        if (el && typeof el === "object" && "type" in el) {
+          if (
+            ["get", "post", "put", "delete", "patch", "head"].includes(el.type)
+          ) {
             const routeElement = el as any;
             const path = routeElement.props?.path;
             if (path) {
-              routePaths.add(typeof path === 'string' ? path : path.join('/'));
+              routePaths.add(typeof path === "string" ? path : path.join("/"));
             }
           }
         }
       }
-      
+
       // Add OPTIONS routes for each discovered path
       for (const path of routePaths) {
         processedElements.push(
           createElement("options", { path, handler: preflightHandler })
         );
       }
-      
+
       return processedElements;
     }
 
-    if (typeof element !== 'object' || !('type' in element)) {
+    if (typeof element !== "object" || !("type" in element)) {
       return element;
     }
 
     // If this is a router element, recursively process its children
-    if (element.type === 'router') {
+    if (element.type === "router") {
       const routerElement = element as any;
       const routerChildren = routerElement.props.children;
       const processedChildren = injectOptionsRoutes(routerChildren);
-      
-      return createElement('router', routerElement.props, processedChildren);
+
+      return createElement("router", routerElement.props, processedChildren);
     }
 
     // For "use" elements, recursively process their children
-    if (element.type === 'use') {
+    if (element.type === "use") {
       const useElement = element as any;
       if (useElement.props?.children) {
-        const processedChildren = injectOptionsRoutes(useElement.props.children);
+        const processedChildren = injectOptionsRoutes(
+          useElement.props.children
+        );
         return {
           ...element,
           props: {

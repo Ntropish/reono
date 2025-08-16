@@ -148,10 +148,18 @@ export async function buildContext(req: Request): Promise<ApiContext> {
     } else if (/text\//i.test(ct)) {
       parsedBody = await req.text();
     } else if (/application\/x-www-form-urlencoded/i.test(ct)) {
-      const form = await req.formData();
-      parsedBody = Object.fromEntries(form.entries());
+      try {
+        const form = await req.formData();
+        parsedBody = Object.fromEntries(form.entries());
+      } catch (e: any) {
+        (req as any)["__reono_body_error"] = e?.message || "Invalid form data";
+      }
     } else if (/multipart\/form-data/i.test(ct)) {
-      parsedBody = await req.formData(); // Keep as FormData for file uploads
+      try {
+        parsedBody = await req.formData(); // Keep as FormData for file uploads
+      } catch (e: any) {
+        (req as any)["__reono_body_error"] = e?.message || "Invalid multipart data";
+      }
     } else {
       parsedBody = await req.arrayBuffer(); // Raw binary data fallback
     }

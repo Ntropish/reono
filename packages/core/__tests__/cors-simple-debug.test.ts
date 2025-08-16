@@ -12,13 +12,20 @@ beforeAll(() => {
         handler: (c: any) => c.json({ method: "GET" }),
       }),
       // Let's see if the wildcard OPTIONS gets added at this level
-    ]
+    ],
   });
-  
-  console.log("Enhanced tree:", JSON.stringify(tree, (key, value) => {
-    if (key === 'handler') return '[Function]';
-    return value;
-  }, 2));
+
+  console.log(
+    "Enhanced tree:",
+    JSON.stringify(
+      tree,
+      (key, value) => {
+        if (key === "handler") return "[Function]";
+        return value;
+      },
+      2
+    )
+  );
   handle = render(tree as any);
 });
 
@@ -33,7 +40,9 @@ describe("CORS Simple Injection", () => {
     console.log("GET status:", getRes.status);
 
     // Test the wildcard with unknown path
-    const unknownRes = await handle(makeRequest("/unknown", { method: "OPTIONS" }));
+    const unknownRes = await handle(
+      makeRequest("/unknown", { method: "OPTIONS" })
+    );
     console.log("Unknown path OPTIONS status:", unknownRes.status);
 
     // Test the specific path with OPTIONS

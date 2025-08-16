@@ -63,16 +63,18 @@ export function RateLimit({
     const now = Date.now();
     const entry = rateLimitStore.get(key);
 
+    let remaining: number;
+    let resetTime: number;
+
     if (!entry || now > entry.resetTime) {
       // First request or window expired, reset counter
       rateLimitStore.set(key, {
         count: 1,
         resetTime: now + window,
       });
-      return next();
-    }
-
-    if (entry.count >= requests) {
+      remaining = requests - 1;
+      resetTime = now + window;
+    } else if (entry.count >= requests) {
       // Rate limit exceeded
       const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
 
@@ -93,21 +95,38 @@ export function RateLimit({
           },
         }
       );
+    } else {
+      // Increment counter and continue
+      entry.count++;
+      rateLimitStore.set(key, entry);
+      remaining = requests - entry.count;
+      resetTime = entry.resetTime;
     }
 
-    // Increment counter and continue
-    entry.count++;
-    rateLimitStore.set(key, entry);
+    // Store the original json function and override it to add rate limit headers
+    const originalJson = ctx.json;
+    ctx.json = (data: unknown, init?: number | ResponseInit) => {
+      const initObj: ResponseInit =
+        typeof init === "number" ? { status: init } : (init ?? {});
+      const headers = new Headers(initObj.headers);
 
-    // Add rate limit headers to response
+      headers.set("X-RateLimit-Limit", requests.toString());
+      headers.set("X-RateLimit-Remaining", remaining.toString());
+      headers.set("X-RateLimit-Reset", resetTime.toString());
+
+      return originalJson(data, { ...initObj, headers });
+    };
+
     const response = await next();
+
+    // Restore original json function
+    ctx.json = originalJson;
+
+    // If response is already a Response object, add headers
     if (response instanceof Response) {
       response.headers.set("X-RateLimit-Limit", requests.toString());
-      response.headers.set(
-        "X-RateLimit-Remaining",
-        (requests - entry.count).toString()
-      );
-      response.headers.set("X-RateLimit-Reset", entry.resetTime.toString());
+      response.headers.set("X-RateLimit-Remaining", remaining.toString());
+      response.headers.set("X-RateLimit-Reset", resetTime.toString());
     }
 
     return response;

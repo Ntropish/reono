@@ -13,16 +13,6 @@ export function render(element: Element): Listener {
   const flat = traverse(element);
   const trie = buildTrie(flat.routes);
 
-  console.log(
-    "Rendered routes:",
-    flat.routes.map((r) => ({
-      method: r.method,
-      path: r.path.join("/"),
-      hasValidate: !!r.validate,
-      validate: r.validate,
-    }))
-  );
-
   return async function handle(req: Request): Promise<Response> {
     const url = new URL(req.url);
     const method = req.method.toUpperCase() as

@@ -12,15 +12,14 @@
   },
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --watch",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "dev": "vite build --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
-    "reono": "1.0.0",
+    "reono": "workspace:*",
     "signal-polyfill": "^0.2.2",
     "vite": "^7.1.2",
     "vite-plugin-dts": "^4.5.4",

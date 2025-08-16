@@ -23,7 +23,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",

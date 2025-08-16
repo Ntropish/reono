@@ -204,10 +204,10 @@ describe('Enhanced Body Parsing', () => {
     formData.append('text', 'hello');
     formData.append('number', '42');
     
+    // Create a mock Request with properly formatted multipart content
     const req = new Request('https://example.com/test', {
       method: 'POST',
-      headers: { 'content-type': 'multipart/form-data; boundary=something' },
-      body: formData
+      body: formData // Let FormData set its own content-type with boundary
     });
     
     const ctx = await buildContext(req);

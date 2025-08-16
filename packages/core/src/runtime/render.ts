@@ -2,7 +2,7 @@ import type { Element } from "../components";
 import type { Listener } from "./types";
 import { traverse } from "./traverse";
 import { buildTrie, matchTrie } from "./trie";
-import { applyValidation, buildContext, compose } from "./pipeline";
+import { applyValidation, buildContext, compose, ValidationError } from "./pipeline";
 
 export function render(element: Element): Listener {
   const flat = traverse(element);
@@ -31,13 +31,20 @@ export function render(element: Element): Listener {
     ctx.params = match.params;
 
     try {
-      applyValidation(match, ctx);
+      await applyValidation(match, ctx);
     } catch (err: any) {
+      const errorResponse: any = {
+        error: "ValidationError",
+        message: String(err?.message ?? err),
+      };
+
+      // Include issues if available (from standard schema format)
+      if (err instanceof ValidationError && err.issues) {
+        errorResponse.issues = err.issues;
+      }
+
       return new Response(
-        JSON.stringify({
-          error: "ValidationError",
-          message: String(err?.message ?? err),
-        }),
+        JSON.stringify(errorResponse),
         {
           status: 400,
           headers: { "content-type": "application/json; charset=utf-8" },

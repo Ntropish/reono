@@ -1,4 +1,10 @@
-import type { ApiContext, MiddlewareHandler } from "../components";
+import type {
+  ApiContext,
+  MiddlewareHandler,
+  Schema,
+  ValidateSpec,
+  CustomValidator,
+} from "../components";
 import type { Match } from "./types";
 
 export function compose(
@@ -215,21 +221,156 @@ export async function buildContext(req: Request): Promise<ApiContext> {
   return ctx;
 }
 
-export function applyValidation(match: Match, ctx: ApiContext): void {
+// Validation error class for proper error handling
+export class ValidationError extends Error {
+  public readonly issues?: Array<{
+    message: string;
+    path?: Array<string | number>;
+  }>;
+
+  constructor(
+    message: string,
+    issues?: Array<{ message: string; path?: Array<string | number> }>
+  ) {
+    super(message);
+    this.name = "ValidationError";
+    this.issues = issues;
+  }
+}
+
+// Helper function to validate input using any supported schema format
+export async function validateWithSchema<T = unknown>(
+  schema: Schema<T>,
+  input: unknown,
+  ctx?: ApiContext
+): Promise<T> {
+  // Custom validator function
+  if (typeof schema === "function") {
+    if (!ctx) {
+      throw new ValidationError("Custom validator requires context");
+    }
+    await schema(ctx);
+    return input as T;
+  }
+
+  // Standard schema format (~standard)
+  if (typeof schema === "object" && schema !== null && "~standard" in schema) {
+    const standardSchema = schema as any;
+    const result = standardSchema["~standard"].validate(input);
+    if (result.success) {
+      return result.data;
+    } else {
+      throw new ValidationError(
+        "Standard schema validation failed",
+        result.issues
+      );
+    }
+  }
+
+  // SafeParse format (safeParse method)
+  if (typeof schema === "object" && schema !== null && "safeParse" in schema) {
+    const safeParseSchema = schema as any;
+    const result = safeParseSchema.safeParse(input);
+    if (result.success) {
+      return result.data;
+    } else {
+      throw new ValidationError(
+        result.error?.message || "SafeParse validation failed"
+      );
+    }
+  }
+
+  // Joi format (validate method)
+  if (typeof schema === "object" && schema !== null && "validate" in schema) {
+    const joiSchema = schema as any;
+    const result = joiSchema.validate(input);
+    if (result.error === null) {
+      return result.value;
+    } else {
+      throw new ValidationError(
+        result.error?.message || "Joi validation failed"
+      );
+    }
+  }
+
+  // Zod/parse format (parse method) - default fallback
+  if (typeof schema === "object" && schema !== null && "parse" in schema) {
+    const zodSchema = schema as any;
+    try {
+      return zodSchema.parse(input);
+    } catch (error) {
+      throw new ValidationError(
+        error instanceof Error ? error.message : "Parse validation failed"
+      );
+    }
+  }
+
+  throw new ValidationError("Unsupported schema format");
+}
+
+// Enhanced validation function with support for all context properties
+export async function applyValidation(
+  match: Match,
+  ctx: ApiContext
+): Promise<void> {
   const v = match.validate;
   if (!v) return;
-  if (v.params) ctx.params = v.params.parse(ctx.params);
-  if (v.body) ctx.body = v.body.parse(ctx.body);
-  if (v.query) {
-    // Convert URLSearchParams to object for validation, then back to URLSearchParams
-    const queryObj = Object.fromEntries(ctx.query.entries());
-    const validatedQuery = v.query.parse(queryObj);
-    ctx.query = new URLSearchParams(validatedQuery);
-  }
-  if (v.headers) {
-    // Convert Headers to object for validation, then back to Headers
-    const headersObj = Object.fromEntries(ctx.headers.entries());
-    const validatedHeaders = v.headers.parse(headersObj);
-    ctx.headers = new Headers(validatedHeaders);
+
+  try {
+    // Validate params
+    if (v.params) {
+      ctx.params = await validateWithSchema(v.params, ctx.params, ctx);
+    }
+
+    // Validate body
+    if (v.body) {
+      ctx.body = await validateWithSchema(v.body, ctx.body, ctx);
+    }
+
+    // Validate query parameters
+    if (v.query) {
+      // Convert URLSearchParams to object for validation
+      const queryObj = Object.fromEntries(ctx.query.entries());
+      const validatedQuery = await validateWithSchema(v.query, queryObj, ctx);
+      ctx.query = new URLSearchParams(validatedQuery);
+    }
+
+    // Validate headers
+    if (v.headers) {
+      // Convert Headers to object for validation
+      const headersObj = Object.fromEntries(ctx.headers.entries());
+      const validatedHeaders = await validateWithSchema(
+        v.headers,
+        headersObj,
+        ctx
+      );
+      ctx.headers = new Headers(validatedHeaders);
+    }
+
+    // Validate cookies
+    if (v.cookies) {
+      // Convert cookie Map to object for validation
+      const cookiesObj = Object.fromEntries(ctx.cookies.entries());
+      const validatedCookies = await validateWithSchema(
+        v.cookies,
+        cookiesObj,
+        ctx
+      );
+      // Convert back to Map
+      ctx.cookies = new Map(Object.entries(validatedCookies));
+    }
+
+    // Run custom validation
+    if (v.custom) {
+      await validateWithSchema(v.custom, null, ctx);
+    }
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      throw error;
+    }
+    // Wrap other errors in ValidationError
+    throw new ValidationError(
+      error instanceof Error ? error.message : "Validation failed"
+    );
   }
 }

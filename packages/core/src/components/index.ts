@@ -54,14 +54,69 @@ export type ElementProps =
   | DeleteRouteElementProps
   | PatchRouteElementProps;
 
-export type SchemaLike<T = unknown> = { parse: (input: unknown) => T };
+// Standard Schema Support - supports multiple validation library patterns
+export type StandardSchemaResult<T = unknown> = {
+  success: true;
+  data: T;
+} | {
+  success: false;
+  issues: Array<{ message: string; path?: Array<string | number> }>;
+};
 
-// Lightweight validation spec to avoid hard-coupling to a specific schema library
+export type StandardSchema<T = unknown> = {
+  "~standard": {
+    version: number;
+    vendor: string;
+    validate: (input: unknown) => StandardSchemaResult<T>;
+  };
+};
+
+export type SafeParseResult<T = unknown> = {
+  success: true;
+  data: T;
+} | {
+  success: false;
+  error: Error;
+};
+
+export type SafeParseSchema<T = unknown> = {
+  safeParse: (input: unknown) => SafeParseResult<T>;
+};
+
+export type JoiResult<T = unknown> = {
+  error: Error | null;
+  value: T | null;
+};
+
+export type JoiSchema<T = unknown> = {
+  validate: (input: unknown) => JoiResult<T>;
+};
+
+export type ZodLikeSchema<T = unknown> = {
+  parse: (input: unknown) => T;
+};
+
+export type CustomValidator = (ctx: ApiContext) => void | Promise<void>;
+
+// Union type for all supported schema formats
+export type Schema<T = unknown> = 
+  | StandardSchema<T>
+  | SafeParseSchema<T>
+  | JoiSchema<T>
+  | ZodLikeSchema<T>
+  | CustomValidator;
+
+// Legacy alias for backward compatibility
+export type SchemaLike<T = unknown> = ZodLikeSchema<T>;
+
+// Enhanced validation spec supporting all schema types and additional context properties
 export type ValidateSpec = {
-  body?: SchemaLike<any>;
-  query?: SchemaLike<any>;
-  params?: SchemaLike<any>;
-  headers?: SchemaLike<any>;
+  body?: Schema<any>;
+  query?: Schema<any>;
+  params?: Schema<any>;
+  headers?: Schema<any>;
+  cookies?: Schema<any>;
+  custom?: CustomValidator;
 };
 
 export type RouterElementProps = {

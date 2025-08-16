@@ -8,6 +8,8 @@ import type {
   Element as ServerJSXElement,
   GlobalAttributes,
   PatchRouteElement,
+  OptionsRouteElement,
+  HeadRouteElement,
   RouterElementProps,
   UseElementProps,
   GetRouteElementProps,
@@ -15,6 +17,8 @@ import type {
   PostRouteElementProps,
   DeleteRouteElementProps,
   PatchRouteElementProps,
+  OptionsRouteElementProps,
+  HeadRouteElementProps,
 } from "./components";
 
 export function createElement(
@@ -56,6 +60,8 @@ export declare namespace JSX {
     post: PostRouteElementProps;
     delete: DeleteRouteElementProps;
     patch: PatchRouteElementProps;
+    options: OptionsRouteElementProps;
+    head: HeadRouteElementProps;
   }
 
   export type IntrinsicAttributes = GlobalAttributes;

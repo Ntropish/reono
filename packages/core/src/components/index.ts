@@ -43,7 +43,9 @@ export type Element =
   | PutRouteElement
   | PostRouteElement
   | DeleteRouteElement
-  | PatchRouteElement;
+  | PatchRouteElement
+  | OptionsRouteElement
+  | HeadRouteElement;
 
 export type ElementProps =
   | RouterElementProps
@@ -52,7 +54,9 @@ export type ElementProps =
   | PutRouteElementProps
   | PostRouteElementProps
   | DeleteRouteElementProps
-  | PatchRouteElementProps;
+  | PatchRouteElementProps
+  | OptionsRouteElementProps
+  | HeadRouteElementProps;
 
 // Standard Schema Support - supports multiple validation library patterns
 export type StandardSchemaResult<T = unknown> =
@@ -195,4 +199,26 @@ export type PatchRouteElementProps = {
 export type PatchRouteElement = {
   type: "patch";
   props: PatchRouteElementProps;
+};
+
+export type OptionsRouteElementProps = {
+  path?: string | string[];
+  handler?: ApiHandler;
+  validate?: ValidateSpec;
+};
+
+export type OptionsRouteElement = {
+  type: "options";
+  props: OptionsRouteElementProps;
+};
+
+export type HeadRouteElementProps = {
+  path?: string | string[];
+  handler?: ApiHandler;
+  validate?: ValidateSpec;
+};
+
+export type HeadRouteElement = {
+  type: "head";
+  props: HeadRouteElementProps;
 };

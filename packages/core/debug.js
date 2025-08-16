@@ -1,5 +1,7 @@
 import { createElement, render } from "./dist/index.js";
 import { CORS } from "./dist/index.js";
+import { traverse } from "./dist/src/runtime/traverse.js";
+import { buildTrie, matchTrie } from "./dist/src/runtime/trie.js";
 
 // Test CORS with corrected syntax and explicit OPTIONS support
 const tree = createElement(
@@ -24,6 +26,18 @@ const tree = createElement(
 );
 
 console.log("CORS tree structure:", JSON.stringify(tree, null, 2));
+
+// Inspect the actual routes that get built
+const flat = traverse(tree);
+console.log("\nFlattened routes:");
+console.log(flat.routes.map((r) => ({ method: r.method, path: r.path })));
+
+const trie = buildTrie(flat.routes);
+console.log("\nTesting route matching:");
+
+// Test what gets matched for the OPTIONS request
+const optionsMatch = matchTrie(trie, "OPTIONS", "/api/data");
+console.log("OPTIONS match for /api/data:", optionsMatch);
 
 const handle = render(tree);
 

@@ -21,7 +21,7 @@ export default defineConfig({
         "yargs/helpers",
         "yargs/yargs",
         "glob",
-        "@reono/core",
+        "reono",
       ],
     },
   },

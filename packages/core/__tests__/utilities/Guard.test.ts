@@ -69,21 +69,25 @@ describe("Guard Component", () => {
       }),
 
       // Test state-based condition
-      createElement("use", {
-        handler: async (
-          c: ApiContext,
-          next: () => unknown | Promise<unknown>
-        ) => {
-          c.state.set("user", { role: "admin" });
-          return next();
-        }
-      }, Guard({
-        condition: (c: ApiContext) => c.state.get("user")?.role === "admin",
-        children: createElement("get", {
-          path: "admin-only",
-          handler: (c: ApiContext) => c.json({ admin: true }),
-        }),
-      }))
+      createElement(
+        "use",
+        {
+          handler: async (
+            c: ApiContext,
+            next: () => unknown | Promise<unknown>
+          ) => {
+            c.state.set("user", { role: "admin" });
+            return next();
+          },
+        },
+        Guard({
+          condition: (c: ApiContext) => c.state.get("user")?.role === "admin",
+          children: createElement("get", {
+            path: "admin-only",
+            handler: (c: ApiContext) => c.json({ admin: true }),
+          }),
+        })
+      )
     );
 
     handle = render(tree);

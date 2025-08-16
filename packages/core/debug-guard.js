@@ -8,25 +8,30 @@ console.log("Debug Guard state-based test...");
 const positionalTree = createElement(
   "router",
   { path: "" },
-  
-  createElement("use", {
-    handler: async (c, next) => {
-      console.log("Positional middleware called");
-      return next();
-    }
-  },
-  createElement("get", {
-    path: "test-positional",
-    handler: (c) => {
-      console.log("Positional handler called");
-      return c.json({ positional: true });
+
+  createElement(
+    "use",
+    {
+      handler: async (c, next) => {
+        console.log("Positional middleware called");
+        return next();
+      },
     },
-  }))
+    createElement("get", {
+      path: "test-positional",
+      handler: (c) => {
+        console.log("Positional handler called");
+        return c.json({ positional: true });
+      },
+    })
+  )
 );
 
 console.log("Testing positional children...");
 const positionalHandle = render(positionalTree);
-const positionalReq = new Request("http://localhost/test-positional", { method: "GET" });
+const positionalReq = new Request("http://localhost/test-positional", {
+  method: "GET",
+});
 positionalHandle(positionalReq).then(async (res) => {
   console.log("Positional response status:", res.status);
   if (res.status === 200) {
@@ -36,14 +41,14 @@ positionalHandle(positionalReq).then(async (res) => {
     const text = await res.text();
     console.log("Positional response text:", text);
   }
-  
+
   // Now test with children prop
   console.log("\nTesting children prop...");
-  
+
   const propTree = createElement(
     "router",
     { path: "" },
-    
+
     createElement("use", {
       handler: async (c, next) => {
         console.log("Prop middleware called");

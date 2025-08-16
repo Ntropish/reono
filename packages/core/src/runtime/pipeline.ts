@@ -158,7 +158,8 @@ export async function buildContext(req: Request): Promise<ApiContext> {
       try {
         parsedBody = await req.formData(); // Keep as FormData for file uploads
       } catch (e: any) {
-        (req as any)["__reono_body_error"] = e?.message || "Invalid multipart data";
+        (req as any)["__reono_body_error"] =
+          e?.message || "Invalid multipart data";
       }
     } else {
       parsedBody = await req.arrayBuffer(); // Raw binary data fallback

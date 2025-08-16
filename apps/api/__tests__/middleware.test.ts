@@ -1,5 +1,5 @@
 import { describe, it, beforeAll, expect, vi } from "vitest";
-import { render, createElement, type MiddlewareHandler } from "@reono/server";
+import { render, createElement, type MiddlewareHandler } from "reono";
 
 let handle: (req: Request) => Promise<Response>;
 let order: string[];

@@ -1,4 +1,4 @@
-// Public API surface for @reono/server
+// Public API surface for reono
 // Expose nameable types so consumer inference doesn’t point to internal paths
 
 export type {

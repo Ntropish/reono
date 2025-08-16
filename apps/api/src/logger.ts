@@ -1,4 +1,4 @@
-import { type MiddlewareHandler } from "@reono/server";
+import { type MiddlewareHandler } from "reono";
 
 export const logger: MiddlewareHandler = async (c, next) => {
   const start = Date.now();

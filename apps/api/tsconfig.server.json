@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "jsx": "react-jsx",
-    "jsxImportSource": "@reono/server",
+    "jsxImportSource": "reono",
     "paths": {
       "@/*": ["./*"]
     },

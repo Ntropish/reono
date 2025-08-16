@@ -15,7 +15,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
-    "@reono/server": "workspace:*",
+    "reono": "workspace:*",
     "@reono/node-http": "workspace:*",
     "vite": "^7.1.2",
     "vite-plugin-dts": "^4.5.4",

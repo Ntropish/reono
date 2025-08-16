@@ -1,5 +1,5 @@
 import { describe, it, beforeAll, expect } from "vitest";
-import { render, createElement } from "@workspace/server";
+import { render, createElement } from "@reono/server";
 
 let handle: (req: Request) => Promise<Response>;
 
@@ -15,7 +15,8 @@ beforeAll(() => {
     // raw Response passthrough
     createElement("get", {
       path: "raw",
-      handler: () => new Response("ok", { status: 200, headers: { "x-test": "1" } }),
+      handler: () =>
+        new Response("ok", { status: 200, headers: { "x-test": "1" } }),
     }),
     // no explicit response -> default null JSON 200
     createElement("get", {

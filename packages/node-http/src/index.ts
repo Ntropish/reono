@@ -1,4 +1,4 @@
-import { render, type JSXElement } from "@workspace/server";
+import { render, type JSXElement } from "@reono/server";
 import * as http from "node:http";
 import { Readable } from "node:stream";
 

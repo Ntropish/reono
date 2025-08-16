@@ -1,5 +1,5 @@
 import { describe, it, beforeAll, expect } from "vitest";
-import { render, createElement } from "@workspace/server";
+import { render, createElement } from "@reono/server";
 import { z } from "zod";
 
 let handle: (req: Request) => Promise<Response>;
@@ -78,13 +78,10 @@ describe("Validation and body parsing", () => {
   });
 
   it("text/plain body is parsed as string", async () => {
-    const tree = createElement(
-      "post",
-      {
-        path: "text",
-        handler: (c: any) => c.json({ text: c.body, type: typeof c.body }),
-      }
-    );
+    const tree = createElement("post", {
+      path: "text",
+      handler: (c: any) => c.json({ text: c.body, type: typeof c.body }),
+    });
     const handle2 = render(tree as any);
     const res = await handle2(
       new Request(url("/text"), {
@@ -98,13 +95,10 @@ describe("Validation and body parsing", () => {
   });
 
   it("x-www-form-urlencoded parses to object", async () => {
-    const tree = createElement(
-      "post",
-      {
-        path: "form",
-        handler: (c: any) => c.json(c.body),
-      }
-    );
+    const tree = createElement("post", {
+      path: "form",
+      handler: (c: any) => c.json(c.body),
+    });
     const handle2 = render(tree as any);
     const res = await handle2(
       new Request(url("/form"), {

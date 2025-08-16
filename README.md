@@ -109,7 +109,7 @@ const App = () => (
   - Handlers may return a `Response` directly; it is passed through unchanged.
   - If no handler or middleware writes a response, a default `200` with JSON `null` is returned.
 
-## Adapter: Node HTTP (`@workspace/node-http`)
+## Adapter: Node HTTP (`@reono/node-http`)
 
 - `createNodeApp()` returns `{ serve(element), listen(port, cb?), close() }`.
 - `serve(element)` builds the trie and stores a fetch-compatible handler.

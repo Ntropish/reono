@@ -1,5 +1,5 @@
 import { describe, it, beforeAll, expect, vi } from "vitest";
-import { render, createElement, type MiddlewareHandler } from "@workspace/server";
+import { render, createElement, type MiddlewareHandler } from "@reono/server";
 
 let handle: (req: Request) => Promise<Response>;
 let order: string[];
@@ -75,7 +75,10 @@ describe("Middleware", () => {
     const tree = createElement(
       "use",
       { handler: bad },
-      createElement("get", { path: "", handler: (c: any) => c.json({ ok: true }) })
+      createElement("get", {
+        path: "",
+        handler: (c: any) => c.json({ ok: true }),
+      })
     );
     const h = render(tree as any);
     const res = await h(new Request(url("/"), { method: "GET" }));

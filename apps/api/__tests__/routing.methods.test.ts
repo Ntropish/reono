@@ -1,5 +1,5 @@
 import { describe, it, beforeAll, expect } from "vitest";
-import { render, createElement } from "@workspace/server";
+import { render, createElement } from "@reono/server";
 import { z } from "zod";
 
 let handle: (req: Request) => Promise<Response>;

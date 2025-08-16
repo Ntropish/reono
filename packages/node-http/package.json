@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/node-http",
+  "name": "@reono/node-http",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -20,7 +20,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
-    "@workspace/server": "workspace:*",
+    "@reono/server": "workspace:*",
     "signal-polyfill": "^0.2.2",
     "vite": "^7.1.2",
     "vite-plugin-dts": "^4.5.4",

@@ -167,14 +167,6 @@ beforeAll(() => {
         headers: safeParseLikeSchema, // safeParse method
       },
       handler: (c: any) => {
-        // Debug output
-        console.log("Mixed handler context:", {
-          validatedQuery: (c as any)._validatedQuery,
-          validatedHeaders: (c as any)._validatedHeaders,
-          queryEntries: Object.fromEntries(c.query.entries()),
-          headersEntries: Object.fromEntries(c.headers.entries()),
-        });
-
         return c.json({
           type: "mixed",
           body: c.body,

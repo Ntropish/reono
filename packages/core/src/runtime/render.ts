@@ -35,14 +35,6 @@ export function render(element: Element): Listener {
       | "HEAD";
 
     const match = matchTrie(trie, method, url.pathname);
-    console.log("Match result:", {
-      hasMatch: !!match,
-      hasRoute: !!match?.route,
-      hasValidate: !!match?.validate,
-      validate: match?.validate,
-      path: url.pathname,
-      method,
-    });
 
     if (!match || !match.route) {
       const status = match ? 405 : 404;

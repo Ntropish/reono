@@ -26,13 +26,13 @@ export function render(element: Element): Listener {
 
     const match = matchTrie(trie, method, url.pathname);
 
-    if (!match || !match.route) {
-      const status = match ? 405 : 404;
-      return new Response(status === 404 ? "Not Found" : "Method Not Allowed", {
-        status,
-      });
+    // If no path match at all, return 404
+    if (!match) {
+      return new Response("Not Found", { status: 404 });
     }
 
+    // If path matches but no method handler, we still run middleware
+    // This allows CORS and other middleware to handle requests like OPTIONS
     const ctx = await buildContext(req);
     ctx.params = match.params;
 
@@ -50,27 +50,34 @@ export function render(element: Element): Listener {
       );
     }
 
-    try {
-      await applyValidation(match, ctx);
-    } catch (err: any) {
-      const errorResponse: any = {
-        error: "ValidationError",
-        message: String(err?.message ?? err),
-      };
+    // If we have a route handler, apply validation
+    if (match.route) {
+      try {
+        await applyValidation(match, ctx);
+      } catch (err: any) {
+        const errorResponse: any = {
+          error: "ValidationError",
+          message: String(err?.message ?? err),
+        };
 
-      // Include issues if available (from standard schema format)
-      if (err instanceof ValidationError && err.issues) {
-        errorResponse.issues = err.issues;
+        // Include issues if available (from standard schema format)
+        if (err instanceof ValidationError && err.issues) {
+          errorResponse.issues = err.issues;
+        }
+
+        return new Response(JSON.stringify(errorResponse), {
+          status: 400,
+          headers: { "content-type": "application/json; charset=utf-8" },
+        });
       }
-
-      return new Response(JSON.stringify(errorResponse), {
-        status: 400,
-        headers: { "content-type": "application/json; charset=utf-8" },
-      });
     }
 
     const terminal = async (c: any) => {
-      const out = await match.route!(c);
+      if (!match.route) {
+        // No handler for this method, return 405
+        return new Response("Method Not Allowed", { status: 405 });
+      }
+      const out = await match.route(c);
       if (out instanceof Response) return out;
       return c.json(out ?? null);
     };

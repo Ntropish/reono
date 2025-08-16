@@ -17,6 +17,7 @@
 ## Current State Analysis
 
 ### ✅ Currently Implemented
+
 - Basic JSX element definitions (`<router>`, `<get>`, `<post>`, `<put>`, `<delete>`, `<patch>`)
 - Trie-based routing with path parameters (`:id`)
 - Basic middleware composition via `<use>` element
@@ -26,6 +27,7 @@
 - Node.js server adapter for hosting
 
 ### ❌ Missing for MVP
+
 - Enhanced request data access (query, headers, cookies)
 - Additional response helpers (text, html, redirect, streaming)
 - Standard schema support
@@ -45,27 +47,32 @@
 ```typescript
 export type ApiContext = {
   // Request data
-  params: Record<string, any>;        // Existing: Route parameters
-  body: any;                          // Existing: Parsed request body
-  query: URLSearchParams;             // NEW: Query parameters
-  headers: Headers;                   // NEW: Request headers  
-  cookies: Map<string, string>;       // NEW: Cookie parsing
-  url: URL;                          // NEW: Parsed URL object
-  req: Request;                      // Existing: Original Request object
-  res?: Response;                    // Existing: Response object (if available)
-  state: Map<string, any>;           // NEW: Middleware state sharing
-  
+  params: Record<string, any>; // Existing: Route parameters
+  body: any; // Existing: Parsed request body
+  query: URLSearchParams; // NEW: Query parameters
+  headers: Headers; // NEW: Request headers
+  cookies: Map<string, string>; // NEW: Cookie parsing
+  url: URL; // NEW: Parsed URL object
+  req: Request; // Existing: Original Request object
+  res?: Response; // Existing: Response object (if available)
+  state: Map<string, any>; // NEW: Middleware state sharing
+
   // Response helpers
-  json: (data: unknown, init?: number | ResponseInit) => Response;           // Existing
-  text: (data: string, init?: number | ResponseInit) => Response;            // NEW
-  html: (data: string, init?: number | ResponseInit) => Response;            // NEW
-  redirect: (url: string, status?: number) => Response;                      // NEW
-  stream: (stream: ReadableStream, init?: ResponseInit) => Response;         // NEW
-  file: (data: ArrayBuffer | Uint8Array, filename?: string, init?: ResponseInit) => Response; // NEW
+  json: (data: unknown, init?: number | ResponseInit) => Response; // Existing
+  text: (data: string, init?: number | ResponseInit) => Response; // NEW
+  html: (data: string, init?: number | ResponseInit) => Response; // NEW
+  redirect: (url: string, status?: number) => Response; // NEW
+  stream: (stream: ReadableStream, init?: ResponseInit) => Response; // NEW
+  file: (
+    data: ArrayBuffer | Uint8Array,
+    filename?: string,
+    init?: ResponseInit
+  ) => Response; // NEW
 };
 ```
 
 **Implementation Files**:
+
 - `packages/core/src/components/index.ts` - Update ApiContext type
 - `packages/core/src/runtime/pipeline.ts` - Enhance buildContext function
 - `packages/core/src/runtime/pipeline.ts` - Add new response helper functions
@@ -76,37 +83,50 @@ export type ApiContext = {
 
 ```typescript
 // Support standard schema interface + backward compatibility
-export type StandardSchema<T = unknown> = {
-  '~standard': {
-    version: 1;
-    vendor: string;
-    validate: (value: unknown) => { success: true; data: T } | { success: false; issues: any[] };
-  };
-} | {
-  parse: (input: unknown) => T; // Backward compatibility with current Zod-style
-} | {
-  safeParse: (input: unknown) => { success: true; data: T } | { success: false; error: any };
-};
+export type StandardSchema<T = unknown> =
+  | {
+      "~standard": {
+        version: 1;
+        vendor: string;
+        validate: (
+          value: unknown
+        ) => { success: true; data: T } | { success: false; issues: any[] };
+      };
+    }
+  | {
+      parse: (input: unknown) => T; // Backward compatibility with current Zod-style
+    }
+  | {
+      safeParse: (
+        input: unknown
+      ) => { success: true; data: T } | { success: false; error: any };
+    };
 
 // Enhanced type inference
 export type InferFromSchema<S> =
-  S extends StandardSchema<infer T> ? T : 
-  S extends { parse: (input: unknown) => infer T } ? T :
-  S extends { safeParse: (input: unknown) => { success: true; data: infer T } } ? T :
-  unknown;
+  S extends StandardSchema<infer T>
+    ? T
+    : S extends { parse: (input: unknown) => infer T }
+      ? T
+      : S extends {
+            safeParse: (input: unknown) => { success: true; data: infer T };
+          }
+        ? T
+        : unknown;
 
 // Enhanced validation spec
 export type ValidateSpec = {
   body?: StandardSchema<any>;
   params?: StandardSchema<any>;
-  query?: StandardSchema<any>;         // NEW
-  headers?: StandardSchema<any>;       // NEW
-  cookies?: StandardSchema<any>;       // NEW
+  query?: StandardSchema<any>; // NEW
+  headers?: StandardSchema<any>; // NEW
+  cookies?: StandardSchema<any>; // NEW
   custom?: (c: ApiContext) => void | Promise<void>; // NEW: Custom validation
 };
 ```
 
 **Implementation Files**:
+
 - `packages/core/src/components/index.ts` - Update validation types
 - `packages/core/src/runtime/pipeline.ts` - Update applyValidation function
 - `packages/core/src/index.ts` - Update exported types
@@ -120,12 +140,12 @@ export async function buildContext(req: Request): Promise<ApiContext> {
   const url = new URL(req.url);
   const query = url.searchParams;
   const headers = req.headers;
-  const cookies = parseCookies(req.headers.get('cookie') || '');
+  const cookies = parseCookies(req.headers.get("cookie") || "");
   const state = new Map<string, any>();
-  
+
   let parsedBody: any = undefined;
   const ct = req.headers.get("content-type") || "";
-  
+
   if (req.method !== "GET" && req.method !== "HEAD") {
     if (/application\/json/i.test(ct)) {
       parsedBody = await req.json();
@@ -140,7 +160,7 @@ export async function buildContext(req: Request): Promise<ApiContext> {
       parsedBody = await req.arrayBuffer(); // Raw binary data
     }
   }
-  
+
   return {
     params: {},
     body: parsedBody,
@@ -154,14 +174,16 @@ export async function buildContext(req: Request): Promise<ApiContext> {
     json: (data, init) => jsonResponder(data, init),
     text: (data, init) => textResponder(data, init),
     html: (data, init) => htmlResponder(data, init),
-    redirect: (url, status = 302) => new Response(null, { status, headers: { Location: url } }),
+    redirect: (url, status = 302) =>
+      new Response(null, { status, headers: { Location: url } }),
     stream: (stream, init) => new Response(stream, init),
-    file: (data, filename, init) => fileResponder(data, filename, init)
+    file: (data, filename, init) => fileResponder(data, filename, init),
   };
 }
 ```
 
 **Implementation Files**:
+
 - `packages/core/src/runtime/pipeline.ts` - Enhance buildContext function
 - `packages/core/src/runtime/pipeline.ts` - Add new response helper functions
 - Add utility functions for cookie parsing and MIME type detection
@@ -180,19 +202,19 @@ export async function buildContext(req: Request): Promise<ApiContext> {
 // Utility component built from <use>
 export const Guard = ({ condition, children, fallback }) => {
   const guardMiddleware = async (c, next) => {
-    const shouldAllow = typeof condition === 'function' 
-      ? await condition(c) 
+    const shouldAllow = typeof condition === 'function'
+      ? await condition(c)
       : condition;
-      
+
     if (!shouldAllow) {
-      return fallback 
+      return fallback
         ? (typeof fallback === 'function' ? fallback(c) : fallback)
         : new Response('Forbidden', { status: 403 });
     }
-    
+
     return next();
   };
-  
+
   return <use handler={guardMiddleware}>{children}</use>;
 };
 
@@ -201,7 +223,7 @@ export const Guard = ({ condition, children, fallback }) => {
   <get path="users" handler={getUsersV2} />
 </Guard>
 
-<Guard 
+<Guard
   condition={(c) => c.state.get('user')?.role === 'admin'}
   fallback={(c) => c.json({ error: 'Admin required' }, 403)}
 >
@@ -218,41 +240,47 @@ export const Guard = ({ condition, children, fallback }) => {
 ```tsx
 export const CORS = ({ origins, methods, headers, credentials, children }) => {
   const corsMiddleware = async (c, next) => {
-    const origin = c.req.headers.get('origin');
-    
+    const origin = c.req.headers.get("origin");
+
     // Handle preflight OPTIONS requests
-    if (c.req.method === 'OPTIONS') {
+    if (c.req.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
         headers: {
-          'Access-Control-Allow-Origin': origins.includes(origin) ? origin : origins[0],
-          'Access-Control-Allow-Methods': methods.join(', '),
-          'Access-Control-Allow-Headers': headers.join(', '),
-          'Access-Control-Allow-Credentials': credentials.toString()
-        }
+          "Access-Control-Allow-Origin": origins.includes(origin)
+            ? origin
+            : origins[0],
+          "Access-Control-Allow-Methods": methods.join(", "),
+          "Access-Control-Allow-Headers": headers.join(", "),
+          "Access-Control-Allow-Credentials": credentials.toString(),
+        },
       });
     }
-    
+
     const response = await next();
     if (response instanceof Response) {
-      response.headers.set('Access-Control-Allow-Origin', 
-        origins.includes(origin) ? origin : origins[0]);
+      response.headers.set(
+        "Access-Control-Allow-Origin",
+        origins.includes(origin) ? origin : origins[0]
+      );
       if (credentials) {
-        response.headers.set('Access-Control-Allow-Credentials', 'true');
+        response.headers.set("Access-Control-Allow-Credentials", "true");
       }
     }
     return response;
   };
-  
+
   return <use handler={corsMiddleware}>{children}</use>;
 };
 
 // Usage
-<CORS origins={['http://localhost:3000']} methods={['GET', 'POST']} credentials={true}>
-  <router path="api">
-    {/* API routes with CORS */}
-  </router>
-</CORS>
+<CORS
+  origins={["http://localhost:3000"]}
+  methods={["GET", "POST"]}
+  credentials={true}
+>
+  <router path="api">{/* API routes with CORS */}</router>
+</CORS>;
 ```
 
 ### 2.3 Transform Component
@@ -263,22 +291,24 @@ export const CORS = ({ origins, methods, headers, credentials, children }) => {
 export const Transform = ({ transform, children }) => {
   const transformMiddleware = async (c, next) => {
     const response = await next();
-    return typeof transform === 'function' ? transform(response, c) : response;
+    return typeof transform === "function" ? transform(response, c) : response;
   };
-  
+
   return <use handler={transformMiddleware}>{children}</use>;
 };
 
 // Usage
-<Transform transform={(response, c) => {
-  if (response instanceof Response) {
-    response.headers.set('X-Custom-Header', 'processed');
-    response.headers.set('X-Request-ID', crypto.randomUUID());
-  }
-  return response;
-}}>
+<Transform
+  transform={(response, c) => {
+    if (response instanceof Response) {
+      response.headers.set("X-Custom-Header", "processed");
+      response.headers.set("X-Request-ID", crypto.randomUUID());
+    }
+    return response;
+  }}
+>
   <get path="data" handler={getDataHandler} />
-</Transform>
+</Transform>;
 ```
 
 ### 2.4 Static File Component
@@ -290,12 +320,12 @@ export const Static = ({ path, directory, middleware = [] }) => {
   const staticHandler = async (c) => {
     const filePath = c.params.filepath || '';
     const fullPath = join(directory, filePath);
-    
+
     // Security: prevent directory traversal
     if (!fullPath.startsWith(resolve(directory))) {
       return new Response('Forbidden', { status: 403 });
     }
-    
+
     try {
       const file = await readFile(fullPath);
       const mimeType = getMimeType(fullPath);
@@ -306,9 +336,9 @@ export const Static = ({ path, directory, middleware = [] }) => {
       return new Response('Not Found', { status: 404 });
     }
   };
-  
+
   const StaticRoute = () => <get path={`${path}/*filepath`} handler={staticHandler} />;
-  
+
   // Apply middleware if provided
   if (middleware.length > 0) {
     return middleware.reduceRight(
@@ -316,16 +346,16 @@ export const Static = ({ path, directory, middleware = [] }) => {
       <StaticRoute />
     );
   }
-  
+
   return <StaticRoute />;
 };
 
 // Usage
 <Static path="/assets" directory="./public" />
-<Static 
-  path="/uploads" 
-  directory="./uploads" 
-  middleware={[authMiddleware]} 
+<Static
+  path="/uploads"
+  directory="./uploads"
+  middleware={[authMiddleware]}
 />
 ```
 
@@ -337,9 +367,9 @@ export const Static = ({ path, directory, middleware = [] }) => {
 export const FileUpload = ({ maxSize, allowedTypes, children }) => {
   const uploadMiddleware = async (c, next) => {
     if (!(c.body instanceof FormData)) {
-      return c.json({ error: 'Expected multipart/form-data' }, 400);
+      return c.json({ error: "Expected multipart/form-data" }, 400);
     }
-    
+
     const files = [];
     for (const [key, value] of c.body.entries()) {
       if (value instanceof File) {
@@ -352,22 +382,28 @@ export const FileUpload = ({ maxSize, allowedTypes, children }) => {
         files.push({ key, file: value });
       }
     }
-    
-    c.state.set('uploadedFiles', files);
+
+    c.state.set("uploadedFiles", files);
     return next();
   };
-  
+
   return <use handler={uploadMiddleware}>{children}</use>;
 };
 
 // Usage
-<FileUpload maxSize={10 * 1024 * 1024} allowedTypes={['image/jpeg', 'image/png']}>
-  <post path="upload" handler={(c) => {
-    const files = c.state.get('uploadedFiles');
-    // Process files...
-    return c.json({ uploaded: files.length });
-  }} />
-</FileUpload>
+<FileUpload
+  maxSize={10 * 1024 * 1024}
+  allowedTypes={["image/jpeg", "image/png"]}
+>
+  <post
+    path="upload"
+    handler={(c) => {
+      const files = c.state.get("uploadedFiles");
+      // Process files...
+      return c.json({ uploaded: files.length });
+    }}
+  />
+</FileUpload>;
 ```
 
 ### 2.6 Rate Limiting Component
@@ -377,34 +413,35 @@ export const FileUpload = ({ maxSize, allowedTypes, children }) => {
 ```tsx
 export const RateLimit = ({ requests, window, keyGen, children }) => {
   const rateLimitMiddleware = async (c, next) => {
-    const key = keyGen ? keyGen(c) : c.req.headers.get('x-forwarded-for') || 'default';
-    
+    const key = keyGen
+      ? keyGen(c)
+      : c.req.headers.get("x-forwarded-for") || "default";
+
     // Rate limiting logic (could use external store like Redis)
     const allowed = await checkRateLimit(key, requests, window);
-    
+
     if (!allowed) {
-      return c.json({ error: 'Rate limit exceeded' }, 429);
+      return c.json({ error: "Rate limit exceeded" }, 429);
     }
-    
+
     return next();
   };
-  
+
   return <use handler={rateLimitMiddleware}>{children}</use>;
 };
 
 // Usage
-<RateLimit 
-  requests={100} 
-  window={60000} 
-  keyGen={(c) => c.headers.get('x-api-key')}
+<RateLimit
+  requests={100}
+  window={60000}
+  keyGen={(c) => c.headers.get("x-api-key")}
 >
-  <router path="api">
-    {/* Rate limited routes */}
-  </router>
-</RateLimit>
+  <router path="api">{/* Rate limited routes */}</router>
+</RateLimit>;
 ```
 
 **Implementation Files**:
+
 - `packages/core/src/components/utilities/index.ts` - New utilities export
 - `packages/core/src/components/utilities/Guard.tsx`
 - `packages/core/src/components/utilities/CORS.tsx`
@@ -424,12 +461,13 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
 ```tsx
 // Enhanced path matching capabilities
 <get path="users/:id(\\d+)" />           // Regex constraints
-<get path="files/*filepath" />           // Named wildcards  
+<get path="files/*filepath" />           // Named wildcards
 <get path="api/v{version:1|2}/users" />  // Enum parameters
 <get path="posts/:slug?" />              // Optional parameters
 ```
 
 **Implementation Files**:
+
 - `packages/core/src/runtime/trie.ts` - Enhance path parsing and matching
 - `packages/core/src/runtime/traverse.ts` - Update route processing
 
@@ -439,33 +477,33 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
 
 ```tsx
 // Complete validation example
-<post 
+<post
   path="users"
   validate={{
     body: userSchema,
     params: z.object({ id: z.coerce.number() }),
-    query: z.object({ 
+    query: z.object({
       limit: z.coerce.number().optional(),
-      offset: z.coerce.number().optional() 
+      offset: z.coerce.number().optional(),
     }),
-    headers: z.object({ 
-      'x-api-key': z.string(),
-      'content-type': z.literal('application/json')
+    headers: z.object({
+      "x-api-key": z.string(),
+      "content-type": z.literal("application/json"),
     }),
     cookies: z.object({
-      session: z.string().optional()
+      session: z.string().optional(),
     }),
     custom: async (c) => {
       // Custom validation logic
-      if (c.headers.get('content-length') > MAX_SIZE) {
-        throw new Error('Payload too large');
+      if (c.headers.get("content-length") > MAX_SIZE) {
+        throw new Error("Payload too large");
       }
-    }
+    },
   }}
   handler={(c) => {
     // All data is now validated and type-safe
     const { limit, offset } = c.query;
-    const apiKey = c.headers.get('x-api-key');
+    const apiKey = c.headers.get("x-api-key");
     return c.json({ success: true });
   }}
 />
@@ -476,6 +514,7 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
 ## Implementation Timeline
 
 ### Phase 1: Core MVP (Priority 1) - Weeks 1-3
+
 1. **Week 1**: Enhanced ApiContext implementation
    - Add query, headers, cookies, url, state to ApiContext
    - Implement new response helpers (text, html, redirect, stream, file)
@@ -492,6 +531,7 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
    - Add custom validation support
 
 ### Phase 2: Utility Components (Priority 2) - Weeks 4-6
+
 1. **Week 4**: Core utility components
    - Implement Guard, CORS, Transform components
    - Create utility component architecture and exports
@@ -506,6 +546,7 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
    - Documentation and examples
 
 ### Phase 3: Advanced Features (Priority 3) - Weeks 7+
+
 1. Enhanced path patterns with regex/constraints
 2. Additional utility components based on user feedback
 3. Performance optimizations
@@ -516,18 +557,21 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
 ## Testing Strategy
 
 ### Unit Tests
+
 - Core routing and matching logic
 - Validation pipeline with different schema types
 - Response helper functions
 - Utility component functionality
 
 ### Integration Tests
+
 - Full request/response cycles
 - Middleware composition and state sharing
 - File upload and static serving
 - Error handling scenarios
 
 ### Performance Tests
+
 - Route matching performance with large route trees
 - Memory usage with concurrent requests
 - Middleware overhead measurements
@@ -537,17 +581,20 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
 ## Documentation Plan
 
 ### Core Documentation
+
 - Enhanced README files for each package
 - API reference documentation
 - Migration guide for breaking changes
 
 ### Examples and Tutorials
+
 - Complete application examples
 - Utility component usage examples
 - Integration with popular validation libraries
 - Deployment guides for different platforms
 
 ### Developer Experience
+
 - TypeScript definitions with comprehensive JSDoc
 - VS Code snippets for common patterns
 - Development tooling recommendations
@@ -557,6 +604,7 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
 ## Success Criteria
 
 ### MVP Success Metrics
+
 - ✅ Complete request data access (query, headers, cookies)
 - ✅ All common response types supported
 - ✅ File upload handling
@@ -567,6 +615,7 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
 - ✅ Production-ready performance
 
 ### Long-term Goals
+
 - Community adoption and ecosystem growth
 - Plugin/extension architecture
 - Additional platform adapters (Deno, Bun, Cloudflare Workers)
@@ -579,11 +628,13 @@ export const RateLimit = ({ requests, window, keyGen, children }) => {
 ## Risk Mitigation
 
 ### Technical Risks
+
 - **Breaking Changes**: Maintain backward compatibility where possible, provide migration guides
 - **Performance**: Regular benchmarking and optimization
 - **Ecosystem Integration**: Ensure compatibility with popular tools and libraries
 
-### Adoption Risks  
+### Adoption Risks
+
 - **Learning Curve**: Comprehensive documentation and examples
 - **Framework Competition**: Focus on unique JSX-based DX and type safety
 - **Community Building**: Early adopter program and feedback collection

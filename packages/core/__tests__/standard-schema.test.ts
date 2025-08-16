@@ -50,13 +50,30 @@ const standardSchema = {
     version: 1,
     vendor: "test-vendor",
     validate: (input: unknown) => {
-      // Accept any object, don't require specific fields for this test
-      if (typeof input === "object" && input !== null) {
+      // Require 'id' field for validation testing
+      if (typeof input === "object" && input !== null && "id" in input) {
         return { success: true, data: input };
       }
       return {
         success: false,
         issues: [{ message: "Invalid input for standard schema" }],
+      };
+    },
+  },
+};
+
+const standardParamsSchema = {
+  "~standard": {
+    version: 1,
+    vendor: "test-vendor",
+    validate: (input: unknown) => {
+      // Accept empty objects for params validation
+      if (typeof input === "object" && input !== null) {
+        return { success: true, data: input };
+      }
+      return {
+        success: false,
+        issues: [{ message: "Invalid input for standard params schema" }],
       };
     },
   },
@@ -133,7 +150,7 @@ beforeAll(() => {
       path: "standard-test",
       validate: {
         body: standardSchema,
-        params: standardSchema,
+        params: standardParamsSchema,
       },
       handler: (c: any) =>
         c.json({

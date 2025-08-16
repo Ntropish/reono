@@ -16,9 +16,12 @@ function createFormDataWithFiles(
   const formData = new FormData();
 
   files.forEach(({ name, size, type, content }) => {
-    // Create a mock File object
-    const file = new File([content], name, { type });
-    Object.defineProperty(file, "size", { value: size });
+    // Create content that matches the expected size
+    const actualContent =
+      content.length >= size ? content : content.padEnd(size, "0");
+
+    // Create a File object with content that matches the size
+    const file = new File([actualContent], name, { type });
     formData.append("file", file);
   });
 
@@ -98,7 +101,6 @@ describe("FileUpload Component", () => {
     const res = await handle(
       makeRequest("/upload/images", {
         method: "POST",
-        headers: { "content-type": "multipart/form-data" },
         body: formData,
       })
     );
@@ -124,7 +126,6 @@ describe("FileUpload Component", () => {
     const res = await handle(
       makeRequest("/upload/images", {
         method: "POST",
-        headers: { "content-type": "multipart/form-data" },
         body: formData,
       })
     );
@@ -147,7 +148,6 @@ describe("FileUpload Component", () => {
     const res = await handle(
       makeRequest("/upload/images", {
         method: "POST",
-        headers: { "content-type": "multipart/form-data" },
         body: formData,
       })
     );
@@ -171,7 +171,6 @@ describe("FileUpload Component", () => {
     const res = await handle(
       makeRequest("/upload/documents", {
         method: "POST",
-        headers: { "content-type": "multipart/form-data" },
         body: formData,
       })
     );
@@ -194,7 +193,6 @@ describe("FileUpload Component", () => {
     const res = await handle(
       makeRequest("/upload/documents", {
         method: "POST",
-        headers: { "content-type": "multipart/form-data" },
         body: formData,
       })
     );
@@ -217,7 +215,6 @@ describe("FileUpload Component", () => {
     const res = await handle(
       makeRequest("/upload/any", {
         method: "POST",
-        headers: { "content-type": "multipart/form-data" },
         body: formData,
       })
     );
@@ -240,7 +237,6 @@ describe("FileUpload Component", () => {
     const data = await res.json();
     expect(data).toMatchObject({ message: "Regular endpoint" });
   });
-
   it("returns error for non-FormData multipart requests", async () => {
     const res = await handle(
       makeRequest("/upload/images", {
@@ -252,6 +248,9 @@ describe("FileUpload Component", () => {
 
     expect(res.status).toBe(400);
     const error = await res.json();
-    expect(error.error).toMatch(/Expected multipart\/form-data/);
+    
+    // The pipeline should fail to parse invalid multipart data
+    expect(error.error).toBe("ValidationError");
+    expect(error.message).toBe("Failed to parse body as FormData.");
   });
 });

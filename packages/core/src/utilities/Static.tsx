@@ -42,13 +42,13 @@ export function Static({
   const staticHandler = async (ctx: ApiContext) => {
     // Extract file path from URL by removing the route prefix
     const pathname = ctx.url.pathname;
-    
+
     // We need to find what comes after our static route in the URL
     // The actual route path in the trie includes parent router prefixes
-    
+
     // For nested paths like js/app.js, we need to reconstruct from individual params
     let filePath = "";
-    
+
     // Check for two-level nested file parameter first (more specific)
     // If we have both singlefile and nestedfile, it means the nested route matched
     if (ctx.params.nestedfile) {
@@ -145,11 +145,23 @@ export function Static({
       (acc, mw) => createElement("use", { handler: mw }, acc),
       nestedFileRouteElement
     );
-    
+
     // Return all routes as children
-    return createElement("router", { path: "" }, wrappedExact, wrappedSingle, wrappedNested);
+    return createElement(
+      "router",
+      { path: "" },
+      wrappedExact,
+      wrappedSingle,
+      wrappedNested
+    );
   }
 
   // Return all routes as children
-  return createElement("router", { path: "" }, exactRouteElement, singleFileRouteElement, nestedFileRouteElement);
+  return createElement(
+    "router",
+    { path: "" },
+    exactRouteElement,
+    singleFileRouteElement,
+    nestedFileRouteElement
+  );
 }

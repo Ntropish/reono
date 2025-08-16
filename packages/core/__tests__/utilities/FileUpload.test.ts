@@ -248,7 +248,7 @@ describe("FileUpload Component", () => {
 
     expect(res.status).toBe(400);
     const error = await res.json();
-    
+
     // The pipeline should fail to parse invalid multipart data
     expect(error.error).toBe("ValidationError");
     expect(error.message).toBe("Failed to parse body as FormData.");

@@ -1,364 +1,230 @@
-# Reono MVP Implementation Plan
+# Reono Scenario-Based Integration Testing Plan
 
 ## Project Overview
 
-**Reono** is an experimental library that enables developers to define HTTP API endpoints using JSX syntax. The library leverages modern Web APIs and provides a type-safe, composable approach to building HTTP services.
+**Reono** has completed all core functionality and utility components. Before finalizing documentation, we need to validate that all components work together seamlessly in realistic, complex scenarios that mirror real-world API development challenges.
 
-### Core Architecture Principles
+### Completed Components Available for Integration
 
-- **Intrinsic Elements**: Core JSX elements handled directly by the runtime (`<router>`, `<get>`, `<post>`, `<use>`, etc.)
-- **Utility Components**: Convenience components built from intrinsic elements for common patterns (sugar/boilerplate reduction)
-- **Middleware via `<use>`**: All middleware applications go through the existing `<use>` element
-- **Standard Schema**: Support standard schema interface for maximum flexibility while preserving type safety
-- **Web API Compliance**: Full compliance with modern Web API standards throughout the system
+- ✅ **Core Runtime**: Enhanced ApiContext, standard schema support, all HTTP methods
+- ✅ **Guard**: Conditional access control with static/dynamic conditions
+- ✅ **CORS**: Cross-origin resource sharing with automatic OPTIONS handling
+- ✅ **Transform**: Request/response transformation middleware
+- ✅ **Static**: Secure static file serving with directory traversal protection
+- ✅ **RateLimit**: In-memory rate limiting with configurable policies
+- ✅ **FileUpload**: File validation, size limits, MIME type restrictions
 
----
+### Testing Philosophy
 
-## Current State Analysis
+**Scenario-based integration testing** focuses on realistic use cases that combine multiple components to validate:
 
-### ✅ **COMPLETED** - Phase 1: Enhanced Core API
-
-- ✅ **1.1 Enhanced ApiContext** - Complete
-  - Enhanced request data access (query, headers, cookies, url, state)
-  - Additional response helpers (text, html, redirect, stream, file)
-  - Cookie parsing and MIME type detection utilities
-
-- ✅ **1.2 Standard Schema Support** - Complete
-  - Support for multiple validation libraries (Zod, Joi, ~standard)
-  - Enhanced validation for query, headers, cookies, custom validation
-  - Backward compatibility maintained
-
-- ✅ **1.3 Enhanced Body Parsing** - Complete
-  - FormData, ArrayBuffer, multipart parsing support
-  - Enhanced error handling for validation failures
-
-### ✅ **COMPLETED** - Phase 2: Utility Components (Sugar Elements)
-
-- ✅ **Guard Component** - 6/6 tests passing
-  - Static boolean and function-based conditions
-  - Custom fallback responses, async condition support
-  - State-based validation
-
-- ✅ **CORS Component** - 7/7 tests passing
-  - Automatic OPTIONS route injection for preflight requests
-  - Origin validation and wildcard support
-  - Nested router compatibility
-
-- ✅ **Transform Component** - 6/6 tests passing
-  - Request/response transformation middleware
-  - Header preservation and Response object handling
-  - Middleware chain integration
-
-- ✅ **Static Component** - 8/8 tests passing
-  - Static file serving with security (directory traversal protection)
-  - Middleware support and nested router contexts
-  - Multi-level file path handling
-
-- ✅ **RateLimit Component** - 8/8 tests passing
-  - In-memory rate limiting with configurable policies
-  - Custom key generation and header management
-  - Time window and request count controls
-
-- ⚠️ **FileUpload Component** - Implementation complete, test environment limitations
-  - File validation (size, MIME type) and processing
-  - FormData handling and file extraction
-  - **Issue**: Tests fail in Node.js/vitest due to FormData parsing limitations (works in production)
-
-### ✅ **COMPLETED** - Additional Core Features
-
-- ✅ **HTTP Method Support** - Complete
-  - Added OPTIONS and HEAD intrinsic elements
-  - Updated routing and method handling throughout the system
-
-- ✅ **Enhanced Error Handling** - Complete
-  - Validation error reporting with detailed messages
-  - FormData parsing error protection in pipeline
+- Component composition and interaction
+- Middleware execution order and state sharing
+- Error handling across component boundaries
+- Performance under realistic load patterns
+- Type safety and developer experience
 
 ---
 
-## ⚠️ **REMAINING WORK** - Phase 3: Documentation and Polish
+## Selected Integration Scenarios
 
-### 3.1 FileUpload Component Test Environment
+### 🎯 **Scenario 1: Content Management API with File Uploads**
 
-**Status**: ⚠️ Implementation complete, test environment limitations
+**Complexity**: Medium  
+**Focus**: FileUpload + Guard + RateLimit + CORS + Transform
 
-**Goal**: Resolve test environment limitations for FileUpload component
+**Real-world context**: A blog/CMS API that handles authenticated content creation with image uploads, rate limiting for abuse prevention, and CORS for frontend integration.
 
-**Issue**: FormData parsing in Node.js/vitest environment differs from browser/production environments
+**Key Features to Test**:
 
-**Current State**: Component implementation is production-ready and works correctly in real HTTP environments. Tests fail due to Node.js FormData parsing limitations, not implementation issues.
+- Multi-component middleware stacking
+- Authentication flow with Guard component
+- File upload validation and processing
+- Rate limiting by user/endpoint
+- CORS preflight handling
+- Request/response transformation
+- Error propagation through middleware chain
 
-**Recommendation**: Accept current state and document the limitation. Component is production-ready for use.
-
-### 3.2 Documentation and Examples
-
-**Status**: ⏳ In progress
-
-**Goal**: Comprehensive documentation for completed features
-
-**Tasks**:
-
-- Update README files with new utility components and HTTP method support
-- Create usage examples for each utility component (Guard, CORS, Transform, Static, FileUpload, RateLimit)
-- Document the enhanced ApiContext features
-- Migration guide for standard schema support
-- Best practices guide for utility component composition
-
-### 3.3 Performance and Polish
-
-**Status**: ⏳ Pending
-
-**Goal**: Ensure production readiness
-
-**Tasks**:
-
-- Performance testing with utility components
-- Memory usage analysis with complex middleware chains
-- Bundle size optimization
-- TypeScript definition completeness review
-
-### 3.4 Enhanced Path Patterns (Optional Enhancement)
-
-**Status**: ⏳ Optional
-
-**Goal**: Support advanced routing patterns in existing intrinsic elements
+**API Endpoints**:
 
 ```tsx
-// Enhanced path matching capabilities
-<get path="users/:id(\\d+)" />           // Regex constraints
-<get path="files/*filepath" />           // Named wildcards (partially done)
-<get path="api/v{version:1|2}/users" />  // Enum parameters
-<get path="posts/:slug?" />              // Optional parameters
+// POST /api/content/articles (with optional image uploads)
+// GET /api/content/articles/:id
+// PUT /api/content/articles/:id (with optional image updates)
+// DELETE /api/content/articles/:id
+// POST /api/content/images (standalone image upload)
+// GET /uploads/* (static file serving)
 ```
 
-**Implementation Files**:
+**Technical Challenges**:
 
-- `packages/core/src/runtime/trie.ts` - Enhance path parsing and matching
-- `packages/core/src/runtime/traverse.ts` - Update route processing
-
----
-
-## ✅ **COMPLETED** - Phase 3: Advanced Features
-
-### 3.1 All HTTP Methods Support
-
-- ✅ Added OPTIONS and HEAD intrinsic elements
-- ✅ Updated routing system to handle all HTTP methods
-- ✅ Enhanced CORS component for proper OPTIONS preflight handling
-
-### 3.2 Production-Ready Utility Components
-
-- ✅ All 6 utility components implemented and tested
-- ✅ Comprehensive test coverage (48/49 tests passing, FileUpload env-limited)
-- ✅ Middleware integration and error handling
-- ✅ Type-safe interfaces and JSDoc documentation
+- Authenticated file uploads with size/type validation
+- Different rate limits for different user tiers
+- Image processing and transformation
+- Proper CORS configuration for file uploads
+- State sharing between Guard and other components
 
 ---
 
-## ⏳ **REMAINING OPTIONAL ENHANCEMENTS**
+### 🎯 **Scenario 2: Multi-Tenant SaaS API Gateway**
 
-### Future Phase: Advanced Validation Features
+**Complexity**: Medium-High  
+**Focus**: Guard + RateLimit + Transform + CORS + Static
 
-**Goal**: Enhanced validation capabilities
+**Real-world context**: A SaaS platform API that serves multiple tenants with different access levels, rate limits, and response transformations based on subscription tiers.
+
+**Key Features to Test**:
+
+- Complex nested Guard conditions (tenant + user + subscription)
+- Tiered rate limiting (free vs premium users)
+- Dynamic response transformation based on user context
+- API versioning with backwards compatibility
+- Static documentation serving
+- Cross-origin requests from multiple domains
+
+**API Endpoints**:
 
 ```tsx
-// Complete validation example
-<post
-  path="users"
-  validate={{
-    body: userSchema,
-    params: z.object({ id: z.coerce.number() }),
-    query: z.object({
-      limit: z.coerce.number().optional(),
-      offset: z.coerce.number().optional(),
-    }),
-    headers: z.object({
-      "x-api-key": z.string(),
-      "content-type": z.literal("application/json"),
-    }),
-    cookies: z.object({
-      session: z.string().optional(),
-    }),
-    custom: async (c) => {
-      // Custom validation logic
-      if (c.headers.get("content-length") > MAX_SIZE) {
-        throw new Error("Payload too large");
-      }
-    },
-  }}
-  handler={(c) => {
-    // All data is now validated and type-safe
-    const { limit, offset } = c.query;
-    const apiKey = c.headers.get("x-api-key");
-    return c.json({ success: true });
-  }}
-/>
+// /api/v1/tenant/:tenantId/users
+// /api/v1/tenant/:tenantId/analytics
+// /api/v1/tenant/:tenantId/billing
+// /api/v2/tenant/:tenantId/* (newer version)
+// /docs/* (static API documentation)
+// /health (public endpoint)
 ```
 
----
+**Technical Challenges**:
 
-## ✅ **PROJECT STATUS SUMMARY**
-
-### Core Implementation: **COMPLETE** ✅
-
-- **Enhanced ApiContext**: Full request data access, comprehensive response helpers
-- **Standard Schema Support**: Multi-library validation (Zod, Joi, ~standard) with backward compatibility
-- **Enhanced Body Parsing**: FormData, ArrayBuffer, multipart with robust error handling
-- **All HTTP Methods**: GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD support
-
-### Utility Components: **COMPLETE** ✅
-
-- **Guard**: 6/6 tests passing - Conditional routing with static/dynamic conditions
-- **CORS**: 7/7 tests passing - Automatic OPTIONS injection, origin validation
-- **Transform**: 6/6 tests passing - Request/response transformation with header preservation
-- **Static**: 8/8 tests passing - Secure file serving with directory traversal protection
-- **RateLimit**: 8/8 tests passing - In-memory rate limiting with configurable policies
-- **FileUpload**: Production-ready implementation (test env limitations in Node.js/vitest)
-
-### Current Test Status: **81/88 tests passing** ✅
-
-- **10/11 test files passing**
-- **Only FileUpload tests affected by Node.js FormData parsing** (component works in production)
-- **All other utility components: 100% test pass rate**
-  - Guard: 6/6 tests ✅
-  - CORS: 7/7 tests ✅
-  - Transform: 6/6 tests ✅
-  - Static: 8/8 tests ✅
-  - RateLimit: 8/8 tests ✅
-  - FileUpload: 1/8 tests ✅ (7 failures due to test environment, not implementation)
+- Tenant isolation through Guard conditions
+- Dynamic rate limiting based on subscription tier
+- Response filtering based on user permissions
+- API key validation and tenant resolution
+- Version-specific CORS policies
 
 ---
 
-## Implementation Timeline
+### 🎯 **Scenario 3: Real-time Gaming Leaderboard API**
 
-### ✅ Phase 1: Core MVP (COMPLETED) - Weeks 1-3
+**Complexity**: Medium  
+**Focus**: RateLimit + Guard + Transform + Static + CORS
 
-1. **✅ Week 1**: Enhanced ApiContext implementation
-   - ✅ Add query, headers, cookies, url, state to ApiContext
-   - ✅ Implement new response helpers (text, html, redirect, stream, file)
-   - ✅ Update buildContext function with enhanced parsing
+**Real-world context**: A gaming API that handles high-frequency score submissions, leaderboard queries, and serves game assets with aggressive rate limiting and real-time data transformation.
 
-2. **✅ Week 2**: Standard Schema support
-   - ✅ Implement StandardSchema type definitions
-   - ✅ Update validation pipeline to support multiple schema formats
-   - ✅ Maintain backward compatibility with existing Zod usage
+**Key Features to Test**:
 
-3. **✅ Week 3**: Enhanced body parsing and validation
-   - ✅ Support FormData, ArrayBuffer, multipart parsing
-   - ✅ Implement complete validation for query, headers, cookies
-   - ✅ Add custom validation support
+- High-frequency request handling
+- Aggressive rate limiting with burst allowances
+- Real-time score validation and transformation
+- Static game asset serving with caching
+- WebSocket preparation (CORS for upgrade)
+- Anti-cheat validation through Guard
 
-### ✅ Phase 2: Utility Components (COMPLETED) - Weeks 4-6
+**API Endpoints**:
 
-1. **✅ Week 4**: Core utility components
-   - ✅ Implement Guard, CORS, Transform components
-   - ✅ Create utility component architecture and exports
+```tsx
+// POST /api/game/scores (high frequency)
+// GET /api/game/leaderboard/:gameId
+// GET /api/game/player/:playerId/stats
+// GET /api/game/player/:playerId/achievements
+// GET /assets/game/* (static game files)
+// GET /api/game/matches/:matchId
+```
 
-2. **✅ Week 5**: File handling utilities
-   - ✅ Implement Static file serving component
-   - ✅ Implement FileUpload component with validation
+**Technical Challenges**:
 
-3. **✅ Week 6**: Advanced utilities
-   - ✅ Implement RateLimit component
-   - ✅ Add all HTTP method support (OPTIONS, HEAD)
-   - ✅ Comprehensive testing and debugging
-
-### ⏳ Phase 3: Documentation and Polish (IN PROGRESS) - Weeks 7+
-
-1. **⏳ In Progress**: Documentation and examples for completed features
-2. **⏳ Pending**: Performance optimizations and bundle analysis
-3. **⏳ Optional**: Enhanced path patterns with regex/constraints
-4. **⏳ Future**: OpenAPI integration (long-term goal)
+- Sub-second rate limiting for score submissions
+- Score validation and anti-cheat detection
+- Leaderboard data transformation and aggregation
+- Static asset serving with proper caching headers
+- High concurrency and performance testing
 
 ---
 
-## Testing Strategy
+## Implementation Strategy
 
-### Unit Tests
+### Phase 1: Scenario 1 Implementation (Current Focus)
 
-- Core routing and matching logic
-- Validation pipeline with different schema types
-- Response helper functions
-- Utility component functionality
+**Target**: Content Management API with File Uploads
 
-### Integration Tests
+**Step 1: Core API Structure**
 
-- Full request/response cycles
-- Middleware composition and state sharing
-- File upload and static serving
-- Error handling scenarios
+- Design the content/article data model
+- Implement basic CRUD operations
+- Set up authentication simulation
 
-### Performance Tests
+**Step 2: Component Integration**
 
-- Route matching performance with large route trees
-- Memory usage with concurrent requests
-- Middleware overhead measurements
+- Add FileUpload for image handling
+- Implement Guard for authentication
+- Configure RateLimit for abuse prevention
+- Enable CORS for frontend integration
+- Add Transform for response formatting
 
----
+**Step 3: Advanced Features**
 
-## Documentation Plan
+- Multiple file uploads per article
+- Image processing and validation
+- User-based rate limiting
+- Error handling across all components
 
-### Core Documentation
+**Step 4: Integration Testing**
 
-- Enhanced README files for each package
-- API reference documentation
-- Migration guide for breaking changes
+- Full request lifecycle testing
+- Component interaction validation
+- Error boundary testing
+- Performance benchmarking
 
-### Examples and Tutorials
+### Test Coverage Goals
 
-- Complete application examples
-- Utility component usage examples
-- Integration with popular validation libraries
-- Deployment guides for different platforms
+**Functional Testing**:
 
-### Developer Experience
+- ✅ All components work together without conflicts
+- ✅ Middleware execution order is correct
+- ✅ State is properly shared between components
+- ✅ Error handling works across component boundaries
+- ✅ Type safety is maintained throughout the stack
 
-- TypeScript definitions with comprehensive JSDoc
-- VS Code snippets for common patterns
-- Development tooling recommendations
+**Performance Testing**:
+
+- ✅ Request latency with full middleware stack
+- ✅ Memory usage with complex component trees
+- ✅ Concurrent request handling
+- ✅ Rate limiting effectiveness under load
+
+**Integration Testing**:
+
+- ✅ Real HTTP requests through full middleware chain
+- ✅ File upload with validation and rate limiting
+- ✅ CORS preflight with complex middleware
+- ✅ Authentication flow with multiple protected endpoints
 
 ---
 
 ## Success Criteria
 
-### MVP Success Metrics
+### For Each Scenario:
 
-- ✅ Complete request data access (query, headers, cookies)
-- ✅ All common response types supported
-- ✅ File upload handling
-- ✅ Static file serving
-- ✅ Multiple validation library support
-- ✅ Rich utility component ecosystem (6/6 components implemented)
-- ✅ Comprehensive TypeScript support
-- ✅ Production-ready performance
-- ✅ All HTTP methods supported (GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD)
-- ✅ 48/49 tests passing (FileUpload env-limited)
+1. **Full Integration**: All utility components work together seamlessly
+2. **Realistic Complexity**: Tests mirror real-world API development challenges
+3. **Performance Validation**: Acceptable latency and memory usage
+4. **Error Robustness**: Graceful handling of edge cases and failures
+5. **Developer Experience**: Clean, readable code with proper TypeScript inference
 
-### Long-term Goals
+### Overall Goals:
 
-- Community adoption and ecosystem growth
-- Plugin/extension architecture
-- Additional platform adapters (Deno, Bun, Cloudflare Workers)
-- Real-time features (WebSockets, SSE)
-- Development tooling and debugging support
-- OpenAPI integration and documentation generation
+- **Component Composition**: Validate that components can be nested and combined arbitrarily
+- **Middleware Order**: Confirm that middleware execution order is predictable and configurable
+- **State Management**: Ensure proper context state sharing between components
+- **Production Readiness**: Verify the library is ready for real-world deployment
 
 ---
 
-## Risk Mitigation
+## Next Steps
 
-### Technical Risks
+1. **Implement Scenario 1**: Start with Content Management API
+2. **Create Integration Test Suite**: Comprehensive testing framework
+3. **Performance Benchmarking**: Establish baseline performance metrics
+4. **Documentation**: Based on validated real-world usage patterns
+5. **Scenario 2 & 3**: Expand to additional complexity levels
 
-- **Breaking Changes**: Maintain backward compatibility where possible, provide migration guides
-- **Performance**: Regular benchmarking and optimization
-- **Ecosystem Integration**: Ensure compatibility with popular tools and libraries
-
-### Adoption Risks
-
-- **Learning Curve**: Comprehensive documentation and examples
-- **Framework Competition**: Focus on unique JSX-based DX and type safety
-- **Community Building**: Early adopter program and feedback collection
-
----
-
-This plan provides a comprehensive roadmap for building Reono into a production-ready framework while maintaining its elegant JSX-based API and strong TypeScript integration.
+This approach will provide confidence that Reono is production-ready and give us concrete examples for documentation and best practices guides.

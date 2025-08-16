@@ -25,7 +25,7 @@ yarn add @reono/node-server reono
 ## Basic Usage
 
 ```tsx
-import { createApp } from '@reono/node-server';
+import { createApp } from "@reono/node-server";
 
 const App = () => (
   <router path="api">
@@ -41,7 +41,7 @@ app.serve(<App />);
 
 // Start the HTTP server
 app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+  console.log("Server running on http://localhost:3000");
 });
 ```
 
@@ -66,6 +66,7 @@ app.serve(<App />);
 ```
 
 **Parameters:**
+
 - `element: JSXElement` - The root JSX element of your Reono application
 
 **Note:** This method must be called before `listen()`.
@@ -76,11 +77,12 @@ Starts the HTTP server on the specified port.
 
 ```typescript
 app.listen(3000, () => {
-  console.log('Server started!');
+  console.log("Server started!");
 });
 ```
 
 **Parameters:**
+
 - `port: number` - The port number to listen on
 - `callback?: () => void` - Optional callback executed when the server starts
 
@@ -92,20 +94,21 @@ Stops the HTTP server.
 
 ```typescript
 app.close((err) => {
-  if (err) console.error('Error closing server:', err);
-  else console.log('Server closed');
+  if (err) console.error("Error closing server:", err);
+  else console.log("Server closed");
 });
 ```
 
 **Parameters:**
+
 - `callback?: (err?: Error) => void` - Optional callback executed when the server closes
 
 ## Complete Example
 
 ```tsx
 // server.tsx
-import { createApp } from '@reono/node-server';
-import { z } from 'zod';
+import { createApp } from "@reono/node-server";
+import { z } from "zod";
 
 const userSchema = z.object({
   name: z.string(),
@@ -114,8 +117,8 @@ const userSchema = z.object({
 
 // Mock data store
 let users = [
-  { id: 1, name: 'Alice', email: 'alice@example.com' },
-  { id: 2, name: 'Bob', email: 'bob@example.com' },
+  { id: 1, name: "Alice", email: "alice@example.com" },
+  { id: 2, name: "Bob", email: "bob@example.com" },
 ];
 
 const logger = (c, next) => {
@@ -129,60 +132,60 @@ const App = () => (
       <router path="users">
         {/* GET /api/v1/users */}
         <get path="" handler={(c) => c.json(users)} />
-        
+
         {/* POST /api/v1/users */}
-        <post 
-          path="" 
+        <post
+          path=""
           validate={{ body: userSchema }}
           handler={(c) => {
             const newUser = { id: Date.now(), ...c.body };
             users.push(newUser);
             return c.json(newUser, 201);
-          }} 
+          }}
         />
-        
+
         {/* GET /api/v1/users/:id */}
-        <get 
+        <get
           path=":id"
           validate={{ params: z.object({ id: z.coerce.number() }) }}
           handler={(c) => {
-            const user = users.find(u => u.id === c.params.id);
+            const user = users.find((u) => u.id === c.params.id);
             if (!user) {
-              return new Response('User not found', { status: 404 });
+              return new Response("User not found", { status: 404 });
             }
             return c.json(user);
-          }} 
+          }}
         />
-        
+
         {/* PUT /api/v1/users/:id */}
-        <put 
+        <put
           path=":id"
-          validate={{ 
+          validate={{
             params: z.object({ id: z.coerce.number() }),
-            body: userSchema 
+            body: userSchema,
           }}
           handler={(c) => {
-            const index = users.findIndex(u => u.id === c.params.id);
+            const index = users.findIndex((u) => u.id === c.params.id);
             if (index === -1) {
-              return new Response('User not found', { status: 404 });
+              return new Response("User not found", { status: 404 });
             }
             users[index] = { id: c.params.id, ...c.body };
             return c.json(users[index]);
-          }} 
+          }}
         />
-        
+
         {/* DELETE /api/v1/users/:id */}
-        <delete 
+        <delete
           path=":id"
           validate={{ params: z.object({ id: z.coerce.number() }) }}
           handler={(c) => {
-            const index = users.findIndex(u => u.id === c.params.id);
+            const index = users.findIndex((u) => u.id === c.params.id);
             if (index === -1) {
-              return new Response('User not found', { status: 404 });
+              return new Response("User not found", { status: 404 });
             }
             users.splice(index, 1);
-            return new Response('', { status: 204 });
-          }} 
+            return new Response("", { status: 204 });
+          }}
         />
       </router>
     </router>
@@ -200,10 +203,10 @@ app.listen(PORT, () => {
 });
 
 // Graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n🛑 Shutting down server...');
+process.on("SIGINT", () => {
+  console.log("\n🛑 Shutting down server...");
   app.close(() => {
-    console.log('✅ Server closed');
+    console.log("✅ Server closed");
     process.exit(0);
   });
 });
@@ -256,6 +259,7 @@ Make sure your `tsconfig.json` is configured for Reono:
 ## Development vs Production
 
 ### Development
+
 Use `tsx` for development with hot reloading:
 
 ```bash
@@ -263,6 +267,7 @@ npx tsx watch src/server.tsx
 ```
 
 ### Production
+
 Compile TypeScript and run the compiled JavaScript:
 
 ```bash
@@ -285,16 +290,12 @@ const errorHandler = async (c, next) => {
   try {
     return await next();
   } catch (error) {
-    console.error('Route error:', error);
-    return c.json({ error: 'Something went wrong' }, 500);
+    console.error("Route error:", error);
+    return c.json({ error: "Something went wrong" }, 500);
   }
 };
 
-const App = () => (
-  <use handler={errorHandler}>
-    {/* Your routes */}
-  </use>
-);
+const App = () => <use handler={errorHandler}>{/* Your routes */}</use>;
 ```
 
 ## Request/Response Conversion
@@ -302,12 +303,14 @@ const App = () => (
 The package handles conversion between Node.js and Web API standards:
 
 ### Request Conversion
+
 - Converts Node.js `IncomingMessage` to Web API `Request`
 - Handles headers, method, URL, and body streaming
 - Supports both HTTP and HTTPS
 - Automatically detects protocol from socket encryption
 
 ### Response Conversion
+
 - Converts Web API `Response` to Node.js HTTP response
 - Transfers status, headers, and body
 - Handles streaming and buffering appropriately

@@ -6,17 +6,10 @@ import { cors } from "../middleware/cors";
 import { logger } from "../middleware/logger";
 import { errorHandler } from "../middleware/error-handler";
 
-// Global type declarations for tests
-declare global {
-  var TEST_PORT: number;
-  var TEST_BASE_URL: string;
-  var TEST_API_KEYS: {
-    ADMIN: string;
-    USER: string;
-    PREMIUM: string;
-    INVALID: string;
-  };
-}
+import { createTEST_BASE_URL, TEST_API_KEYS, TEST_TENANTS } from "./util";
+
+const TEST_PORT = 8011;
+const TEST_BASE_URL = createTEST_BASE_URL(TEST_PORT);
 
 // Test application
 const App = () => (

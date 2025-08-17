@@ -5,7 +5,7 @@ import { errorHandler } from "../middleware/error-handler";
 import { authGuard, users } from "../middleware/auth";
 
 // Performance test configuration (separate from integration tests)
-const PERF_TEST_PORT = 8083;
+const PERF_TEST_PORT = 8012;
 const PERF_TEST_BASE_URL = `http://localhost:${PERF_TEST_PORT}`;
 
 // Test API keys for authentication

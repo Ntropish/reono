@@ -1,6 +1,10 @@
 {
   "name": "@reono/node-server",
-  "version": "1.0.4",
+  "version": "1.0.6",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ntropish/reono.git"
+  },
   "description": "",
   "main": "index.js",
   "exports": {

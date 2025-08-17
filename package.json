@@ -1,7 +1,12 @@
 {
-  "name": "shadcn-ui-monorepo",
+  "name": "@reono/root",
   "version": "0.0.1",
   "private": true,
+  "description": "Reono monorepo root package",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ntropish/reono.git"
+  },
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",

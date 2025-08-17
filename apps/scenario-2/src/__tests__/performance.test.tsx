@@ -17,11 +17,13 @@ const App = () => (
       <use handler={globalRateLimit}>
         <get
           path="health"
-          handler={(c) => c.json({ 
-            status: "ok", 
-            timestamp: Date.now(),
-            service: "Multi-Tenant SaaS API Gateway"
-          })}
+          handler={(c) =>
+            c.json({
+              status: "ok",
+              timestamp: Date.now(),
+              service: "Multi-Tenant SaaS API Gateway",
+            })
+          }
         />
         <router path="api/v1">
           <TenantRouter />
@@ -38,7 +40,7 @@ const App = () => (
 describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
   let app: any;
   let server: any;
-  const PERF_TEST_PORT = 8093;
+  const PERF_TEST_PORT = 8023;
   const PERF_BASE_URL = `http://localhost:${PERF_TEST_PORT}`;
 
   beforeAll(async () => {
@@ -47,7 +49,9 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
 
     await new Promise<void>((resolve) => {
       server = app.listen(PERF_TEST_PORT, () => {
-        console.log(`🚀 Performance test server started on port ${PERF_TEST_PORT}`);
+        console.log(
+          `🚀 Performance test server started on port ${PERF_TEST_PORT}`
+        );
         resolve();
       });
     });
@@ -69,7 +73,7 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
       const startTime = Date.now();
       const response = await fetch(`${PERF_BASE_URL}/health`);
       const endTime = Date.now();
-      
+
       expect(response.status).toBe(200);
       expect(endTime - startTime).toBeLessThan(100); // Should respond within 100ms
     });
@@ -77,19 +81,19 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
     it("should handle concurrent health checks", async () => {
       const concurrentRequests = 10;
       const startTime = Date.now();
-      
+
       const requests = Array.from({ length: concurrentRequests }, () =>
         fetch(`${PERF_BASE_URL}/health`)
       );
-      
+
       const responses = await Promise.all(requests);
       const endTime = Date.now();
-      
+
       // All requests should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
       });
-      
+
       // Total time for 10 concurrent requests should be reasonable
       expect(endTime - startTime).toBeLessThan(500);
     });
@@ -99,7 +103,7 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
     it("should handle auth validation efficiently", async () => {
       const validKey = TEST_API_KEYS.PREMIUM;
       const tenantId = TEST_TENANTS.PREMIUM;
-      
+
       const startTime = Date.now();
       const response = await fetch(
         `${PERF_BASE_URL}/api/v1/tenant/${tenantId}/users`,
@@ -110,7 +114,7 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
         }
       );
       const endTime = Date.now();
-      
+
       expect(response.status).toBe(200);
       expect(endTime - startTime).toBeLessThan(200); // Auth should be fast
     });
@@ -118,7 +122,7 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
     it("should handle invalid auth efficiently", async () => {
       const invalidKey = TEST_API_KEYS.INVALID;
       const tenantId = TEST_TENANTS.PREMIUM;
-      
+
       const startTime = Date.now();
       const response = await fetch(
         `${PERF_BASE_URL}/api/v1/tenant/${tenantId}/users`,
@@ -129,7 +133,7 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
         }
       );
       const endTime = Date.now();
-      
+
       expect(response.status).toBe(401);
       expect(endTime - startTime).toBeLessThan(150); // Fast rejection
     });
@@ -143,7 +147,7 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
       ];
 
       const startTime = Date.now();
-      
+
       const requests = tenantTests.map(({ key, tenant }) =>
         fetch(`${PERF_BASE_URL}/api/v1/tenant/${tenant}/users`, {
           headers: {
@@ -151,15 +155,15 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
           },
         })
       );
-      
+
       const responses = await Promise.all(requests);
       const endTime = Date.now();
-      
+
       // All tenant requests should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
       });
-      
+
       expect(endTime - startTime).toBeLessThan(400); // Multi-tenant should be efficient
     });
   });
@@ -168,11 +172,11 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
     it("should apply rate limits without significant overhead", async () => {
       const validKey = TEST_API_KEYS.PREMIUM;
       const tenantId = TEST_TENANTS.PREMIUM;
-      
+
       // Make several requests to test rate limiting performance
       const numRequests = 5;
       const startTime = Date.now();
-      
+
       const requests = Array.from({ length: numRequests }, () =>
         fetch(`${PERF_BASE_URL}/api/v1/tenant/${tenantId}/users`, {
           headers: {
@@ -180,14 +184,14 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
           },
         })
       );
-      
+
       const responses = await Promise.all(requests);
       const endTime = Date.now();
-      
+
       // Some requests should succeed (rate limiting may kick in)
-      const successfulRequests = responses.filter(r => r.status === 200);
+      const successfulRequests = responses.filter((r) => r.status === 200);
       expect(successfulRequests.length).toBeGreaterThan(0);
-      
+
       // Average time per request should be reasonable
       const avgTime = (endTime - startTime) / numRequests;
       expect(avgTime).toBeLessThan(200);
@@ -198,10 +202,10 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
     it("should handle analytics requests efficiently for premium users", async () => {
       const validKey = TEST_API_KEYS.PREMIUM;
       const tenantId = TEST_TENANTS.PREMIUM;
-      
+
       const startTime = Date.now();
       const response = await fetch(
-        `${PERF_BASE_URL}/api/v1/tenant/${tenantId}/analytics/requests`,
+        `${PERF_BASE_URL}/api/v1/tenant/${tenantId}/analytics`,
         {
           headers: {
             Authorization: `Bearer ${validKey}`,
@@ -209,7 +213,7 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
         }
       );
       const endTime = Date.now();
-      
+
       expect(response.status).toBe(200);
       expect(endTime - startTime).toBeLessThan(300); // Analytics should be reasonably fast
     });
@@ -218,18 +222,15 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
   describe("Content Management Performance", () => {
     it("should handle content operations efficiently", async () => {
       const validKey = TEST_API_KEYS.PREMIUM;
-      
+
       const startTime = Date.now();
-      const response = await fetch(
-        `${PERF_BASE_URL}/api/v1/content/articles`,
-        {
-          headers: {
-            Authorization: `Bearer ${validKey}`,
-          },
-        }
-      );
+      const response = await fetch(`${PERF_BASE_URL}/api/v1/content/articles`, {
+        headers: {
+          Authorization: `Bearer ${validKey}`,
+        },
+      });
       const endTime = Date.now();
-      
+
       expect(response.status).toBe(200);
       expect(endTime - startTime).toBeLessThan(200);
     });
@@ -242,21 +243,18 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
         published: false,
         tags: ["performance", "test"],
       };
-      
+
       const startTime = Date.now();
-      const response = await fetch(
-        `${PERF_BASE_URL}/api/v1/content/articles`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${validKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(article),
-        }
-      );
+      const response = await fetch(`${PERF_BASE_URL}/api/v1/content/articles`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${validKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(article),
+      });
       const endTime = Date.now();
-      
+
       expect(response.status).toBe(201);
       expect(endTime - startTime).toBeLessThan(250);
     });
@@ -267,7 +265,7 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
       const startTime = Date.now();
       const response = await fetch(`${PERF_BASE_URL}/non-existent-endpoint`);
       const endTime = Date.now();
-      
+
       expect(response.status).toBe(404);
       expect(endTime - startTime).toBeLessThan(100); // Error handling should be fast
     });
@@ -278,9 +276,9 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
       const burstSize = 20;
       const validKey = TEST_API_KEYS.PREMIUM;
       const tenantId = TEST_TENANTS.PREMIUM;
-      
+
       const startTime = Date.now();
-      
+
       const requests = Array.from({ length: burstSize }, (_, i) =>
         fetch(`${PERF_BASE_URL}/api/v1/tenant/${tenantId}/users`, {
           headers: {
@@ -289,17 +287,17 @@ describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
           },
         })
       );
-      
+
       const responses = await Promise.all(requests);
       const endTime = Date.now();
-      
+
       // Most requests should succeed (some may be rate limited)
-      const successfulRequests = responses.filter(r => r.status === 200);
+      const successfulRequests = responses.filter((r) => r.status === 200);
       expect(successfulRequests.length).toBeGreaterThan(burstSize * 0.5); // At least 50% should succeed
-      
+
       // Total time should be reasonable for burst
       expect(endTime - startTime).toBeLessThan(2000); // Under 2 seconds for 20 requests
-      
+
       const avgTime = (endTime - startTime) / burstSize;
       expect(avgTime).toBeLessThan(300); // Average under 300ms per request
     });

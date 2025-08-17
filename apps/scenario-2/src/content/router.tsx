@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { tenantAuth, type User } from "../middleware/auth";
-import { sensitiveOperationRateLimit, tenantRateLimit } from "../middleware/rate-limit";
+import {
+  sensitiveOperationRateLimit,
+  tenantRateLimit,
+} from "../middleware/rate-limit";
 
 // Content data models
 export interface Article {

@@ -43,7 +43,7 @@ describe("Scenario 1: Performance Tests", () => {
     app.serve(<App />);
 
     await new Promise<void>((resolve) => {
-      server = app.listen(8082, () => {
+      server = app.listen(8012, () => {
         console.log("🚀 Performance test server started on port 8082");
         resolve();
       });

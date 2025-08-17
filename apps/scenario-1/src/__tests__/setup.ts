@@ -3,7 +3,7 @@
 console.log("🧪 Setting up Scenario 1 integration tests");
 
 // Global test configuration
-(globalThis as any).TEST_PORT = 8091;
+(globalThis as any).TEST_PORT = 8011;
 (globalThis as any).TEST_BASE_URL =
   `http://localhost:${(globalThis as any).TEST_PORT}`;
 

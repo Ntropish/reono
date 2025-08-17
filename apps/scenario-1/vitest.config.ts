@@ -6,7 +6,6 @@ export default defineConfig({
     environment: "node",
     testTimeout: 10000,
     hookTimeout: 10000,
-    setupFiles: ["./src/__tests__/setup.ts"],
   },
   esbuild: {
     jsx: "automatic",

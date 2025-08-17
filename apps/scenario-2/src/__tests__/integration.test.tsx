@@ -9,22 +9,11 @@ import { basicCors as cors } from "../middleware/cors";
 import { logger } from "../middleware/logger";
 import { errorHandler } from "../middleware/error-handler";
 import { globalRateLimit } from "../middleware/rate-limit";
+import { createTEST_BASE_URL, TEST_API_KEYS, TEST_TENANTS } from "./util";
 
 // Type safe access to test globals
-const TEST_PORT = (globalThis as any).TEST_PORT;
-const TEST_BASE_URL = (globalThis as any).TEST_BASE_URL;
-const TEST_API_KEYS = (globalThis as any).TEST_API_KEYS as {
-  FREE: string;
-  PREMIUM: string;
-  ENTERPRISE: string;
-  INVALID: string;
-};
-const TEST_TENANTS = (globalThis as any).TEST_TENANTS as {
-  FREE: string;
-  PREMIUM: string;
-  ENTERPRISE: string;
-  INVALID: string;
-};
+const TEST_PORT = 8023;
+const TEST_BASE_URL = createTEST_BASE_URL(TEST_PORT);
 
 // Test application matching the main app structure
 const App = () => (

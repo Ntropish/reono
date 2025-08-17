@@ -9,22 +9,7 @@ import { basicCors as cors } from "../middleware/cors";
 import { logger } from "../middleware/logger";
 import { errorHandler } from "../middleware/error-handler";
 import { globalRateLimit } from "../middleware/rate-limit";
-
-// Type safe access to test globals
-const TEST_PORT = (globalThis as any).TEST_PORT;
-const TEST_BASE_URL = (globalThis as any).TEST_BASE_URL;
-const TEST_API_KEYS = (globalThis as any).TEST_API_KEYS as {
-  FREE: string;
-  PREMIUM: string;
-  ENTERPRISE: string;
-  INVALID: string;
-};
-const TEST_TENANTS = (globalThis as any).TEST_TENANTS as {
-  FREE: string;
-  PREMIUM: string;
-  ENTERPRISE: string;
-  INVALID: string;
-};
+import { createTEST_BASE_URL, TEST_API_KEYS, TEST_TENANTS } from "./util";
 
 // Test application (simplified for performance testing)
 const App = () => (
@@ -56,8 +41,8 @@ const App = () => (
 describe("Scenario 2: Multi-Tenant SaaS API Gateway Performance Tests", () => {
   let app: any;
   let server: any;
-  const PERF_TEST_PORT = 8023;
-  const PERF_BASE_URL = `http://localhost:${PERF_TEST_PORT}`;
+  const PERF_TEST_PORT = 8022;
+  const PERF_BASE_URL = createTEST_BASE_URL(PERF_TEST_PORT);
 
   beforeAll(async () => {
     app = createApp();

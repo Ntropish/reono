@@ -27,8 +27,7 @@
   },
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --watch",
-    "test": "vitest run"
+    "dev": "vite build --watch"
   },
   "keywords": [
     "reono",

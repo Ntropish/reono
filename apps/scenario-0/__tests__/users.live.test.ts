@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
 
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.API_BASE_URL || "http://localhost:3050";
 
 async function waitForServer(path = "/users", timeoutMs = 10000) {
   const start = Date.now();

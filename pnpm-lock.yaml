@@ -24,7 +24,7 @@ importers:
         specifier: 5.7.3
         version: 5.7.3
 
-  apps/api:
+  apps/scenario-0:
     dependencies:
       '@reono/node-server':
         specifier: workspace:*
@@ -78,6 +78,16 @@ importers:
       zod:
         specifier: ^3.25.76
         version: 3.25.76
+    devDependencies:
+      nodemon:
+        specifier: ^3.1.10
+        version: 3.1.10
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
+      wait-on:
+        specifier: ^8.0.4
+        version: 8.0.4
 
   apps/web:
     dependencies:

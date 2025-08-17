@@ -10,7 +10,7 @@ import { logger } from "./middleware/logger";
 import { errorHandler } from "./middleware/error-handler";
 import { globalRateLimit } from "./middleware/rate-limit";
 
-const port = z.coerce.number().parse(process.env.PORT ?? 8082);
+const port = z.coerce.number().parse(process.env.PORT ?? 8200);
 
 const App = () => {
   return (

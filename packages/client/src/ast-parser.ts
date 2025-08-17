@@ -40,9 +40,12 @@ export class ReonoASTParser {
     const mainComponent = await this.parseComponent(filePath);
 
     // Extract routes from the main component and all imported components
+    console.log(`[reono-client] Starting route extraction from main component`);
     await this.extractRoutesFromComponent(mainComponent, routes, "");
 
-    console.log(`[reono-client] Found ${routes.length} routes`);
+    console.log(
+      `[reono-client] After extraction, found ${routes.length} routes`
+    );
     routes.forEach((route) => {
       console.log(`  ${route.method} ${route.path}`);
     });
@@ -76,7 +79,10 @@ export class ReonoASTParser {
     traverse.default(ast, {
       ImportDeclaration: (path) => {
         if (path.node.source.value.startsWith(".")) {
-          path.node.specifiers.forEach((spec) => {
+          console.log(
+            `[reono-client] Processing import from: ${path.node.source.value}`
+          );
+          path.node.specifiers.forEach((spec: any) => {
             if (t.isImportSpecifier(spec) && t.isIdentifier(spec.imported)) {
               const importName = spec.imported.name;
               const importPath = this.resolveImportPath(
@@ -84,6 +90,9 @@ export class ReonoASTParser {
                 filePath
               );
               if (importPath) {
+                console.log(
+                  `[reono-client] Found import: ${importName} -> ${importPath}`
+                );
                 imports.set(importName, importPath);
               }
             }
@@ -96,8 +105,16 @@ export class ReonoASTParser {
     for (const [componentName, componentPath] of imports) {
       if (componentName.endsWith("Router") && existsSync(componentPath)) {
         try {
+          console.log(
+            `[reono-client] Parsing router component: ${componentName} from ${componentPath}`
+          );
           const importedComponent = await this.parseComponent(componentPath);
+          // Store component by both file path AND component name for lookup
+          this.components.set(componentPath, importedComponent);
           this.components.set(componentName, importedComponent);
+          console.log(
+            `[reono-client] Stored component: ${componentName} with ${importedComponent.routes.length} routes`
+          );
         } catch (error) {
           console.warn(
             `[reono-client] Failed to parse ${componentPath}:`,
@@ -122,9 +139,12 @@ export class ReonoASTParser {
       plugins: ["typescript", "jsx"],
     });
 
+    // First pass: collect all the async work we need to do
+    const asyncTasks: Promise<void>[] = [];
+
     // @ts-ignore
     traverse.default(ast, {
-      JSXElement: (path) => {
+      JSXElement: (path: any) => {
         const element = path.node;
         if (t.isJSXIdentifier(element.openingElement.name)) {
           const tagName = element.openingElement.name.name;
@@ -148,35 +168,60 @@ export class ReonoASTParser {
               const newBasePath = this.combinePaths(basePath, routerPath);
 
               // Process child elements recursively
-              this.processJSXChildren(element, routes, newBasePath);
+              asyncTasks.push(
+                this.processJSXChildren(element, routes, newBasePath)
+              );
             }
           }
 
           // Handle imported router components
           else if (tagName.endsWith("Router")) {
+            console.log(`[reono-client] Found router component: ${tagName}`);
             const importedComponent = this.components.get(tagName);
             if (importedComponent) {
-              this.extractRoutesFromComponent(
-                importedComponent,
-                routes,
-                basePath
+              console.log(
+                `[reono-client] Processing routes from ${tagName} at ${importedComponent.path}`
+              );
+              // Schedule async processing instead of calling directly
+              asyncTasks.push(
+                this.extractRoutesFromComponent(
+                  importedComponent,
+                  routes,
+                  basePath
+                )
+              );
+            } else {
+              console.log(
+                `[reono-client] Router component ${tagName} not found in components map`
+              );
+              console.log(
+                `[reono-client] Available components:`,
+                Array.from(this.components.keys())
               );
             }
           }
         }
       },
     });
+
+    // Wait for all async tasks to complete
+    await Promise.all(asyncTasks);
   }
 
-  private processJSXChildren(
+  private async processJSXChildren(
     element: t.JSXElement,
     routes: RouteInfo[],
     basePath: string
-  ): void {
+  ): Promise<void> {
+    const asyncTasks: Promise<void>[] = [];
+
     element.children.forEach((child) => {
       if (t.isJSXElement(child)) {
         if (t.isJSXIdentifier(child.openingElement.name)) {
           const tagName = child.openingElement.name.name;
+          console.log(
+            `[reono-client] Processing JSX element: ${tagName} at basePath: ${basePath}`
+          );
 
           if (this.isHTTPMethod(tagName)) {
             const route = this.extractRouteFromElement(
@@ -185,30 +230,59 @@ export class ReonoASTParser {
               basePath
             );
             if (route) {
+              console.log(
+                `[reono-client] Found HTTP route: ${route.method} ${route.path} - adding to routes array (current length: ${routes.length})`
+              );
               routes.push(route);
+              console.log(
+                `[reono-client] Routes array now has ${routes.length} items`
+              );
             }
           } else if (tagName === "router") {
             const routerPath = this.getAttributeValue(child, "path");
             if (routerPath) {
               const newBasePath = this.combinePaths(basePath, routerPath);
-              this.processJSXChildren(child, routes, newBasePath);
+              console.log(
+                `[reono-client] Found router with path: ${routerPath}, new basePath: ${newBasePath}`
+              );
+              asyncTasks.push(
+                this.processJSXChildren(child, routes, newBasePath)
+              );
             }
           } else if (tagName.endsWith("Router")) {
+            console.log(
+              `[reono-client] Found router component in children: ${tagName}`
+            );
+            console.log(
+              `[reono-client] Available components: ${Array.from(this.components.keys()).join(", ")}`
+            );
             const importedComponent = this.components.get(tagName);
             if (importedComponent) {
-              this.extractRoutesFromComponent(
-                importedComponent,
-                routes,
-                basePath
+              console.log(
+                `[reono-client] Processing routes from child ${tagName} at ${importedComponent.path}`
+              );
+              asyncTasks.push(
+                this.extractRoutesFromComponent(
+                  importedComponent,
+                  routes,
+                  basePath
+                )
+              );
+            } else {
+              console.log(
+                `[reono-client] Child router component ${tagName} not found`
               );
             }
           } else {
             // Process other elements recursively (like <use> elements)
-            this.processJSXChildren(child, routes, basePath);
+            asyncTasks.push(this.processJSXChildren(child, routes, basePath));
           }
         }
       }
     });
+
+    // Wait for all async processing to complete
+    await Promise.all(asyncTasks);
   }
 
   private extractRouteFromElement(
@@ -245,12 +319,68 @@ export class ReonoASTParser {
 
     if (!validateAttr || !t.isJSXAttribute(validateAttr)) return undefined;
 
-    // This is a simplified extraction - in production we'd want to
-    // fully parse the validation schema to extract types
+    if (t.isJSXExpressionContainer(validateAttr.value)) {
+      const expression = validateAttr.value.expression;
+
+      if (t.isObjectExpression(expression)) {
+        const validation: RouteInfo["validation"] = {};
+
+        expression.properties.forEach((prop) => {
+          if (t.isObjectProperty(prop) && t.isIdentifier(prop.key)) {
+            const key = prop.key.name;
+
+            // Try to extract type information from validation schema
+            if (key === "params" || key === "body" || key === "query") {
+              // For now, we'll use a simplified type extraction
+              // In a full implementation, we'd parse the Zod schema AST
+              validation[key] = this.extractSchemaType(prop.value);
+            }
+          }
+        });
+
+        return validation;
+      }
+    }
+
+    // Fallback for simple cases
     return {
-      params: "object", // placeholder
-      body: "object", // placeholder
+      params: "Record<string, string>",
+      body: "any",
     };
+  }
+
+  private extractSchemaType(node: t.Node): string {
+    // Simplified schema type extraction
+    // In production, this would be more sophisticated and handle:
+    // - z.object({ id: z.string(), name: z.string() }) -> { id: string; name: string }
+    // - z.string() -> string
+    // - z.number() -> number
+    // - etc.
+
+    if (t.isCallExpression(node)) {
+      if (
+        t.isMemberExpression(node.callee) &&
+        t.isIdentifier(node.callee.property)
+      ) {
+        const method = node.callee.property.name;
+
+        switch (method) {
+          case "string":
+            return "string";
+          case "number":
+            return "number";
+          case "boolean":
+            return "boolean";
+          case "object":
+            // For object schemas, we'd need to parse the argument
+            return "Record<string, any>";
+          default:
+            return "any";
+        }
+      }
+    }
+
+    return "any";
   }
 
   private getAttributeValue(

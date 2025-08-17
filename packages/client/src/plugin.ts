@@ -46,6 +46,11 @@ interface RouteInfo {
   hasBody: boolean;
   bodyType?: string;
   responseType?: string;
+  validation?: {
+    params?: string;
+    body?: string;
+    query?: string;
+  };
 }
 
 export function reonoClient(options: ReonoClientOptions): Plugin {
@@ -72,6 +77,12 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
 
       // Analyze the JSX file
       const routes = await analyzeServerFile(serverFilePath);
+      console.log(
+        `[reono-client] Plugin received ${routes.length} routes from parser`
+      );
+      routes.forEach((route, i) => {
+        console.log(`  [${i + 1}] ${route.method} ${route.path}`);
+      });
 
       // Generate the client code
       const clientCode = generateClientCode(routes, clientName, baseUrl);
@@ -120,8 +131,12 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
     const parser = new ReonoASTParser();
     const astRoutes = await parser.parseServerFile(filePath);
 
+    console.log(
+      `[reono-client] Plugin analyzeServerFile: Got ${astRoutes.length} routes from AST parser`
+    );
+
     // Convert AST routes to plugin RouteInfo format
-    return astRoutes.map(
+    const convertedRoutes = astRoutes.map(
       (astRoute): RouteInfo => ({
         method: astRoute.method,
         path: astRoute.path,
@@ -129,8 +144,28 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
         hasBody: astRoute.hasBody,
         bodyType: astRoute.bodyType,
         responseType: astRoute.responseType,
+        validation: astRoute.validation,
       })
     );
+
+    console.log(
+      `[reono-client] Plugin analyzeServerFile: Converted to ${convertedRoutes.length} routes`
+    );
+
+    // Deduplicate routes based on method + path combination
+    const routeMap = new Map<string, RouteInfo>();
+    convertedRoutes.forEach((route) => {
+      const key = `${route.method} ${route.path}`;
+      if (!routeMap.has(key)) {
+        routeMap.set(key, route);
+      }
+    });
+
+    const deduplicatedRoutes = Array.from(routeMap.values());
+    console.log(
+      `[reono-client] Plugin analyzeServerFile: Deduplicated from ${convertedRoutes.length} to ${deduplicatedRoutes.length} routes`
+    );
+    return deduplicatedRoutes;
   }
 
   function generateClientCode(
@@ -193,8 +228,17 @@ export { createTypedClient as create${clientName.charAt(0).toUpperCase() + clien
   }
 
   function generatePathParamTypes(routes: RouteInfo[]): string {
-    const pathTypes = routes
+    // Deduplicate paths by using a Map to store unique path entries
+    const pathMap = new Map<string, RouteInfo>();
+    routes
       .filter((route) => route.params.length > 0)
+      .forEach((route) => {
+        if (!pathMap.has(route.path)) {
+          pathMap.set(route.path, route);
+        }
+      });
+
+    const pathTypes = Array.from(pathMap.values())
       .map(
         (route) =>
           `  '${route.path}': { ${route.params.map((p) => `${p}: string | number`).join("; ")} }`
@@ -215,12 +259,24 @@ ${pathTypes || "  // No paths with parameters"}
     routes: RouteInfo[]
   ): string {
     const overloads = routes.map((route) => {
+      const routeKey = `"${method.toUpperCase()} ${route.path}"`;
       const paramType =
         route.params.length > 0
-          ? `ClientRequestOptions & { params: PathParams<'${route.path}'> }`
+          ? `ClientRequestOptions & { params: RouteDefinitions[${routeKey}]["params"] }`
           : "ClientRequestOptions";
 
-      return `  ${method}<T = any>(path: '${route.path}', options${route.params.length > 0 ? "" : "?"}: ${paramType}): Promise<T>;`;
+      const bodyConstraint = route.hasBody
+        ? ` & { body: RouteDefinitions[${routeKey}]["body"] }`
+        : "";
+
+      const optionsType =
+        route.params.length > 0 || route.hasBody
+          ? `${paramType}${bodyConstraint}`
+          : "ClientRequestOptions";
+
+      const isOptional = route.params.length === 0 && !route.hasBody ? "?" : "";
+
+      return `  ${method}(path: '${route.path}', options${isOptional}: ${optionsType}): Promise<RouteDefinitions[${routeKey}]["response"]>;`;
     });
 
     return overloads.join("\n");
@@ -232,16 +288,45 @@ ${pathTypes || "  // No paths with parameters"}
   ): string {
     const implementations = routes
       .map((route) => {
-        return `      case '${route.path}': return client.${method}<T>(path, options);`;
+        const routeKey = `"${route.method} ${route.path}"`;
+        return `      case '${route.path}': return client.${method}(path, options) as Promise<RouteDefinitions[${routeKey}]["response"]>;`;
       })
       .join("\n");
 
-    return `    ${method}: <T = any>(path: string, options?: ClientRequestOptions) => {
+    return `    ${method}: (path: string, options?: ClientRequestOptions) => {
       switch (path) {
 ${implementations}
         default: throw new Error(\`Invalid path for ${method.toUpperCase()}: \${path}\`);
       }
     }`;
+  }
+
+  function inferResponseType(route: RouteInfo): string {
+    // Common response patterns based on the route
+    if (route.path.includes("/health")) {
+      return `{ status: string; timestamp: number; version: string; service?: string }`;
+    }
+
+    if (route.path.includes("/users") && route.method === "GET") {
+      if (route.path.includes(":")) {
+        // Single user
+        return `{ id: string; email: string; name: string; role: string; [key: string]: any }`;
+      } else {
+        // User list
+        return `{ users: Array<{ id: string; email: string; name: string; role: string; [key: string]: any }> }`;
+      }
+    }
+
+    if (route.method === "POST" && route.path.includes("/users")) {
+      return `{ id: string; email: string; name: string; role: string; [key: string]: any }`;
+    }
+
+    if (route.path.includes("/tenant") && route.path.includes("/info")) {
+      return `{ id: string; name: string; domain: string; subscription: string; [key: string]: any }`;
+    }
+
+    // Default fallback
+    return "any";
   }
 
   function generateRouteTypesRecord(routes: RouteInfo[]): string {
@@ -252,16 +337,24 @@ ${implementations}
             ? `{ ${route.params.map((p) => `${p}: string | number`).join("; ")} }`
             : "never";
 
+        const bodyType = route.hasBody
+          ? route.validation?.body || "any"
+          : "never";
+
+        // For response types, we could extract from handler return types
+        // For now, using a more specific type based on common patterns
+        const responseType = route.responseType || inferResponseType(route);
+
         const routeKey = `"${route.method} ${route.path}"`;
         return `  ${routeKey}: {
     params: ${paramType};
-    body: ${route.hasBody ? "any" : "never"};
-    response: any;
+    body: ${bodyType};
+    response: ${responseType};
   }`;
       })
       .join(",\n");
 
-    return `// Route information stored in a record
+    return `// Route type definitions
 export interface RouteDefinitions {
 ${routeEntries}
 }`;

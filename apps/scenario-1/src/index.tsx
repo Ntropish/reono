@@ -7,7 +7,7 @@ import { cors } from "./middleware/cors";
 import { logger } from "./middleware/logger";
 import { errorHandler } from "./middleware/error-handler";
 
-const port = z.coerce.number().parse(process.env.PORT ?? 8080);
+const port = z.coerce.number().parse(process.env.PORT ?? 8081);
 
 const App = () => {
   return (

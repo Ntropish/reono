@@ -55,10 +55,42 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
 
   let root: string;
 
+  // Define the generateClient function outside the plugin object
+  async function generateClient() {
+    try {
+      const serverFilePath = resolve(root, serverFile);
+      const outputDirPath = resolve(root, outputDir);
+
+      if (!existsSync(serverFilePath)) {
+        console.warn(`[reono-client] Server file not found: ${serverFile}`);
+        return;
+      }
+
+      // Analyze the JSX file
+      const routes = await analyzeServerFile(serverFilePath);
+
+      // Generate the client code
+      const clientCode = generateClientCode(routes, clientName, baseUrl);
+
+      // Ensure output directory exists
+      await mkdir(outputDirPath, { recursive: true });
+
+      // Write the client file
+      const clientFilePath = resolve(outputDirPath, `${clientName}.ts`);
+      await writeFile(clientFilePath, clientCode, "utf-8");
+
+      console.log(
+        `[reono-client] Generated client: ${relative(root, clientFilePath)}`
+      );
+    } catch (error) {
+      console.error("[reono-client] Failed to generate client:", error);
+    }
+  }
+
   return {
     name: "reono-client",
 
-    configResolved(config) {
+    configResolved(config: any) {
       root = config.root;
     },
 
@@ -66,47 +98,16 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
       await generateClient();
     },
 
-    configureServer(server) {
+    configureServer(server: any) {
       if (watch) {
         const serverFilePath = resolve(root, serverFile);
         server.watcher.add(serverFilePath);
 
-        server.watcher.on("change", (file) => {
+        server.watcher.on("change", (file: string) => {
           if (file === serverFilePath) {
             generateClient();
           }
         });
-      }
-    },
-
-    async generateClient() {
-      try {
-        const serverFilePath = resolve(root, serverFile);
-        const outputDirPath = resolve(root, outputDir);
-
-        if (!existsSync(serverFilePath)) {
-          console.warn(`[reono-client] Server file not found: ${serverFile}`);
-          return;
-        }
-
-        // Analyze the JSX file
-        const routes = await analyzeServerFile(serverFilePath);
-
-        // Generate the client code
-        const clientCode = generateClientCode(routes, clientName, baseUrl);
-
-        // Ensure output directory exists
-        await mkdir(outputDirPath, { recursive: true });
-
-        // Write the client file
-        const clientFilePath = resolve(outputDirPath, `${clientName}.ts`);
-        await writeFile(clientFilePath, clientCode, "utf-8");
-
-        console.log(
-          `[reono-client] Generated client: ${relative(root, clientFilePath)}`
-        );
-      } catch (error) {
-        console.error("[reono-client] Failed to generate client:", error);
       }
     },
   };
@@ -126,12 +127,15 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
     for (const pattern of routePatterns) {
       let match;
       while ((match = pattern.exec(content)) !== null) {
+        // Ensure we have the expected capture groups
+        if (!match[1] || !match[2]) continue;
+
         const method = match[1].toUpperCase();
         const attributesString = match[2];
 
         // Extract path attribute
         const pathMatch = attributesString.match(/path=["']([^"']+)["']/);
-        if (!pathMatch) continue;
+        if (!pathMatch || !pathMatch[1]) continue;
 
         const path = pathMatch[1];
         const params = extractPathParams(path);
@@ -158,7 +162,9 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
     const paramMatches = path.matchAll(/:([A-Za-z0-9_]+)/g);
 
     for (const match of paramMatches) {
-      params.push(match[1]);
+      if (match[1]) {
+        params.push(match[1]);
+      }
     }
 
     return params;

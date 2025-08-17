@@ -1,0 +1,14 @@
+{
+  "extends": "@reono/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "reono",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "moduleResolution": "Bundler"
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

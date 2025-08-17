@@ -10,6 +10,22 @@ import { logger } from "../middleware/logger";
 import { errorHandler } from "../middleware/error-handler";
 import { globalRateLimit } from "../middleware/rate-limit";
 
+// Type safe access to test globals
+const TEST_PORT = (globalThis as any).TEST_PORT;
+const TEST_BASE_URL = (globalThis as any).TEST_BASE_URL;
+const TEST_API_KEYS = (globalThis as any).TEST_API_KEYS as {
+  FREE: string;
+  PREMIUM: string;
+  ENTERPRISE: string;
+  INVALID: string;
+};
+const TEST_TENANTS = (globalThis as any).TEST_TENANTS as {
+  FREE: string;
+  PREMIUM: string;
+  ENTERPRISE: string;
+  INVALID: string;
+};
+
 // Test application matching the main app structure
 const App = () => (
   <use handler={errorHandler}>

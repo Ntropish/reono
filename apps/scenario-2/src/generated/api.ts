@@ -2,20 +2,8 @@
 import { createClient, type ClientRequestOptions, type CreateClientOptions } from '@reono/client/runtime';
 
 // Route type definitions
-// GET health
+// GET /health
 export type GET_health_Route = {
-  params: never;
-  body: never;
-  response: any;
-};
-// GET *
-export type GET_*_Route = {
-  params: never;
-  body: never;
-  response: any;
-};
-// GET v1
-export type GET_v1_Route = {
   params: never;
   body: never;
   response: any;
@@ -28,7 +16,7 @@ export type GET_*_Route = {
 };
 
 // Union type of all valid paths
-export type ValidPaths = 'health' | '*' | 'v1' | '*';
+export type ValidPaths = '/health' | '*';
 
 // Path-specific parameter requirements
 export type PathParams<T extends ValidPaths> = T extends keyof PathParamMap 
@@ -41,9 +29,7 @@ interface PathParamMap {
 
 // Generated client interface
 export interface GeneratedApiClient {
-  get<T = any>(path: 'health', options?: ClientRequestOptions): Promise<T>;
-  get<T = any>(path: '*', options?: ClientRequestOptions): Promise<T>;
-  get<T = any>(path: 'v1', options?: ClientRequestOptions): Promise<T>;
+  get<T = any>(path: '/health', options?: ClientRequestOptions): Promise<T>;
   get<T = any>(path: '*', options?: ClientRequestOptions): Promise<T>;
 }
 
@@ -52,11 +38,7 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
   const client = createClient({ baseUrl: 'http://localhost:8082', ...options });
   
   return {
-    get: <T = any>(path: 'health', options?: ClientRequestOptions) => 
-      client.get<T>(path, options),
-    get: <T = any>(path: '*', options?: ClientRequestOptions) => 
-      client.get<T>(path, options),
-    get: <T = any>(path: 'v1', options?: ClientRequestOptions) => 
+    get: <T = any>(path: '/health', options?: ClientRequestOptions) => 
       client.get<T>(path, options),
     get: <T = any>(path: '*', options?: ClientRequestOptions) => 
       client.get<T>(path, options)

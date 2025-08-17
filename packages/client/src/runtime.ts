@@ -1,4 +1,5 @@
 // Runtime client implementation that gets used by generated code
+import type { ServerElement } from "reono";
 
 export interface ClientRequestOptions {
   params?: Record<string, string | number>;
@@ -32,6 +33,63 @@ export interface CreateClientOptions {
   fetchImpl?: typeof fetch;
   defaultHeaders?: HeadersInit;
 }
+
+// Enhanced types for renderClient
+export type RenderClientOptions = CreateClientOptions;
+
+export type RequestOptions = ClientRequestOptions;
+
+export type ClientRequest = <T = unknown>(
+  path: string,
+  options?: RequestOptions
+) => Promise<T>;
+
+// Enhanced typed client that provides intellisense for routes
+export type TypedRenderedClient<TRoutes = any> = {
+  request: (
+    method: string,
+    path: string,
+    options?: RequestOptions
+  ) => Promise<any>;
+  get: ClientRequest;
+  post: ClientRequest;
+  put: ClientRequest;
+  patch: ClientRequest;
+  delete: ClientRequest;
+  options: ClientRequest;
+  head: ClientRequest;
+  // Internal route metadata for dev tooling
+  _routes?: TRoutes;
+};
+
+export type RenderedClient = TypedRenderedClient;
+
+// Type helpers for extracting route information
+type ExtractParams<T extends string> =
+  T extends `${infer _Start}:${infer Param}/${infer Rest}`
+    ? { [K in Param]: string | number } & ExtractParams<`/${Rest}`>
+    : T extends `${infer _Start}:${infer Param}`
+      ? { [K in Param]: string | number }
+      : {};
+
+type HasParams<T extends string> =
+  ExtractParams<T> extends {}
+    ? keyof ExtractParams<T> extends never
+      ? false
+      : true
+    : false;
+
+// Enhanced request options that require params when path has parameters
+export type SafeRequestOptions<TPath extends string> =
+  HasParams<TPath> extends true
+    ? RequestOptions & { params: ExtractParams<TPath> }
+    : RequestOptions;
+
+// Type-safe client request function
+export type SafeClientRequest = <TPath extends string, T = unknown>(
+  path: TPath,
+  options?: SafeRequestOptions<TPath>
+) => Promise<T>;
 
 function interpolatePath(
   path: string,
@@ -173,4 +231,108 @@ export function createClient(options: CreateClientOptions = {}): ApiClient {
     head: <T = any>(path: string, options?: ClientRequestOptions) =>
       request<T>("HEAD", path, options),
   };
+}
+
+function withQuery(path: string, query?: RequestOptions["query"]): string {
+  if (!query) return path;
+  const usp = new URLSearchParams();
+  for (const [k, v] of Object.entries(query)) {
+    if (v === undefined) continue;
+    usp.append(k, String(v));
+  }
+  const q = usp.toString();
+  if (!q) return path;
+  return path.includes("?") ? `${path}&${q}` : `${path}?${q}`;
+}
+
+export function renderClient(
+  element: ServerElement,
+  opts: RenderClientOptions = {}
+): RenderedClient {
+  // Note: We could traverse and build trie to validate paths at runtime for dev UX
+  // For now, we'll keep it simple and just provide the client interface
+
+  const base = opts.baseUrl?.replace(/\/$/, "") || "";
+  const $fetch = opts.fetchImpl || fetch;
+  const defaultHeaders = opts.defaultHeaders;
+
+  async function coreRequest(
+    method: string,
+    path: string,
+    options: RequestOptions = {}
+  ) {
+    // Interpolate params and query
+    let finalPath = interpolatePath(path, options.params);
+    finalPath = withQuery(finalPath, options.query);
+
+    const url = base
+      ? `${base}${finalPath.startsWith("/") ? "" : "/"}${finalPath}`
+      : finalPath;
+
+    const headers = new Headers(defaultHeaders);
+    if (options.headers) {
+      const h = new Headers(options.headers);
+      h.forEach((v, k) => headers.set(k, v));
+    }
+
+    let body: BodyInit | undefined;
+    if (options.body !== undefined) {
+      const ct = detectContentType(options.body);
+      if (ct && !headers.has("content-type")) headers.set("content-type", ct);
+      if (ct?.startsWith("application/json"))
+        body = JSON.stringify(options.body);
+      else body = options.body as any;
+    }
+
+    const res = await $fetch(url, { method, headers, body });
+
+    // Default parse
+    const mode = options.parseAs || "json";
+    if (mode === "response") return res;
+    if (mode === "text") return (await res.text()) as any;
+    if (mode === "blob") return (await res.blob()) as any;
+    if (mode === "arrayBuffer") return (await res.arrayBuffer()) as any;
+    if (mode === "formData") return (await res.formData()) as any;
+
+    // JSON default
+    const ctRes = res.headers.get("content-type") || "";
+    if (/application\/json/i.test(ctRes)) {
+      const data = await res.json();
+      if (!res.ok) {
+        const err: any = new Error(data?.message || `HTTP ${res.status}`);
+        err.status = res.status;
+        err.data = data;
+        throw err;
+      }
+      return data;
+    }
+    // Non-JSON: return Response for caller
+    if (!res.ok) {
+      const err: any = new Error(`HTTP ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+    return (await res.text()) as any;
+  }
+
+  const client: RenderedClient = {
+    request: coreRequest,
+    get: (path, o) => coreRequest("GET", path, o),
+    post: (path, o) => coreRequest("POST", path, o),
+    put: (path, o) => coreRequest("PUT", path, o),
+    patch: (path, o) => coreRequest("PATCH", path, o),
+    delete: (path, o) => coreRequest("DELETE", path, o),
+    options: (path, o) => coreRequest("OPTIONS", path, o),
+    head: (path, o) => coreRequest("HEAD", path, o),
+  };
+
+  return client;
+}
+
+// Type-safe render client factory (for when full type safety is needed)
+export function createTypedClient<TElement extends ServerElement>(
+  element: TElement,
+  opts: RenderClientOptions = {}
+): TypedRenderedClient {
+  return renderClient(element, opts);
 }

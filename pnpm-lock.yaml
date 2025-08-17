@@ -247,10 +247,25 @@ importers:
 
   packages/client:
     dependencies:
+      '@babel/parser':
+        specifier: ^7.25.0
+        version: 7.28.3
+      '@babel/traverse':
+        specifier: ^7.25.0
+        version: 7.28.3
+      '@babel/types':
+        specifier: ^7.25.0
+        version: 7.28.2
       reono:
         specifier: workspace:*
         version: link:../core
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.2
     devDependencies:
+      '@types/babel__traverse':
+        specifier: ^7.28.0
+        version: 7.28.0
       '@types/node':
         specifier: ^22.0.0
         version: 22.17.2

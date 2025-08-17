@@ -11,22 +11,30 @@ import { errorHandler } from "../middleware/error-handler";
 import { globalRateLimit } from "../middleware/rate-limit";
 import { createElement } from "reono";
 import { renderClient } from "@reono/client";
+import { api } from "../generated/api"; // Use the generated type-safe client
 
-// Type safe access to test globals
-const TEST_PORT = (globalThis as any).TEST_PORT;
-const TEST_BASE_URL = (globalThis as any).TEST_BASE_URL;
-const TEST_API_KEYS = (globalThis as any).TEST_API_KEYS as {
-  FREE: string;
-  PREMIUM: string;
-  ENTERPRISE: string;
-  INVALID: string;
-};
-const TEST_TENANTS = (globalThis as any).TEST_TENANTS as {
-  FREE: string;
-  PREMIUM: string;
-  ENTERPRISE: string;
-  INVALID: string;
-};
+// Type safe access to test globals - these are set by the test setup
+declare global {
+  var TEST_PORT: number;
+  var TEST_BASE_URL: string;
+  var TEST_API_KEYS: {
+    FREE: string;
+    PREMIUM: string;
+    ENTERPRISE: string;
+    INVALID: string;
+  };
+  var TEST_TENANTS: {
+    FREE: string;
+    PREMIUM: string;
+    ENTERPRISE: string;
+    INVALID: string;
+  };
+}
+
+const TEST_PORT = globalThis.TEST_PORT;
+const TEST_BASE_URL = globalThis.TEST_BASE_URL;
+const TEST_API_KEYS = globalThis.TEST_API_KEYS;
+const TEST_TENANTS = globalThis.TEST_TENANTS;
 
 // Test application matching the main app structure
 const App = () => (
@@ -80,7 +88,7 @@ const App = () => (
 describe("Scenario 2: Client Integration via renderClient", () => {
   let app: any;
   let server: any;
-  let api: ReturnType<typeof renderClient>;
+  let client: ReturnType<typeof renderClient>;
 
   beforeAll(async () => {
     // Start test server
@@ -91,7 +99,9 @@ describe("Scenario 2: Client Integration via renderClient", () => {
       server = app.listen(TEST_PORT, () => resolve());
     });
 
-    api = renderClient(App(), { baseUrl: TEST_BASE_URL });
+    // Use renderClient for runtime type-safe requests
+    // Note: This provides runtime path interpolation but not compile-time type safety
+    client = renderClient(App(), { baseUrl: TEST_BASE_URL });
   });
 
   afterAll(async () => {
@@ -103,22 +113,14 @@ describe("Scenario 2: Client Integration via renderClient", () => {
   });
 
   it("health via client", async () => {
-    const data = await api.get<{
-      status: string;
-      timestamp: number;
-      version: string;
-      service: string;
-    }>("/health");
+    const data = await api.get("/health");
     expect(data.status).toBe("ok");
   });
 
   it("auth + users via client", async () => {
-    const data = await api.get<{ users: any[]; total: number }>(
-      `/api/v1/tenant/${TEST_TENANTS.FREE}/users`,
-      {
-        headers: { Authorization: `Bearer ${TEST_API_KEYS.FREE}` },
-      }
-    );
+    const data = await api.get(`/api/v1/tenant/${TEST_TENANTS.FREE}/users`, {
+      headers: { Authorization: `Bearer ${TEST_API_KEYS.FREE}` },
+    });
     expect(Array.isArray(data.users)).toBe(true);
   });
 
@@ -128,7 +130,7 @@ describe("Scenario 2: Client Integration via renderClient", () => {
       name: "Test User",
       role: "user",
     };
-    const data = await api.post<{ email: string; name: string; role: string }>(
+    const data = await api.post(
       `/api/v1/tenant/${TEST_TENANTS.PREMIUM}/users`,
       {
         headers: {
@@ -156,7 +158,7 @@ describe("Scenario 2: Client Integration via renderClient", () => {
   it("demonstrates type safety with createTypedClient", async () => {
     // This demonstrates how createTypedClient could provide compile-time path validation
     // For now, we'll use the regular client but with better typing
-    const typedApi = api as any; // In real usage, this would be from createTypedClient
+    const typedApi = api; // In real usage, this would be from createTypedClient
 
     // This would provide intellisense and type checking for paths with parameters
     const result = await typedApi.get("/health");

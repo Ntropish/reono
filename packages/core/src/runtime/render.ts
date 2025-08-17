@@ -77,7 +77,7 @@ export function render(element: Element): Listener {
       if (c.res instanceof Response) {
         return c.res;
       }
-      
+
       if (!match.route) {
         // No handler for this method, return 405
         return new Response("Method Not Allowed", { status: 405 });

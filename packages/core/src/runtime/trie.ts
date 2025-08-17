@@ -43,24 +43,30 @@ export function buildTrie(routes: RouteDef[]): TrieNode {
         if (!node.param)
           node.param = {
             name,
-            node: { static: new Map(), handlers: { methods: new Map(), pathMiddleware: [] } },
+            node: {
+              static: new Map(),
+              handlers: { methods: new Map(), pathMiddleware: [] },
+            },
           };
         node = node.param.node;
       } else {
         let next = node.static.get(seg);
         if (!next) {
-          next = { static: new Map(), handlers: { methods: new Map(), pathMiddleware: [] } };
+          next = {
+            static: new Map(),
+            handlers: { methods: new Map(), pathMiddleware: [] },
+          };
           node.static.set(seg, next);
         }
         node = next;
       }
     }
-    
+
     // Store the middleware at the path level for any method to access
     if (r.middleware && r.middleware.length > 0) {
       node.handlers.pathMiddleware = r.middleware;
     }
-    
+
     node.handlers.methods.set(r.method, {
       handler: r.handler,
       validate: r.validate,
@@ -103,11 +109,11 @@ export function matchTrie(
   const entry = leaf.handlers.methods.get(method);
   if (!entry) {
     // No method handler, but use path-level middleware if available
-    return { 
-      params, 
-      handlers: leaf.handlers.pathMiddleware, 
-      route: undefined, 
-      validate: undefined 
+    return {
+      params,
+      handlers: leaf.handlers.pathMiddleware,
+      route: undefined,
+      validate: undefined,
     };
   }
   return {

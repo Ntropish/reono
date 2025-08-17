@@ -9,6 +9,7 @@ import {
   deleteUser,
   createUser,
   userInputSchema,
+  patchUser,
 } from "../src/routes/users/repo";
 
 let handle: (req: Request) => Promise<Response>;
@@ -47,6 +48,14 @@ beforeAll(() => {
         path: "",
         validate: { body: userInputSchema },
         handler: (c: any) => createUser(c.body),
+      }),
+      createElement("patch", {
+        path: ":userId",
+        validate: {
+          body: userInputSchema.partial(),
+          params: z.object({ userId: z.coerce.number() }),
+        },
+        handler: (c: any) => patchUser(c.params.userId, c.body),
       })
     )
   );
@@ -117,10 +126,10 @@ describe("Users API", () => {
     expect(after.status).toBe(500); // repo throws -> runtime returns 500 for now
   });
 
-  it("PATCH /users/:id is not implemented yet (should 405)", async () => {
+  it("PATCH /users/:id updates a user with partial record", async () => {
     const res = await call("PATCH", "/users/2", { name: "Bobby" });
-    expect(res.status).toBe(405);
-    const text = await res.text();
-    expect(text).toMatch(/Method Not Allowed/i);
+    expect(res.status).toBe(200);
+    const updated = await res.json();
+    expect(updated).toMatchObject({ id: 2, name: "Bobby" });
   });
 });

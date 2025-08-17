@@ -52,3 +52,11 @@ export const createUser = (input: UserInput) => {
   users[newUser.id] = newUser;
   return newUser;
 };
+
+export const patchUser = (id: number, data: Partial<UserInput>) => {
+  if (!users[id]) {
+    throw new Error(`User with id ${id} not found`);
+  }
+  users[id] = { ...users[id], ...data };
+  return users[id];
+};

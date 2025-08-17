@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createApp } from '@reono/node-server';
-import { UserRouter } from '../users/router';
-import { ContentRouter } from '../content/router';
-import { cors } from '../middleware/cors';
-import { logger } from '../middleware/logger';
-import { errorHandler } from '../middleware/error-handler';
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { createApp } from "@reono/node-server";
+import { UserRouter } from "../users/router";
+import { ContentRouter } from "../content/router";
+import { cors } from "../middleware/cors";
+import { logger } from "../middleware/logger";
+import { errorHandler } from "../middleware/error-handler";
 
 // Global type declarations for tests
 declare global {
@@ -26,11 +26,13 @@ const App = () => (
         <router path="api/v1">
           <get
             path="health"
-            handler={(c) => c.json({ 
-              status: "ok", 
-              timestamp: Date.now(),
-              version: "1.0.0"
-            })}
+            handler={(c) =>
+              c.json({
+                status: "ok",
+                timestamp: Date.now(),
+                version: "1.0.0",
+              })
+            }
           />
           <UserRouter />
           <ContentRouter />
@@ -40,7 +42,7 @@ const App = () => (
   </use>
 );
 
-describe('Scenario 1: Content Management API Integration Tests', () => {
+describe("Scenario 1: Content Management API Integration Tests", () => {
   let app: any;
   let server: any;
 
@@ -48,7 +50,7 @@ describe('Scenario 1: Content Management API Integration Tests', () => {
     // Start test server
     app = createApp();
     app.serve(<App />);
-    
+
     await new Promise<void>((resolve) => {
       server = app.listen(TEST_PORT, () => {
         console.log(`🧪 Test server started on ${TEST_BASE_URL}`);
@@ -61,115 +63,131 @@ describe('Scenario 1: Content Management API Integration Tests', () => {
     if (server) {
       await new Promise<void>((resolve) => {
         server.close(() => {
-          console.log('🧪 Test server stopped');
+          console.log("🧪 Test server stopped");
           resolve();
         });
       });
     }
   });
 
-  describe('Health Check', () => {
-    it('should return health status', async () => {
+  describe("Health Check", () => {
+    it("should return health status", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/health`);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data).toMatchObject({
-        status: 'ok',
-        version: '1.0.0',
+        status: "ok",
+        version: "1.0.0",
       });
-      expect(typeof data.timestamp).toBe('number');
+      expect(typeof data.timestamp).toBe("number");
     });
   });
 
-  describe('CORS Middleware', () => {
-    it('should handle OPTIONS preflight requests correctly', async () => {
+  describe("CORS Middleware", () => {
+    it("should handle OPTIONS preflight requests correctly", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/health`, {
-        method: 'OPTIONS',
+        method: "OPTIONS",
         headers: {
-          'Origin': 'https://example.com',
-          'Access-Control-Request-Method': 'GET',
-          'Access-Control-Request-Headers': 'Authorization, Content-Type',
+          Origin: "https://example.com",
+          "Access-Control-Request-Method": "GET",
+          "Access-Control-Request-Headers": "Authorization, Content-Type",
         },
       });
 
       // CORS preflight should return 204 No Content
       expect(response.status).toBe(204);
-      
+
       // Should have proper CORS headers
-      expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
-      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('GET');
-      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('POST');
-      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('PUT');
-      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('DELETE');
-      expect(response.headers.get('Access-Control-Allow-Headers')).toContain('Authorization');
-      expect(response.headers.get('Access-Control-Allow-Headers')).toContain('Content-Type');
-      expect(response.headers.get('Access-Control-Allow-Credentials')).toBe('true');
-      expect(response.headers.get('Access-Control-Max-Age')).toBe('86400');
-      
+      expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
+      expect(response.headers.get("Access-Control-Allow-Methods")).toContain(
+        "GET"
+      );
+      expect(response.headers.get("Access-Control-Allow-Methods")).toContain(
+        "POST"
+      );
+      expect(response.headers.get("Access-Control-Allow-Methods")).toContain(
+        "PUT"
+      );
+      expect(response.headers.get("Access-Control-Allow-Methods")).toContain(
+        "DELETE"
+      );
+      expect(response.headers.get("Access-Control-Allow-Headers")).toContain(
+        "Authorization"
+      );
+      expect(response.headers.get("Access-Control-Allow-Headers")).toContain(
+        "Content-Type"
+      );
+      expect(response.headers.get("Access-Control-Allow-Credentials")).toBe(
+        "true"
+      );
+      expect(response.headers.get("Access-Control-Max-Age")).toBe("86400");
+
       // Should have no response body for preflight
       const text = await response.text();
-      expect(text).toBe('');
+      expect(text).toBe("");
     });
 
-    it('should add CORS headers to regular responses', async () => {
+    it("should add CORS headers to regular responses", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/health`);
-      
+
       expect(response.status).toBe(200);
-      expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
-      expect(response.headers.get('Access-Control-Allow-Credentials')).toBe('true');
+      expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
+      expect(response.headers.get("Access-Control-Allow-Credentials")).toBe(
+        "true"
+      );
     });
   });
 
-  describe('Authentication Guard', () => {
-    it('should reject requests without authorization', async () => {
+  describe("Authentication Guard", () => {
+    it("should reject requests without authorization", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users`);
-      
+
       expect(response.status).toBe(401);
-      
+
       const data = await response.json();
-      expect(data.error).toBe('Missing or invalid authorization header');
+      expect(data.error).toBe("Missing or invalid authorization header");
     });
 
-    it('should reject requests with invalid API key', async () => {
+    it("should reject requests with invalid API key", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.INVALID}`,
+          Authorization: `Bearer ${TEST_API_KEYS.INVALID}`,
         },
       });
-      
+
       expect(response.status).toBe(401);
-      
+
       const data = await response.json();
-      expect(data.error).toBe('Invalid API key');
+      expect(data.error).toBe("Invalid API key");
     });
 
-    it('should accept requests with valid API key', async () => {
+    it("should accept requests with valid API key", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
       });
-      
+
       expect(response.status).toBe(200);
     });
   });
 
-  describe('Rate Limiting', () => {
-    it('should include rate limit headers', async () => {
+  describe("Rate Limiting", () => {
+    it("should include rate limit headers", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
       });
-      
+
       expect(response.status).toBe(200);
-      expect(response.headers.get('X-RateLimit-Limit')).toBeTruthy();
-      expect(response.headers.get('X-RateLimit-Remaining')).toBeTruthy();
-      expect(response.headers.get('X-RateLimit-Reset')).toBeTruthy();
+      expect(response.headers.get("X-RateLimit-Limit")).toBeTruthy();
+      expect(response.headers.get("X-RateLimit-Remaining")).toBeTruthy();
+      expect(response.headers.get("X-RateLimit-Reset")).toBeTruthy();
     });
 
-    it('should enforce rate limits (requires many requests)', async () => {
+    it("should enforce rate limits (requires many requests)", async () => {
       // This would require many rapid requests to test properly
       // For now, just verify the headers are present
       const response = await fetch(`${TEST_BASE_URL}/api/v1/health`);
@@ -177,254 +195,260 @@ describe('Scenario 1: Content Management API Integration Tests', () => {
     });
   });
 
-  describe('User Management API', () => {
-    it('should get user list (filtered by role)', async () => {
+  describe("User Management API", () => {
+    it("should get user list (filtered by role)", async () => {
       // Regular user sees only themselves
       const userResponse = await fetch(`${TEST_BASE_URL}/api/v1/users`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
       });
-      
+
       expect(userResponse.status).toBe(200);
       const userData = await userResponse.json();
       expect(userData.users).toHaveLength(1);
-      expect(userData.users[0].email).toBe('user@example.com');
+      expect(userData.users[0].email).toBe("user@example.com");
 
       // Admin sees all users
       const adminResponse = await fetch(`${TEST_BASE_URL}/api/v1/users`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.ADMIN}`,
+          Authorization: `Bearer ${TEST_API_KEYS.ADMIN}`,
         },
       });
-      
+
       expect(adminResponse.status).toBe(200);
       const adminData = await adminResponse.json();
       expect(adminData.users.length).toBeGreaterThan(1);
     });
 
-    it('should get specific user with access control', async () => {
+    it("should get specific user with access control", async () => {
       // User can access their own data
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users/2`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
       });
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data.id).toBe(2);
-      expect(data.email).toBe('user@example.com');
+      expect(data.email).toBe("user@example.com");
     });
 
-    it('should deny access to other user data', async () => {
+    it("should deny access to other user data", async () => {
       // User cannot access other user's data
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users/1`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
       });
-      
+
       expect(response.status).toBe(403);
       const data = await response.json();
-      expect(data.error).toBe('Access denied');
+      expect(data.error).toBe("Access denied");
     });
 
-    it('should allow admin to create users', async () => {
+    it("should allow admin to create users", async () => {
       const newUser = {
-        email: 'newuser@example.com',
-        name: 'New User',
-        role: 'user',
-        tier: 'free',
+        email: "newuser@example.com",
+        name: "New User",
+        role: "user",
+        tier: "free",
       };
 
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${TEST_API_KEYS.ADMIN}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TEST_API_KEYS.ADMIN}`,
         },
         body: JSON.stringify(newUser),
       });
-      
+
       expect(response.status).toBe(201);
       const data = await response.json();
       expect(data.email).toBe(newUser.email);
       expect(data.name).toBe(newUser.name);
-      expect(typeof data.id).toBe('number');
+      expect(typeof data.id).toBe("number");
     });
 
-    it('should deny non-admin user creation', async () => {
+    it("should deny non-admin user creation", async () => {
       const newUser = {
-        email: 'hacker@example.com',
-        name: 'Hacker',
+        email: "hacker@example.com",
+        name: "Hacker",
       };
 
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
         body: JSON.stringify(newUser),
       });
-      
+
       expect(response.status).toBe(403);
       const data = await response.json();
-      expect(data.error).toBe('Admin access required');
+      expect(data.error).toBe("Admin access required");
     });
   });
 
-  describe('Content Management API', () => {
-    it('should get articles with proper filtering', async () => {
+  describe("Content Management API", () => {
+    it("should get articles with proper filtering", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/content/articles`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
       });
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(Array.isArray(data.articles)).toBe(true);
-      expect(typeof data.total).toBe('number');
+      expect(typeof data.total).toBe("number");
     });
 
-    it('should create new articles', async () => {
+    it("should create new articles", async () => {
       const newArticle = {
-        title: 'Test Article',
-        content: 'This is a test article content.',
-        tags: ['test', 'integration'],
+        title: "Test Article",
+        content: "This is a test article content.",
+        tags: ["test", "integration"],
         published: false,
       };
 
       const response = await fetch(`${TEST_BASE_URL}/api/v1/content/articles`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
         body: JSON.stringify(newArticle),
       });
-      
+
       expect(response.status).toBe(201);
       const data = await response.json();
       expect(data.title).toBe(newArticle.title);
       expect(data.content).toBe(newArticle.content);
       expect(data.authorId).toBe(2); // User ID
-      expect(data.authorName).toBe('Regular User');
-      expect(typeof data.id).toBe('number');
+      expect(data.authorName).toBe("Regular User");
+      expect(typeof data.id).toBe("number");
     });
 
-    it('should validate article data', async () => {
+    it("should validate article data", async () => {
       const invalidArticle = {
-        title: '', // Invalid: empty title
-        content: 'Content',
+        title: "", // Invalid: empty title
+        content: "Content",
       };
 
       const response = await fetch(`${TEST_BASE_URL}/api/v1/content/articles`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
         body: JSON.stringify(invalidArticle),
       });
-      
+
       expect(response.status).toBe(400);
     });
   });
 
-  describe('File Upload Integration', () => {
-    it('should reject non-multipart requests to upload endpoint', async () => {
+  describe("File Upload Integration", () => {
+    it("should reject non-multipart requests to upload endpoint", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/content/images`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
-        body: JSON.stringify({ test: 'data' }),
+        body: JSON.stringify({ test: "data" }),
       });
-      
+
       expect(response.status).toBe(400);
       const data = await response.json();
-      expect(data.error).toBe('No file provided');
+      expect(data.error).toBe("No file provided");
     });
 
-    it('should handle multipart form without file', async () => {
+    it("should handle multipart form without file", async () => {
       const formData = new FormData();
-      formData.append('description', 'Test upload');
+      formData.append("description", "Test upload");
 
       const response = await fetch(`${TEST_BASE_URL}/api/v1/content/images`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
         body: formData,
       });
-      
+
       expect(response.status).toBe(400);
       const data = await response.json();
       // Either specific error or general multipart error is acceptable
-      expect(['No file provided', 'Failed to parse multipart data']).toContain(data.error);
+      expect(["No file provided", "Failed to parse multipart data"]).toContain(
+        data.error
+      );
     });
 
-    it('should reject invalid file types', async () => {
+    it("should reject invalid file types", async () => {
       // Create a mock text file
-      const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
+      const file = new File(["test content"], "test.txt", {
+        type: "text/plain",
+      });
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
       const response = await fetch(`${TEST_BASE_URL}/api/v1/content/images`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
         body: formData,
       });
-      
+
       expect(response.status).toBe(400);
       const data = await response.json();
       // Either specific error or general multipart error is acceptable
-      expect(['Invalid file type', 'Failed to parse multipart data']).toContain(data.error);
+      expect(["Invalid file type", "Failed to parse multipart data"]).toContain(
+        data.error
+      );
     });
 
-    it('should get user uploads', async () => {
+    it("should get user uploads", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/content/images`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
       });
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(Array.isArray(data.files)).toBe(true);
-      expect(typeof data.total).toBe('number');
+      expect(typeof data.total).toBe("number");
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle 404 for unknown routes', async () => {
+  describe("Error Handling", () => {
+    it("should handle 404 for unknown routes", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/nonexistent`);
-      
+
       expect(response.status).toBe(404);
     });
 
-    it('should handle malformed JSON', async () => {
+    it("should handle malformed JSON", async () => {
       const response = await fetch(`${TEST_BASE_URL}/api/v1/content/articles`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
-        body: '{invalid json}',
+        body: "{invalid json}",
       });
-      
+
       expect(response.status).toBe(400);
     });
   });
 
-  describe('Component Integration', () => {
-    it('should demonstrate full middleware stack execution', async () => {
+  describe("Component Integration", () => {
+    it("should demonstrate full middleware stack execution", async () => {
       // This request will go through:
       // 1. Error handler
       // 2. CORS
@@ -432,21 +456,21 @@ describe('Scenario 1: Content Management API Integration Tests', () => {
       // 4. Auth guard
       // 5. Rate limit
       // 6. Route handler
-      
+
       const response = await fetch(`${TEST_BASE_URL}/api/v1/users/2`, {
         headers: {
-          'Authorization': `Bearer ${TEST_API_KEYS.USER}`,
+          Authorization: `Bearer ${TEST_API_KEYS.USER}`,
         },
       });
-      
+
       expect(response.status).toBe(200);
-      
+
       // Verify CORS headers are present
-      expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
-      
+      expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
+
       // Verify rate limit headers are present
-      expect(response.headers.get('X-RateLimit-Limit')).toBeTruthy();
-      
+      expect(response.headers.get("X-RateLimit-Limit")).toBeTruthy();
+
       // Verify response content
       const data = await response.json();
       expect(data.id).toBe(2);

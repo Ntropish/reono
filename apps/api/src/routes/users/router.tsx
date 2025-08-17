@@ -35,6 +35,14 @@ export const UserRouter = () => {
         validate={{ body: userInputSchema }}
         handler={(c) => createUser(c.body)}
       />
+      <patch
+        path=":userId"
+        validate={{
+          body: userInputSchema.partial(),
+          params: z.object({ userId: z.coerce.number() }),
+        }}
+        handler={(c) => updateUser(c.params.userId, c.body)}
+      />
     </router>
   );
 };

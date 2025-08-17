@@ -173,6 +173,9 @@ importers:
       '@faker-js/faker':
         specifier: ^9.9.0
         version: 9.9.0
+      '@reono/client':
+        specifier: workspace:*
+        version: link:../../packages/client
       '@reono/node-server':
         specifier: workspace:*
         version: link:../../packages/node-server

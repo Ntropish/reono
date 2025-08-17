@@ -57,14 +57,15 @@ type ExtractParams<T extends string> =
   T extends `${infer _Start}:${infer Param}/${infer Rest}`
     ? { [K in Param]: string | number } & ExtractParams<`/${Rest}`>
     : T extends `${infer _Start}:${infer Param}`
-    ? { [K in Param]: string | number }
-    : {};
+      ? { [K in Param]: string | number }
+      : {};
 
-type HasParams<T extends string> = ExtractParams<T> extends {}
-  ? keyof ExtractParams<T> extends never
-    ? false
-    : true
-  : false;
+type HasParams<T extends string> =
+  ExtractParams<T> extends {}
+    ? keyof ExtractParams<T> extends never
+      ? false
+      : true
+    : false;
 
 // Enhanced request options that require params when path has parameters
 export type SafeRequestOptions<TPath extends string> =

@@ -11,17 +11,17 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts",
+      "types": "./dist/src/index.d.ts",
       "require": "./dist/index.js"
     },
     "./plugin": {
       "import": "./dist/plugin.mjs",
-      "types": "./dist/plugin.d.ts",
+      "types": "./dist/src/plugin.d.ts",
       "require": "./dist/plugin.js"
     },
     "./runtime": {
       "import": "./dist/runtime.mjs",
-      "types": "./dist/runtime.d.ts",
+      "types": "./dist/src/runtime.d.ts",
       "require": "./dist/runtime.js"
     }
   },
@@ -30,7 +30,13 @@
     "dev": "vite build --watch",
     "test": "vitest run"
   },
-  "keywords": ["reono", "vite-plugin", "typescript", "rest-client", "code-generation"],
+  "keywords": [
+    "reono",
+    "vite-plugin",
+    "typescript",
+    "rest-client",
+    "code-generation"
+  ],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",

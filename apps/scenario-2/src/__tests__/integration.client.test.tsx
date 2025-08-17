@@ -10,7 +10,7 @@ import { logger } from "../middleware/logger";
 import { errorHandler } from "../middleware/error-handler";
 import { globalRateLimit } from "../middleware/rate-limit";
 import { createElement } from "reono";
-import { renderClient } from "reono/client";
+import { renderClient } from "@reono/client";
 
 // Type safe access to test globals
 const TEST_PORT = (globalThis as any).TEST_PORT;

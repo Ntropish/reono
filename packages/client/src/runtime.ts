@@ -33,9 +33,12 @@ export interface CreateClientOptions {
   defaultHeaders?: HeadersInit;
 }
 
-function interpolatePath(path: string, params?: Record<string, string | number>): string {
+function interpolatePath(
+  path: string,
+  params?: Record<string, string | number>
+): string {
   if (!params) return path;
-  
+
   return path.replace(/:([A-Za-z0-9_]+)/g, (_, key) => {
     const value = params[key];
     if (value === undefined || value === null) {
@@ -47,14 +50,14 @@ function interpolatePath(path: string, params?: Record<string, string | number>)
 
 function buildQueryString(query?: ClientRequestOptions["query"]): string {
   if (!query) return "";
-  
+
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (value !== undefined) {
       params.append(key, String(value));
     }
   }
-  
+
   const queryString = params.toString();
   return queryString ? `?${queryString}` : "";
 }
@@ -64,14 +67,15 @@ function detectContentType(body: any): string | undefined {
   if (typeof body === "string") return "text/plain; charset=utf-8";
   if (body instanceof FormData) return undefined; // Let browser set boundary
   if (body instanceof Blob) return body.type || undefined;
-  if (body instanceof URLSearchParams) return "application/x-www-form-urlencoded; charset=utf-8";
+  if (body instanceof URLSearchParams)
+    return "application/x-www-form-urlencoded; charset=utf-8";
   if (typeof body === "object") return "application/json; charset=utf-8";
   return undefined;
 }
 
 export function createClient(options: CreateClientOptions = {}): ApiClient {
   const { baseUrl = "", fetchImpl = fetch, defaultHeaders } = options;
-  
+
   async function request<T = any>(
     method: string,
     path: string,
@@ -81,14 +85,14 @@ export function createClient(options: CreateClientOptions = {}): ApiClient {
     const interpolatedPath = interpolatePath(path, requestOptions.params);
     const queryString = buildQueryString(requestOptions.query);
     const url = `${baseUrl}${interpolatedPath}${queryString}`;
-    
+
     // Build headers
     const headers = new Headers(defaultHeaders);
     if (requestOptions.headers) {
       const requestHeaders = new Headers(requestOptions.headers);
       requestHeaders.forEach((value, key) => headers.set(key, value));
     }
-    
+
     // Handle body
     let body: BodyInit | undefined;
     if (requestOptions.body !== undefined) {
@@ -96,30 +100,30 @@ export function createClient(options: CreateClientOptions = {}): ApiClient {
       if (contentType && !headers.has("content-type")) {
         headers.set("content-type", contentType);
       }
-      
+
       if (contentType?.startsWith("application/json")) {
         body = JSON.stringify(requestOptions.body);
       } else {
         body = requestOptions.body as BodyInit;
       }
     }
-    
+
     // Make the request
     const response = await fetchImpl(url, {
       method: method.toUpperCase(),
       headers,
       body,
     });
-    
+
     // Parse response
     const parseAs = requestOptions.parseAs || "json";
-    
+
     if (parseAs === "response") {
       return response as T;
     }
-    
+
     let data: any;
-    
+
     if (parseAs === "text") {
       data = await response.text();
     } else if (parseAs === "blob") {
@@ -137,27 +141,36 @@ export function createClient(options: CreateClientOptions = {}): ApiClient {
         data = await response.text();
       }
     }
-    
+
     // Handle errors
     if (!response.ok) {
-      const error: any = new Error(`HTTP ${response.status}: ${response.statusText}`);
+      const error: any = new Error(
+        `HTTP ${response.status}: ${response.statusText}`
+      );
       error.status = response.status;
       error.response = response;
       error.data = data;
       throw error;
     }
-    
+
     return data;
   }
-  
+
   return {
     request,
-    get: <T = any>(path: string, options?: ClientRequestOptions) => request<T>("GET", path, options),
-    post: <T = any>(path: string, options?: ClientRequestOptions) => request<T>("POST", path, options),
-    put: <T = any>(path: string, options?: ClientRequestOptions) => request<T>("PUT", path, options),
-    patch: <T = any>(path: string, options?: ClientRequestOptions) => request<T>("PATCH", path, options),
-    delete: <T = any>(path: string, options?: ClientRequestOptions) => request<T>("DELETE", path, options),
-    options: <T = any>(path: string, options?: ClientRequestOptions) => request<T>("OPTIONS", path, options),
-    head: <T = any>(path: string, options?: ClientRequestOptions) => request<T>("HEAD", path, options),
+    get: <T = any>(path: string, options?: ClientRequestOptions) =>
+      request<T>("GET", path, options),
+    post: <T = any>(path: string, options?: ClientRequestOptions) =>
+      request<T>("POST", path, options),
+    put: <T = any>(path: string, options?: ClientRequestOptions) =>
+      request<T>("PUT", path, options),
+    patch: <T = any>(path: string, options?: ClientRequestOptions) =>
+      request<T>("PATCH", path, options),
+    delete: <T = any>(path: string, options?: ClientRequestOptions) =>
+      request<T>("DELETE", path, options),
+    options: <T = any>(path: string, options?: ClientRequestOptions) =>
+      request<T>("OPTIONS", path, options),
+    head: <T = any>(path: string, options?: ClientRequestOptions) =>
+      request<T>("HEAD", path, options),
   };
 }

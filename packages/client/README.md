@@ -1,13 +1,112 @@
-# @reono/node-server
+# @reono/client
 
-A Node.js server adapter for **Reono** that enables you to run your JSX-defined API routes on Node.js HTTP servers. This package provides a simple interface to convert Reono applications into Node.js HTTP handlers.
+A Vite plugin that generates type-safe REST clients from your Reono JSX API definitions.
 
-## Overview
+## Why @reono/client?
 
-The `@reono/node-server` package:
+- **🔒 Compile-time type safety**: Your frontend code knows exactly what endpoints exist and their parameter requirements
+- **🚀 Zero runtime overhead**: All type checking happens at build time  
+- **🔄 Always in sync**: Client types are automatically generated from your server API definition
+- **💡 Great DX**: Full IntelliSense support with auto-completion and error detection
+- **🎯 Framework agnostic**: Works with any frontend framework (React, Vue, Svelte, etc.)
 
-- **Node.js Integration**: Converts Node.js `IncomingMessage` to Web API `Request` objects
-- **Response Handling**: Transforms Web API `Response` objects back to Node.js HTTP responses
+## Quick Start
+
+### 1. Install
+
+```bash
+npm install @reono/client
+# or
+pnpm add @reono/client
+```
+
+### 2. Configure Vite Plugin
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import { reonoClient } from '@reono/client/plugin'
+
+export default defineConfig({
+  plugins: [
+    reonoClient({
+      serverFile: './src/api/server.tsx',  // Your Reono API definition
+      outputDir: './src/generated',        // Where to generate the client
+      clientName: 'api',                   // Name of the generated client
+      baseUrl: 'http://localhost:3000',    // Default base URL
+    })
+  ]
+})
+```
+
+### 3. Create Your API Definition
+
+```tsx
+// src/api/server.tsx
+import { z } from 'zod';
+
+const UserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email(),
+});
+
+export const ApiServer = () => (
+  <router path="api/v1">
+    {/* Health check */}
+    <get path="health" handler={(c) => c.json({ status: 'ok' })} />
+    
+    {/* Users */}
+    <get path="users" handler={getUsers} />
+    <post path="users" validate={{ body: UserSchema }} handler={createUser} />
+    <get path="users/:id" validate={{ params: z.object({ id: z.string() }) }} handler={getUser} />
+    <put path="users/:id" validate={{ params: z.object({ id: z.string() }), body: UserSchema }} handler={updateUser} />
+  </router>
+);
+```
+
+### 4. Use the Generated Client
+
+```ts
+// src/app.ts
+import { api } from './generated/api';
+
+// ✅ Fully type-safe API calls
+async function example() {
+  // Simple GET - no params required
+  const health = await api.get('/api/v1/health');
+  
+  // GET with required params - TypeScript enforces them
+  const user = await api.get('/api/v1/users/:id', {
+    params: { id: '123' } // ✅ Required and typed
+  });
+  
+  // POST with typed body
+  const newUser = await api.post('/api/v1/users', {
+    body: {
+      name: 'John',
+      email: 'john@example.com'
+    }
+  });
+  
+  // ❌ These would be COMPILE ERRORS:
+  // await api.get('/nonexistent');           // Invalid path
+  // await api.get('/api/v1/users/:id');      // Missing required params
+  // await api.get('/api/v1/users/:id', {     // Wrong param name
+  //   params: { userId: '123' }
+  // });
+}
+```
+
+## How It Works
+
+1. **Build-time Analysis**: The Vite plugin analyzes your JSX API definition during the build process
+2. **Route Extraction**: It extracts all routes, parameters, and validation schemas  
+3. **Type Generation**: TypeScript definitions are generated for all endpoints
+4. **Client Creation**: A fully typed client is generated with methods for each endpoint
+5. **Runtime Safety**: The generated client handles all HTTP details while maintaining type safety
+
+This approach provides true compile-time type safety without runtime overhead, ensuring your frontend and backend stay perfectly in sync.
 - **Simple API**: Provides a clean, minimal interface for serving Reono applications
 - **Error Handling**: Built-in error handling for unhandled exceptions
 - **Streaming Support**: Handles request/response streaming efficiently

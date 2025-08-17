@@ -5,28 +5,45 @@
     "type": "git",
     "url": "https://github.com/Ntropish/reono.git"
   },
-  "description": "",
-  "main": "index.js",
+  "description": "Vite plugin for generating type-safe REST clients from Reono JSX APIs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "types": "./dist/src/index.d.ts",
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.js"
+    },
+    "./plugin": {
+      "import": "./dist/plugin.mjs",
+      "types": "./dist/plugin.d.ts",
+      "require": "./dist/plugin.js"
+    },
+    "./runtime": {
+      "import": "./dist/runtime.mjs",
+      "types": "./dist/runtime.d.ts",
+      "require": "./dist/runtime.js"
     }
   },
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --watch"
+    "dev": "vite build --watch",
+    "test": "vitest run"
   },
-  "keywords": [],
+  "keywords": ["reono", "vite-plugin", "typescript", "rest-client", "code-generation"],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
   "dependencies": {
-    "reono": "workspace:*",
-    "signal-polyfill": "^0.2.2",
+    "reono": "workspace:*"
+  },
+  "devDependencies": {
     "vite": "^7.1.2",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@types/node": "^22.0.0"
+  },
+  "peerDependencies": {
+    "vite": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
   }
 }

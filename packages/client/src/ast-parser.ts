@@ -304,7 +304,7 @@ export class ReonoASTParser {
     basePath: string
   ): RouteInfo | null {
     const pathAttr = this.getAttributeValue(element, "path");
-    if (!pathAttr) return null;
+    if (pathAttr === null) return null;
 
     const fullPath = this.combinePaths(basePath, pathAttr);
     const params = this.extractPathParams(fullPath);

@@ -11,59 +11,11 @@ import { errorHandler } from "../middleware/error-handler";
 import { globalRateLimit } from "../middleware/rate-limit";
 import { createElement } from "reono";
 import { createApi } from "../generated/api"; // Use the generated type-safe client factory
+import { App } from "../../dist/index.mjs"; // Import the main application component
 
 import { createTEST_BASE_URL, TEST_API_KEYS, TEST_TENANTS } from "./util";
 
 const TEST_PORT = 8024;
-
-// Test application matching the main app structure
-const App = () => (
-  <use handler={errorHandler}>
-    <use handler={cors}>
-      <use handler={logger}>
-        <use handler={globalRateLimit}>
-          {/* Public health check endpoint */}
-          <get
-            path="health"
-            handler={(c) =>
-              c.json({
-                status: "ok",
-                timestamp: Date.now(),
-                version: "2.0.0",
-                service: "Multi-Tenant SaaS API Gateway",
-              })
-            }
-          />
-
-          {/* API versioning routes */}
-          <router path="api">
-            <router path="v1">
-              <TenantRouter />
-              <UserRouter />
-              <AnalyticsRouter />
-              <BillingRouter />
-              <ContentRouter />
-            </router>
-          </router>
-
-          {/* Catch-all for undefined routes */}
-          <get
-            path="*"
-            handler={(c) =>
-              c.json(
-                {
-                  error: "Endpoint not found",
-                  message: "This endpoint does not exist",
-                },
-                404
-              )
-            }
-          />
-        </use>
-      </use>
-    </use>
-  </use>
-);
 
 describe("Scenario 2: Type-Safe Generated Client Integration", () => {
   let app: any;

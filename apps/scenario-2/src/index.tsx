@@ -10,9 +10,7 @@ import { logger } from "./middleware/logger";
 import { errorHandler } from "./middleware/error-handler";
 import { globalRateLimit } from "./middleware/rate-limit";
 
-const port = z.coerce.number().parse(process.env.PORT ?? 8200);
-
-const App = () => {
+export const App = () => {
   return (
     <use handler={errorHandler}>
       <use handler={cors}>
@@ -139,72 +137,3 @@ const App = () => {
     </use>
   );
 };
-
-const app: any = createApp();
-app.serve(<App />);
-
-app.listen(port, () => {
-  console.log(`🚀 Scenario 2: Multi-Tenant SaaS API Gateway`);
-  console.log(`📍 Server running on http://localhost:${port}`);
-  console.log(`🏥 Health check: http://localhost:${port}/health`);
-  console.log(`📚 Documentation: http://localhost:${port}/docs`);
-  console.log(`🔌 API v1: http://localhost:${port}/api/v1`);
-  console.log(``);
-  console.log(`🏢 Sample Tenant Endpoints:`);
-  console.log(`   Free Tier (AcmeCorp):`);
-  console.log(
-    `     • Users: http://localhost:${port}/api/v1/tenant/tenant-1/users`
-  );
-  console.log(
-    `     • Content: http://localhost:${port}/api/v1/content/articles`
-  );
-  console.log(
-    `     • Billing: http://localhost:${port}/api/v1/tenant/tenant-1/billing`
-  );
-  console.log(`   Premium Tier (TechCorp):`);
-  console.log(
-    `     • Users: http://localhost:${port}/api/v1/tenant/tenant-2/users`
-  );
-  console.log(
-    `     • Content: http://localhost:${port}/api/v1/content/articles`
-  );
-  console.log(
-    `     • Analytics: http://localhost:${port}/api/v1/tenant/tenant-2/analytics`
-  );
-  console.log(
-    `     • Billing: http://localhost:${port}/api/v1/tenant/tenant-2/billing`
-  );
-  console.log(`   Enterprise Tier (BigCorp):`);
-  console.log(
-    `     • Users: http://localhost:${port}/api/v1/tenant/tenant-3/users`
-  );
-  console.log(`     • Content: http://localhost:${port}/api/v1/content/images`);
-  console.log(
-    `     • Analytics: http://localhost:${port}/api/v1/tenant/tenant-3/analytics/enterprise`
-  );
-  console.log(
-    `     • Billing: http://localhost:${port}/api/v1/tenant/tenant-3/billing`
-  );
-  console.log(``);
-  console.log(`🔑 Test API Keys:`);
-  console.log(`   Free:       free_tenant_abc123`);
-  console.log(`   Premium:    premium_tenant_def456`);
-  console.log(`   Enterprise: enterprise_tenant_ghi789`);
-  console.log(``);
-  console.log(`📖 Usage Example:`);
-  console.log(`   curl -H "Authorization: Bearer premium_tenant_def456" \\`);
-  console.log(
-    `        http://localhost:${port}/api/v1/tenant/tenant-2/analytics`
-  );
-});
-
-// Graceful shutdown
-process.on("SIGINT", () => {
-  console.log("\n🛑 Shutting down gracefully...");
-  app.close(() => {
-    console.log("✅ Server closed");
-    process.exit(0);
-  });
-});
-
-export { app };

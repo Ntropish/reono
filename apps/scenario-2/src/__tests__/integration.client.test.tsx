@@ -119,11 +119,12 @@ describe("Scenario 2: Type-Safe Generated Client Integration", () => {
 
   it("tenant user by ID via type-safe client", async () => {
     // Test a parameterized route with proper type safety
+    // Use user-1 which exists in tenant-1 (free tier)
     const data = await api.get("/api/v1/tenant/:tenantId/users/:userId", {
-      params: { tenantId: TEST_TENANTS.FREE, userId: "123" },
+      params: { tenantId: TEST_TENANTS.FREE, userId: "user-1" },
       headers: { Authorization: `Bearer ${TEST_API_KEYS.FREE}` },
     });
-    expect(data).toHaveProperty("id");
+    expect(data).toHaveProperty("id", "user-1");
     expect(data).toHaveProperty("email");
     expect(data).toHaveProperty("name");
     expect(data).toHaveProperty("role");

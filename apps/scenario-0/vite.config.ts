@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
+import { reonoClient } from "@reono/client";
 
 export default defineConfig({
   build: {
@@ -24,6 +25,14 @@ export default defineConfig({
       ],
     },
   },
-  plugins: [dts()],
+  plugins: [
+    dts(),
+    reonoClient({
+      serverFile: "./src/api-definition.tsx",
+      outputDir: "./src/generated",
+      clientName: "api",
+      baseUrl: "http://localhost:8082",
+    }),
+  ],
   test: {},
 });

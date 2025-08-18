@@ -1,44 +1,64 @@
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
+import { App } from "../dist/index.mjs"; // Import the main application component
 
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:3050";
+// const BASE_URL = process.env.API_BASE_URL || "http://localhost:3050";
 
-async function waitForServer(path = "/users", timeoutMs = 10000) {
-  const start = Date.now();
-  let lastErr: any;
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(`${BASE_URL}${path}`);
-      if (res.ok || res.status === 405) return; // endpoint available
-    } catch (e) {
-      lastErr = e;
-    }
-    await new Promise((r) => setTimeout(r, 200));
-  }
-  throw new Error(
-    `Server at ${BASE_URL} did not become ready within ${timeoutMs}ms. Last error: ${lastErr}`
-  );
-}
+// async function waitForServer(path = "/users", timeoutMs = 10000) {
+//   const start = Date.now();
+//   let lastErr: any;
+//   while (Date.now() - start < timeoutMs) {
+//     try {
+//       const res = await fetch(`${BASE_URL}${path}`);
+//       if (res.ok || res.status === 405) return; // endpoint available
+//     } catch (e) {
+//       lastErr = e;
+//     }
+//     await new Promise((r) => setTimeout(r, 200));
+//   }
+//   throw new Error(
+//     `Server at ${BASE_URL} did not become ready within ${timeoutMs}ms. Last error: ${lastErr}`
+//   );
+// }
 
-async function request(method: string, path: string, body?: any) {
-  const headers: Record<string, string> = {};
-  let payload: BodyInit | undefined = undefined;
-  if (body !== undefined) {
-    headers["content-type"] = "application/json";
-    payload = JSON.stringify(body);
-  }
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: payload,
-  });
-  return res;
-}
+// async function request(method: string, path: string, body?: any) {
+//   const headers: Record<string, string> = {};
+//   let payload: BodyInit | undefined = undefined;
+//   if (body !== undefined) {
+//     headers["content-type"] = "application/json";
+//     payload = JSON.stringify(body);
+//   }
+//   const res = await fetch(`${BASE_URL}${path}`, {
+//     method,
+//     headers,
+//     body: payload,
+//   });
+//   return res;
+// }
 
 let createdId: number | null = null;
 
 beforeAll(async () => {
-  await waitForServer("/users");
+  // await waitForServer("/users");
 });
+
+  let app: any;
+  let server: any;
+  let api: ReturnType<typeof createApi>;
+
+  beforeAll(async () => {
+    // Start test server
+    app = createApp();
+    app.serve(<App />);
+
+    await new Promise<void>((resolve) => {
+      server = app.listen(TEST_PORT, () => resolve());
+    });
+
+    const TEST_BASE_URL = createTEST_BASE_URL(TEST_PORT);
+
+    // Create the type-safe generated client
+    api = createApi({ baseUrl: TEST_BASE_URL });
+  });
 
 describe("Users API (live)", () => {
   it("GET /users returns a list", async () => {

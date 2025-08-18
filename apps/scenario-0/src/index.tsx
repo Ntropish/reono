@@ -8,3 +8,6 @@ app.serve(<App />);
 app.listen(3050, () => {
   console.log("Server is running on http://localhost:3050");
 });
+
+// export App for testing
+export { App };

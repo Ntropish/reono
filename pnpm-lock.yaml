@@ -105,6 +105,9 @@ importers:
 
   apps/scenario-0:
     dependencies:
+      '@reono/client':
+        specifier: workspace:*
+        version: link:../../packages/client
       '@reono/node-server':
         specifier: workspace:*
         version: link:../../packages/node-server

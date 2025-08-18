@@ -154,6 +154,16 @@ export interface RouteDefinitions {
       body: never;
       response: any;
     },
+    "/v1/tenant/:tenantId/users/:userId": {
+      params: { tenantId: string | number; userId: string | number };
+      body: never;
+      response: { id: string; email: string; name: string; role: string; [key: string]: any };
+    },
+    "/v1/:userId": {
+      params: { userId: string | number };
+      body: never;
+      response: any;
+    },
     "/v1/tenant/:tenantId/info": {
       params: { tenantId: string | number };
       body: never;
@@ -163,11 +173,6 @@ export interface RouteDefinitions {
       params: { tenantId: string | number };
       body: never;
       response: any;
-    },
-    "/v1/tenant/:tenantId/users/:userId": {
-      params: { tenantId: string | number; userId: string | number };
-      body: never;
-      response: { id: string; email: string; name: string; role: string; [key: string]: any };
     },
     "/v1/tenant/:tenantId/analytics/advanced": {
       params: { tenantId: string | number };
@@ -203,11 +208,6 @@ export interface RouteDefinitions {
       params: { userId: string | number };
       body: never;
       response: { id: string; email: string; name: string; role: string; [key: string]: any };
-    },
-    "/v1/:userId": {
-      params: { userId: string | number };
-      body: never;
-      response: any;
     },
     "/v1/analytics/advanced": {
       params: never;
@@ -431,16 +431,6 @@ export interface RouteDefinitions {
       body: any;
       response: any;
     },
-    "/v1/tenant/:tenantId/settings": {
-      params: { tenantId: string | number };
-      body: any;
-      response: any;
-    },
-    "/v1/settings": {
-      params: never;
-      body: any;
-      response: any;
-    },
     "/v1/tenant/:tenantId/users/:userId": {
       params: { tenantId: string | number; userId: string | number };
       body: any;
@@ -448,6 +438,16 @@ export interface RouteDefinitions {
     },
     "/v1/:userId": {
       params: { userId: string | number };
+      body: any;
+      response: any;
+    },
+    "/v1/tenant/:tenantId/settings": {
+      params: { tenantId: string | number };
+      body: any;
+      response: any;
+    },
+    "/v1/settings": {
+      params: never;
       body: any;
       response: any;
     },
@@ -518,6 +518,16 @@ export interface RouteDefinitions {
       body: any;
       response: any;
     },
+    "/api/v1/tenant/:tenantId/billing/cancel": {
+      params: { tenantId: string | number };
+      body: any;
+      response: any;
+    },
+    "/api/v1/cancel": {
+      params: never;
+      body: any;
+      response: any;
+    },
     "/api/v1/tenant/:tenantId/analytics/export": {
       params: { tenantId: string | number };
       body: any;
@@ -543,12 +553,12 @@ export interface RouteDefinitions {
       body: any;
       response: any;
     },
-    "/api/v1/tenant/:tenantId/billing/cancel": {
+    "/v1/tenant/:tenantId/billing/cancel": {
       params: { tenantId: string | number };
       body: any;
       response: any;
     },
-    "/api/v1/cancel": {
+    "/v1/cancel": {
       params: never;
       body: any;
       response: any;
@@ -559,16 +569,6 @@ export interface RouteDefinitions {
       response: any;
     },
     "/v1/export": {
-      params: never;
-      body: any;
-      response: any;
-    },
-    "/v1/tenant/:tenantId/billing/cancel": {
-      params: { tenantId: string | number };
-      body: any;
-      response: any;
-    },
-    "/v1/cancel": {
       params: never;
       body: any;
       response: any;
@@ -689,13 +689,13 @@ export interface RouteDefinitions {
 }
 
 // Method-specific path types
-export type GETPaths = '/health' | '/api/v2/*' | '/v2/*' | '/*' | '/docs/v1' | '/v1' | '/api/v1/tenant/:tenantId/info' | '/api/v1/tenant/:tenantId/usage' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/analytics/advanced' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/billing/usage' | '/api/v1/tenant/:tenantId/billing/invoices' | '/api/v1/info' | '/api/v1/usage' | '/api/v1/users/:userId' | '/api/v1/:userId' | '/api/v1/analytics/advanced' | '/api/v1/analytics/export' | '/api/v1/advanced' | '/api/v1/export' | '/api/v1/billing/usage' | '/api/v1/billing/invoices' | '/api/v1/invoices' | '/api/v1/tenant/:tenantId/analytics/enterprise' | '/api/v1/tenant/:tenantId/analytics/usage' | '/api/v1/enterprise' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/info' | '/v1/tenant/:tenantId/usage' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/analytics/advanced' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/billing/usage' | '/v1/tenant/:tenantId/billing/invoices' | '/v1/info' | '/v1/usage' | '/v1/users/:userId' | '/v1/:userId' | '/v1/analytics/advanced' | '/v1/analytics/export' | '/v1/advanced' | '/v1/export' | '/v1/billing/usage' | '/v1/billing/invoices' | '/v1/invoices' | '/v1/tenant/:tenantId/analytics/enterprise' | '/v1/tenant/:tenantId/analytics/usage' | '/v1/enterprise' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/tenant/:tenantId/info' | '/tenant/:tenantId/usage' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/analytics/advanced' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/billing/usage' | '/tenant/:tenantId/billing/invoices' | '/info' | '/usage' | '/users/:userId' | '/:userId' | '/analytics/advanced' | '/analytics/export' | '/advanced' | '/export' | '/billing/usage' | '/billing/invoices' | '/invoices' | '/tenant/:tenantId/analytics/enterprise' | '/tenant/:tenantId/analytics/usage' | '/enterprise' | '/content/articles/:id' | '/articles/:id' | '/:id';
-export type PUTPaths = '/api/v1/tenant/:tenantId/settings' | '/api/v1/settings' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/settings' | '/v1/settings' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/tenant/:tenantId/settings' | '/settings' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/content/articles/:id' | '/articles/:id' | '/:id';
-export type POSTPaths = '/api/v1/tenant/:tenantId/billing/upgrade' | '/api/v1/billing/upgrade' | '/api/v1/upgrade' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/export' | '/v1/tenant/:tenantId/billing/upgrade' | '/v1/billing/upgrade' | '/v1/upgrade' | '/api/v1/tenant/:tenantId/billing/cancel' | '/api/v1/cancel' | '/v1/tenant/:tenantId/analytics/export' | '/v1/export' | '/v1/tenant/:tenantId/billing/cancel' | '/v1/cancel' | '/tenant/:tenantId/billing/upgrade' | '/billing/upgrade' | '/upgrade' | '/tenant/:tenantId/analytics/export' | '/export' | '/tenant/:tenantId/billing/cancel' | '/cancel';
+export type GETPaths = '/health' | '/api/v2/*' | '/v2/*' | '/*' | '/docs/v1' | '/v1' | '/api/v1/tenant/:tenantId/info' | '/api/v1/tenant/:tenantId/usage' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/analytics/advanced' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/billing/usage' | '/api/v1/tenant/:tenantId/billing/invoices' | '/api/v1/info' | '/api/v1/usage' | '/api/v1/users/:userId' | '/api/v1/:userId' | '/api/v1/analytics/advanced' | '/api/v1/analytics/export' | '/api/v1/advanced' | '/api/v1/export' | '/api/v1/billing/usage' | '/api/v1/billing/invoices' | '/api/v1/invoices' | '/api/v1/tenant/:tenantId/analytics/enterprise' | '/api/v1/tenant/:tenantId/analytics/usage' | '/api/v1/enterprise' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/tenant/:tenantId/info' | '/v1/tenant/:tenantId/usage' | '/v1/tenant/:tenantId/analytics/advanced' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/billing/usage' | '/v1/tenant/:tenantId/billing/invoices' | '/v1/info' | '/v1/usage' | '/v1/users/:userId' | '/v1/analytics/advanced' | '/v1/analytics/export' | '/v1/advanced' | '/v1/export' | '/v1/billing/usage' | '/v1/billing/invoices' | '/v1/invoices' | '/v1/tenant/:tenantId/analytics/enterprise' | '/v1/tenant/:tenantId/analytics/usage' | '/v1/enterprise' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/tenant/:tenantId/info' | '/tenant/:tenantId/usage' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/analytics/advanced' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/billing/usage' | '/tenant/:tenantId/billing/invoices' | '/info' | '/usage' | '/users/:userId' | '/:userId' | '/analytics/advanced' | '/analytics/export' | '/advanced' | '/export' | '/billing/usage' | '/billing/invoices' | '/invoices' | '/tenant/:tenantId/analytics/enterprise' | '/tenant/:tenantId/analytics/usage' | '/enterprise' | '/content/articles/:id' | '/articles/:id' | '/:id';
+export type PUTPaths = '/api/v1/tenant/:tenantId/settings' | '/api/v1/settings' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/tenant/:tenantId/settings' | '/v1/settings' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/tenant/:tenantId/settings' | '/settings' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/content/articles/:id' | '/articles/:id' | '/:id';
+export type POSTPaths = '/api/v1/tenant/:tenantId/billing/upgrade' | '/api/v1/billing/upgrade' | '/api/v1/upgrade' | '/api/v1/tenant/:tenantId/billing/cancel' | '/api/v1/cancel' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/export' | '/v1/tenant/:tenantId/billing/upgrade' | '/v1/billing/upgrade' | '/v1/upgrade' | '/v1/tenant/:tenantId/billing/cancel' | '/v1/cancel' | '/v1/tenant/:tenantId/analytics/export' | '/v1/export' | '/tenant/:tenantId/billing/upgrade' | '/billing/upgrade' | '/upgrade' | '/tenant/:tenantId/analytics/export' | '/export' | '/tenant/:tenantId/billing/cancel' | '/cancel';
 export type DELETEPaths = '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/content/articles/:id' | '/articles/:id' | '/:id';
 
 // Union type of all valid paths
-export type ValidPaths = '/health' | '/api/v2/*' | '/v2/*' | '/*' | '/docs/v1' | '/v1' | '/api/v1/tenant/:tenantId/info' | '/api/v1/tenant/:tenantId/settings' | '/api/v1/tenant/:tenantId/usage' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/analytics/advanced' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/billing/usage' | '/api/v1/tenant/:tenantId/billing/invoices' | '/api/v1/tenant/:tenantId/billing/upgrade' | '/api/v1/info' | '/api/v1/settings' | '/api/v1/usage' | '/api/v1/users/:userId' | '/api/v1/:userId' | '/api/v1/analytics/advanced' | '/api/v1/analytics/export' | '/api/v1/advanced' | '/api/v1/export' | '/api/v1/billing/usage' | '/api/v1/billing/invoices' | '/api/v1/billing/upgrade' | '/api/v1/invoices' | '/api/v1/upgrade' | '/api/v1/tenant/:tenantId/analytics/enterprise' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/analytics/usage' | '/api/v1/enterprise' | '/api/v1/export' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/:userId' | '/api/v1/content/articles/:id' | '/api/v1/content/articles/:id' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/api/v1/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/info' | '/v1/tenant/:tenantId/settings' | '/v1/tenant/:tenantId/usage' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/analytics/advanced' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/billing/usage' | '/v1/tenant/:tenantId/billing/invoices' | '/v1/tenant/:tenantId/billing/upgrade' | '/v1/info' | '/v1/settings' | '/v1/usage' | '/v1/users/:userId' | '/v1/:userId' | '/v1/analytics/advanced' | '/v1/analytics/export' | '/v1/advanced' | '/v1/export' | '/v1/billing/usage' | '/v1/billing/invoices' | '/v1/billing/upgrade' | '/v1/invoices' | '/v1/upgrade' | '/api/v1/tenant/:tenantId/billing/cancel' | '/api/v1/cancel' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/:userId' | '/v1/tenant/:tenantId/analytics/enterprise' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/analytics/usage' | '/v1/enterprise' | '/v1/export' | '/v1/tenant/:tenantId/billing/cancel' | '/v1/cancel' | '/v1/content/articles/:id' | '/v1/content/articles/:id' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/v1/:id' | '/v1/:id' | '/tenant/:tenantId/info' | '/tenant/:tenantId/settings' | '/tenant/:tenantId/usage' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/analytics/advanced' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/billing/usage' | '/tenant/:tenantId/billing/invoices' | '/tenant/:tenantId/billing/upgrade' | '/info' | '/settings' | '/usage' | '/users/:userId' | '/:userId' | '/analytics/advanced' | '/analytics/export' | '/advanced' | '/export' | '/billing/usage' | '/billing/invoices' | '/billing/upgrade' | '/invoices' | '/upgrade' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/:userId' | '/tenant/:tenantId/analytics/enterprise' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/analytics/usage' | '/enterprise' | '/export' | '/tenant/:tenantId/billing/cancel' | '/cancel' | '/content/articles/:id' | '/content/articles/:id' | '/content/articles/:id' | '/articles/:id' | '/articles/:id' | '/articles/:id' | '/:id' | '/:id' | '/:id';
+export type ValidPaths = '/health' | '/api/v2/*' | '/v2/*' | '/*' | '/docs/v1' | '/v1' | '/api/v1/tenant/:tenantId/info' | '/api/v1/tenant/:tenantId/settings' | '/api/v1/tenant/:tenantId/usage' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/analytics/advanced' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/billing/usage' | '/api/v1/tenant/:tenantId/billing/invoices' | '/api/v1/tenant/:tenantId/billing/upgrade' | '/api/v1/info' | '/api/v1/settings' | '/api/v1/usage' | '/api/v1/users/:userId' | '/api/v1/:userId' | '/api/v1/analytics/advanced' | '/api/v1/analytics/export' | '/api/v1/advanced' | '/api/v1/export' | '/api/v1/billing/usage' | '/api/v1/billing/invoices' | '/api/v1/billing/upgrade' | '/api/v1/invoices' | '/api/v1/upgrade' | '/api/v1/tenant/:tenantId/billing/cancel' | '/api/v1/cancel' | '/api/v1/tenant/:tenantId/analytics/enterprise' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/analytics/usage' | '/api/v1/enterprise' | '/api/v1/export' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/:userId' | '/api/v1/content/articles/:id' | '/api/v1/content/articles/:id' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/api/v1/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/:userId' | '/v1/:userId' | '/v1/tenant/:tenantId/info' | '/v1/tenant/:tenantId/settings' | '/v1/tenant/:tenantId/usage' | '/v1/tenant/:tenantId/analytics/advanced' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/billing/usage' | '/v1/tenant/:tenantId/billing/invoices' | '/v1/tenant/:tenantId/billing/upgrade' | '/v1/info' | '/v1/settings' | '/v1/usage' | '/v1/users/:userId' | '/v1/analytics/advanced' | '/v1/analytics/export' | '/v1/advanced' | '/v1/export' | '/v1/billing/usage' | '/v1/billing/invoices' | '/v1/billing/upgrade' | '/v1/invoices' | '/v1/upgrade' | '/v1/tenant/:tenantId/billing/cancel' | '/v1/cancel' | '/v1/tenant/:tenantId/analytics/enterprise' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/analytics/usage' | '/v1/enterprise' | '/v1/export' | '/v1/content/articles/:id' | '/v1/content/articles/:id' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/v1/:id' | '/v1/:id' | '/tenant/:tenantId/info' | '/tenant/:tenantId/settings' | '/tenant/:tenantId/usage' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/analytics/advanced' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/billing/usage' | '/tenant/:tenantId/billing/invoices' | '/tenant/:tenantId/billing/upgrade' | '/info' | '/settings' | '/usage' | '/users/:userId' | '/:userId' | '/analytics/advanced' | '/analytics/export' | '/advanced' | '/export' | '/billing/usage' | '/billing/invoices' | '/billing/upgrade' | '/invoices' | '/upgrade' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/:userId' | '/tenant/:tenantId/analytics/enterprise' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/analytics/usage' | '/enterprise' | '/export' | '/tenant/:tenantId/billing/cancel' | '/cancel' | '/content/articles/:id' | '/content/articles/:id' | '/content/articles/:id' | '/articles/:id' | '/articles/:id' | '/articles/:id' | '/:id' | '/:id' | '/:id';
 
 export type PathParams<T extends ValidPaths> = T extends keyof PathParamMap 
   ? PathParamMap[T] 
@@ -713,26 +713,26 @@ interface PathParamMap {
   '/api/v1/tenant/:tenantId/billing/upgrade': { tenantId: string | number };
   '/api/v1/users/:userId': { userId: string | number };
   '/api/v1/:userId': { userId: string | number };
+  '/api/v1/tenant/:tenantId/billing/cancel': { tenantId: string | number };
   '/api/v1/tenant/:tenantId/analytics/enterprise': { tenantId: string | number };
   '/api/v1/tenant/:tenantId/analytics/usage': { tenantId: string | number };
   '/api/v1/content/articles/:id': { id: string | number };
   '/api/v1/articles/:id': { id: string | number };
   '/api/v1/:id': { id: string | number };
+  '/v1/tenant/:tenantId/users/:userId': { tenantId: string | number; userId: string | number };
+  '/v1/:userId': { userId: string | number };
   '/v1/tenant/:tenantId/info': { tenantId: string | number };
   '/v1/tenant/:tenantId/settings': { tenantId: string | number };
   '/v1/tenant/:tenantId/usage': { tenantId: string | number };
-  '/v1/tenant/:tenantId/users/:userId': { tenantId: string | number; userId: string | number };
   '/v1/tenant/:tenantId/analytics/advanced': { tenantId: string | number };
   '/v1/tenant/:tenantId/analytics/export': { tenantId: string | number };
   '/v1/tenant/:tenantId/billing/usage': { tenantId: string | number };
   '/v1/tenant/:tenantId/billing/invoices': { tenantId: string | number };
   '/v1/tenant/:tenantId/billing/upgrade': { tenantId: string | number };
   '/v1/users/:userId': { userId: string | number };
-  '/v1/:userId': { userId: string | number };
-  '/api/v1/tenant/:tenantId/billing/cancel': { tenantId: string | number };
+  '/v1/tenant/:tenantId/billing/cancel': { tenantId: string | number };
   '/v1/tenant/:tenantId/analytics/enterprise': { tenantId: string | number };
   '/v1/tenant/:tenantId/analytics/usage': { tenantId: string | number };
-  '/v1/tenant/:tenantId/billing/cancel': { tenantId: string | number };
   '/v1/content/articles/:id': { id: string | number };
   '/v1/articles/:id': { id: string | number };
   '/v1/:id': { id: string | number };
@@ -787,9 +787,10 @@ export interface GeneratedApiClient {
   get(path: '/api/v1/content/articles/:id', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/api/v1/content/articles/:id"]["params"] }): Promise<RouteDefinitions["GET"]["/api/v1/content/articles/:id"]["response"]>;
   get(path: '/api/v1/articles/:id', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/api/v1/articles/:id"]["params"] }): Promise<RouteDefinitions["GET"]["/api/v1/articles/:id"]["response"]>;
   get(path: '/api/v1/:id', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/api/v1/:id"]["params"] }): Promise<RouteDefinitions["GET"]["/api/v1/:id"]["response"]>;
+  get(path: '/v1/tenant/:tenantId/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/tenant/:tenantId/users/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/users/:userId"]["response"]>;
+  get(path: '/v1/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/:userId"]["response"]>;
   get(path: '/v1/tenant/:tenantId/info', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/tenant/:tenantId/info"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/info"]["response"]>;
   get(path: '/v1/tenant/:tenantId/usage', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/tenant/:tenantId/usage"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/usage"]["response"]>;
-  get(path: '/v1/tenant/:tenantId/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/tenant/:tenantId/users/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/users/:userId"]["response"]>;
   get(path: '/v1/tenant/:tenantId/analytics/advanced', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/tenant/:tenantId/analytics/advanced"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/analytics/advanced"]["response"]>;
   get(path: '/v1/tenant/:tenantId/analytics/export', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/tenant/:tenantId/analytics/export"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/analytics/export"]["response"]>;
   get(path: '/v1/tenant/:tenantId/billing/usage', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/tenant/:tenantId/billing/usage"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/billing/usage"]["response"]>;
@@ -797,7 +798,6 @@ export interface GeneratedApiClient {
   get(path: '/v1/info', options?: ClientRequestOptions): Promise<RouteDefinitions["GET"]["/v1/info"]["response"]>;
   get(path: '/v1/usage', options?: ClientRequestOptions): Promise<RouteDefinitions["GET"]["/v1/usage"]["response"]>;
   get(path: '/v1/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/users/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/users/:userId"]["response"]>;
-  get(path: '/v1/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/v1/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/v1/:userId"]["response"]>;
   get(path: '/v1/analytics/advanced', options?: ClientRequestOptions): Promise<RouteDefinitions["GET"]["/v1/analytics/advanced"]["response"]>;
   get(path: '/v1/analytics/export', options?: ClientRequestOptions): Promise<RouteDefinitions["GET"]["/v1/analytics/export"]["response"]>;
   get(path: '/v1/advanced', options?: ClientRequestOptions): Promise<RouteDefinitions["GET"]["/v1/advanced"]["response"]>;
@@ -842,10 +842,10 @@ export interface GeneratedApiClient {
   put(path: '/api/v1/content/articles/:id', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/api/v1/content/articles/:id"]["params"] } & { body: RouteDefinitions["PUT"]["/api/v1/content/articles/:id"]["body"] }): Promise<RouteDefinitions["PUT"]["/api/v1/content/articles/:id"]["response"]>;
   put(path: '/api/v1/articles/:id', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/api/v1/articles/:id"]["params"] } & { body: RouteDefinitions["PUT"]["/api/v1/articles/:id"]["body"] }): Promise<RouteDefinitions["PUT"]["/api/v1/articles/:id"]["response"]>;
   put(path: '/api/v1/:id', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/api/v1/:id"]["params"] } & { body: RouteDefinitions["PUT"]["/api/v1/:id"]["body"] }): Promise<RouteDefinitions["PUT"]["/api/v1/:id"]["response"]>;
-  put(path: '/v1/tenant/:tenantId/settings', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/v1/tenant/:tenantId/settings"]["params"] } & { body: RouteDefinitions["PUT"]["/v1/tenant/:tenantId/settings"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/tenant/:tenantId/settings"]["response"]>;
-  put(path: '/v1/settings', options: ClientRequestOptions & { body: RouteDefinitions["PUT"]["/v1/settings"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/settings"]["response"]>;
   put(path: '/v1/tenant/:tenantId/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/v1/tenant/:tenantId/users/:userId"]["params"] } & { body: RouteDefinitions["PUT"]["/v1/tenant/:tenantId/users/:userId"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/tenant/:tenantId/users/:userId"]["response"]>;
   put(path: '/v1/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/v1/:userId"]["params"] } & { body: RouteDefinitions["PUT"]["/v1/:userId"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/:userId"]["response"]>;
+  put(path: '/v1/tenant/:tenantId/settings', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/v1/tenant/:tenantId/settings"]["params"] } & { body: RouteDefinitions["PUT"]["/v1/tenant/:tenantId/settings"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/tenant/:tenantId/settings"]["response"]>;
+  put(path: '/v1/settings', options: ClientRequestOptions & { body: RouteDefinitions["PUT"]["/v1/settings"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/settings"]["response"]>;
   put(path: '/v1/content/articles/:id', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/v1/content/articles/:id"]["params"] } & { body: RouteDefinitions["PUT"]["/v1/content/articles/:id"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/content/articles/:id"]["response"]>;
   put(path: '/v1/articles/:id', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/v1/articles/:id"]["params"] } & { body: RouteDefinitions["PUT"]["/v1/articles/:id"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/articles/:id"]["response"]>;
   put(path: '/v1/:id', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/v1/:id"]["params"] } & { body: RouteDefinitions["PUT"]["/v1/:id"]["body"] }): Promise<RouteDefinitions["PUT"]["/v1/:id"]["response"]>;
@@ -859,17 +859,17 @@ export interface GeneratedApiClient {
   post(path: '/api/v1/tenant/:tenantId/billing/upgrade', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/upgrade"]["params"] } & { body: RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/upgrade"]["response"]>;
   post(path: '/api/v1/billing/upgrade', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/api/v1/billing/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/billing/upgrade"]["response"]>;
   post(path: '/api/v1/upgrade', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/api/v1/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/upgrade"]["response"]>;
+  post(path: '/api/v1/tenant/:tenantId/billing/cancel', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/cancel"]["params"] } & { body: RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/cancel"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/cancel"]["response"]>;
+  post(path: '/api/v1/cancel', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/api/v1/cancel"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/cancel"]["response"]>;
   post(path: '/api/v1/tenant/:tenantId/analytics/export', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/analytics/export"]["params"] } & { body: RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/analytics/export"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/analytics/export"]["response"]>;
   post(path: '/api/v1/export', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/api/v1/export"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/export"]["response"]>;
   post(path: '/v1/tenant/:tenantId/billing/upgrade', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/v1/tenant/:tenantId/billing/upgrade"]["params"] } & { body: RouteDefinitions["POST"]["/v1/tenant/:tenantId/billing/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/tenant/:tenantId/billing/upgrade"]["response"]>;
   post(path: '/v1/billing/upgrade', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/v1/billing/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/billing/upgrade"]["response"]>;
   post(path: '/v1/upgrade', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/v1/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/upgrade"]["response"]>;
-  post(path: '/api/v1/tenant/:tenantId/billing/cancel', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/cancel"]["params"] } & { body: RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/cancel"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/cancel"]["response"]>;
-  post(path: '/api/v1/cancel', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/api/v1/cancel"]["body"] }): Promise<RouteDefinitions["POST"]["/api/v1/cancel"]["response"]>;
-  post(path: '/v1/tenant/:tenantId/analytics/export', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/v1/tenant/:tenantId/analytics/export"]["params"] } & { body: RouteDefinitions["POST"]["/v1/tenant/:tenantId/analytics/export"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/tenant/:tenantId/analytics/export"]["response"]>;
-  post(path: '/v1/export', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/v1/export"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/export"]["response"]>;
   post(path: '/v1/tenant/:tenantId/billing/cancel', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/v1/tenant/:tenantId/billing/cancel"]["params"] } & { body: RouteDefinitions["POST"]["/v1/tenant/:tenantId/billing/cancel"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/tenant/:tenantId/billing/cancel"]["response"]>;
   post(path: '/v1/cancel', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/v1/cancel"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/cancel"]["response"]>;
+  post(path: '/v1/tenant/:tenantId/analytics/export', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/v1/tenant/:tenantId/analytics/export"]["params"] } & { body: RouteDefinitions["POST"]["/v1/tenant/:tenantId/analytics/export"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/tenant/:tenantId/analytics/export"]["response"]>;
+  post(path: '/v1/export', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/v1/export"]["body"] }): Promise<RouteDefinitions["POST"]["/v1/export"]["response"]>;
   post(path: '/tenant/:tenantId/billing/upgrade', options: ClientRequestOptions & { params: RouteDefinitions["POST"]["/tenant/:tenantId/billing/upgrade"]["params"] } & { body: RouteDefinitions["POST"]["/tenant/:tenantId/billing/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/tenant/:tenantId/billing/upgrade"]["response"]>;
   post(path: '/billing/upgrade', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/billing/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/billing/upgrade"]["response"]>;
   post(path: '/upgrade', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/upgrade"]["body"] }): Promise<RouteDefinitions["POST"]["/upgrade"]["response"]>;
@@ -931,9 +931,10 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/api/v1/content/articles/:id': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/api/v1/content/articles/:id"]["response"]>;
       case '/api/v1/articles/:id': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/api/v1/articles/:id"]["response"]>;
       case '/api/v1/:id': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/api/v1/:id"]["response"]>;
+      case '/v1/tenant/:tenantId/users/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/users/:userId"]["response"]>;
+      case '/v1/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/:userId"]["response"]>;
       case '/v1/tenant/:tenantId/info': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/info"]["response"]>;
       case '/v1/tenant/:tenantId/usage': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/usage"]["response"]>;
-      case '/v1/tenant/:tenantId/users/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/users/:userId"]["response"]>;
       case '/v1/tenant/:tenantId/analytics/advanced': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/analytics/advanced"]["response"]>;
       case '/v1/tenant/:tenantId/analytics/export': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/analytics/export"]["response"]>;
       case '/v1/tenant/:tenantId/billing/usage': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/tenant/:tenantId/billing/usage"]["response"]>;
@@ -941,7 +942,6 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/v1/info': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/info"]["response"]>;
       case '/v1/usage': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/usage"]["response"]>;
       case '/v1/users/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/users/:userId"]["response"]>;
-      case '/v1/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/:userId"]["response"]>;
       case '/v1/analytics/advanced': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/analytics/advanced"]["response"]>;
       case '/v1/analytics/export': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/analytics/export"]["response"]>;
       case '/v1/advanced': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/v1/advanced"]["response"]>;
@@ -991,10 +991,10 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/api/v1/content/articles/:id': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/api/v1/content/articles/:id"]["response"]>;
       case '/api/v1/articles/:id': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/api/v1/articles/:id"]["response"]>;
       case '/api/v1/:id': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/api/v1/:id"]["response"]>;
-      case '/v1/tenant/:tenantId/settings': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/tenant/:tenantId/settings"]["response"]>;
-      case '/v1/settings': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/settings"]["response"]>;
       case '/v1/tenant/:tenantId/users/:userId': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/tenant/:tenantId/users/:userId"]["response"]>;
       case '/v1/:userId': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/:userId"]["response"]>;
+      case '/v1/tenant/:tenantId/settings': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/tenant/:tenantId/settings"]["response"]>;
+      case '/v1/settings': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/settings"]["response"]>;
       case '/v1/content/articles/:id': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/content/articles/:id"]["response"]>;
       case '/v1/articles/:id': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/articles/:id"]["response"]>;
       case '/v1/:id': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/v1/:id"]["response"]>;
@@ -1013,17 +1013,17 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/api/v1/tenant/:tenantId/billing/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/upgrade"]["response"]>;
       case '/api/v1/billing/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/billing/upgrade"]["response"]>;
       case '/api/v1/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/upgrade"]["response"]>;
+      case '/api/v1/tenant/:tenantId/billing/cancel': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/cancel"]["response"]>;
+      case '/api/v1/cancel': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/cancel"]["response"]>;
       case '/api/v1/tenant/:tenantId/analytics/export': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/analytics/export"]["response"]>;
       case '/api/v1/export': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/export"]["response"]>;
       case '/v1/tenant/:tenantId/billing/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/tenant/:tenantId/billing/upgrade"]["response"]>;
       case '/v1/billing/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/billing/upgrade"]["response"]>;
       case '/v1/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/upgrade"]["response"]>;
-      case '/api/v1/tenant/:tenantId/billing/cancel': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/tenant/:tenantId/billing/cancel"]["response"]>;
-      case '/api/v1/cancel': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/api/v1/cancel"]["response"]>;
-      case '/v1/tenant/:tenantId/analytics/export': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/tenant/:tenantId/analytics/export"]["response"]>;
-      case '/v1/export': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/export"]["response"]>;
       case '/v1/tenant/:tenantId/billing/cancel': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/tenant/:tenantId/billing/cancel"]["response"]>;
       case '/v1/cancel': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/cancel"]["response"]>;
+      case '/v1/tenant/:tenantId/analytics/export': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/tenant/:tenantId/analytics/export"]["response"]>;
+      case '/v1/export': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/v1/export"]["response"]>;
       case '/tenant/:tenantId/billing/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/tenant/:tenantId/billing/upgrade"]["response"]>;
       case '/billing/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/billing/upgrade"]["response"]>;
       case '/upgrade': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/upgrade"]["response"]>;

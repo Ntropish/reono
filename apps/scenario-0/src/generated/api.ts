@@ -3,26 +3,84 @@ import { createClient, type ClientRequestOptions, type CreateClientOptions } fro
 
 // Route type definitions grouped by HTTP method
 export interface RouteDefinitions {
-
+  GET: {
+    "/users/:userId": {
+      params: { userId: string | number };
+      body: never;
+      response: { id: string; email: string; name: string; role: string; [key: string]: any };
+    },
+    "/:userId": {
+      params: { userId: string | number };
+      body: never;
+      response: any;
+    }
+  },
+  PUT: {
+    "/users/:userId": {
+      params: { userId: string | number };
+      body: any;
+      response: any;
+    },
+    "/:userId": {
+      params: { userId: string | number };
+      body: any;
+      response: any;
+    }
+  },
+  DELETE: {
+    "/users/:userId": {
+      params: { userId: string | number };
+      body: never;
+      response: any;
+    },
+    "/:userId": {
+      params: { userId: string | number };
+      body: never;
+      response: any;
+    }
+  },
+  PATCH: {
+    "/users/:userId": {
+      params: { userId: string | number };
+      body: any;
+      response: any;
+    },
+    "/:userId": {
+      params: { userId: string | number };
+      body: any;
+      response: any;
+    }
+  }
 }
 
 // Method-specific path types
-
+export type GETPaths = '/users/:userId' | '/:userId';
+export type PUTPaths = '/users/:userId' | '/:userId';
+export type DELETEPaths = '/users/:userId' | '/:userId';
+export type PATCHPaths = '/users/:userId' | '/:userId';
 
 // Union type of all valid paths
-export type ValidPaths = never;
+export type ValidPaths = '/users/:userId' | '/users/:userId' | '/users/:userId' | '/users/:userId' | '/:userId' | '/:userId' | '/:userId' | '/:userId';
 
 export type PathParams<T extends ValidPaths> = T extends keyof PathParamMap 
   ? PathParamMap[T] 
   : never;
 
 interface PathParamMap {
-  // No paths with parameters
+  '/users/:userId': { userId: string | number };
+  '/:userId': { userId: string | number }
 }
 
 // Generated client interface
 export interface GeneratedApiClient {
-
+  get(path: '/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/users/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/users/:userId"]["response"]>;
+  get(path: '/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/:userId"]["response"]>;
+  put(path: '/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/users/:userId"]["params"] } & { body: RouteDefinitions["PUT"]["/users/:userId"]["body"] }): Promise<RouteDefinitions["PUT"]["/users/:userId"]["response"]>;
+  put(path: '/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/:userId"]["params"] } & { body: RouteDefinitions["PUT"]["/:userId"]["body"] }): Promise<RouteDefinitions["PUT"]["/:userId"]["response"]>;
+  delete(path: '/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["DELETE"]["/users/:userId"]["params"] }): Promise<RouteDefinitions["DELETE"]["/users/:userId"]["response"]>;
+  delete(path: '/:userId', options: ClientRequestOptions & { params: RouteDefinitions["DELETE"]["/:userId"]["params"] }): Promise<RouteDefinitions["DELETE"]["/:userId"]["response"]>;
+  patch(path: '/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PATCH"]["/users/:userId"]["params"] } & { body: RouteDefinitions["PATCH"]["/users/:userId"]["body"] }): Promise<RouteDefinitions["PATCH"]["/users/:userId"]["response"]>;
+  patch(path: '/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PATCH"]["/:userId"]["params"] } & { body: RouteDefinitions["PATCH"]["/:userId"]["body"] }): Promise<RouteDefinitions["PATCH"]["/:userId"]["response"]>;
 }
 
 // Create the typed client
@@ -30,7 +88,34 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
   const client = createClient({ baseUrl: 'http://localhost:8082', ...options });
   
   return {
-
+    get: (path: string, options?: ClientRequestOptions) => {
+      switch (path) {
+      case '/users/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/users/:userId"]["response"]>;
+      case '/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/:userId"]["response"]>;
+        default: throw new Error(`Invalid path for GET: ${path}`);
+      }
+    },
+    put: (path: string, options?: ClientRequestOptions) => {
+      switch (path) {
+      case '/users/:userId': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/users/:userId"]["response"]>;
+      case '/:userId': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/:userId"]["response"]>;
+        default: throw new Error(`Invalid path for PUT: ${path}`);
+      }
+    },
+    delete: (path: string, options?: ClientRequestOptions) => {
+      switch (path) {
+      case '/users/:userId': return client.delete(path, options) as Promise<RouteDefinitions["DELETE"]["/users/:userId"]["response"]>;
+      case '/:userId': return client.delete(path, options) as Promise<RouteDefinitions["DELETE"]["/:userId"]["response"]>;
+        default: throw new Error(`Invalid path for DELETE: ${path}`);
+      }
+    },
+    patch: (path: string, options?: ClientRequestOptions) => {
+      switch (path) {
+      case '/users/:userId': return client.patch(path, options) as Promise<RouteDefinitions["PATCH"]["/users/:userId"]["response"]>;
+      case '/:userId': return client.patch(path, options) as Promise<RouteDefinitions["PATCH"]["/:userId"]["response"]>;
+        default: throw new Error(`Invalid path for PATCH: ${path}`);
+      }
+    }
   };
 }
 

@@ -1,59 +1,46 @@
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
 import { createApi } from "@/src/generated/api";
+import { App } from "@/dist/index.mjs"; // Import the main application component
+import { createApp } from "@reono/node-server";
 
 const BASE_URL = process.env.API_BASE_URL || "http://localhost:3050";
 
-async function waitForServer(path = "/users", timeoutMs = 10000) {
-  const start = Date.now();
-  let lastErr: any;
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(`${BASE_URL}${path}`);
-      if (res.ok || res.status === 405) return; // endpoint available
-    } catch (e) {
-      lastErr = e;
-    }
-    await new Promise((r) => setTimeout(r, 200));
-  }
-  throw new Error(
-    `Server at ${BASE_URL} did not become ready within ${timeoutMs}ms. Last error: ${lastErr}`
-  );
-}
-
-async function request(method: string, path: string, body?: any) {
-  const headers: Record<string, string> = {};
-  let payload: BodyInit | undefined = undefined;
-  if (body !== undefined) {
-    headers["content-type"] = "application/json";
-    payload = JSON.stringify(body);
-  }
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: payload,
-  });
-  return res;
-}
-
 let createdId: number | null = null;
+let app: any;
+let server: any;
+let api: ReturnType<typeof createApi>;
 
-beforeAll(async () => {});
+beforeAll(async () => {
+  // Start the server with the App component
+  app = createApp();
+  app.serve(App());
+
+  await new Promise<void>((resolve) => {
+    server = app.listen(3050, () => resolve());
+  });
+
+  // Create the type-safe client
+  api = createApi({ baseUrl: BASE_URL });
+});
+
+afterAll(async () => {
+  if (server) {
+    await new Promise<void>((resolve) => {
+      server.close(() => resolve());
+    });
+  }
+});
 
 describe("Users API (live)", () => {
   it("GET /users returns a list", async () => {
-    const res = await request("GET", "/users");
-    expect(res.status).toBe(200);
-    expect(res.headers.get("content-type") || "").toMatch(/application\/json/i);
-    const data = await res.json();
+    const data = await api.get("/users");
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBeGreaterThan(0);
   });
 
   it("POST /users creates a new user", async () => {
     const name = `TestUser-${Date.now()}`;
-    const res = await request("POST", "/users", { name });
-    expect(res.status).toBe(200);
-    const created = await res.json();
+    const created = await api.post("/users", { body: { name } });
     expect(created).toMatchObject({ name });
     expect(typeof created.id).toBe("number");
     createdId = created.id;

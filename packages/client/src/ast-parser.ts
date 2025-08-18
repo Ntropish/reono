@@ -83,8 +83,21 @@ export class ReonoASTParser {
             `[reono-client] Processing import from: ${path.node.source.value}`
           );
           path.node.specifiers.forEach((spec: any) => {
+            let importName: string | null = null;
+
+            // Handle named imports: import { UserRouter } from "./router"
             if (t.isImportSpecifier(spec) && t.isIdentifier(spec.imported)) {
-              const importName = spec.imported.name;
+              importName = spec.imported.name;
+            }
+            // Handle default imports: import UserRouter from "./router"
+            else if (
+              t.isImportDefaultSpecifier(spec) &&
+              t.isIdentifier(spec.local)
+            ) {
+              importName = spec.local.name;
+            }
+
+            if (importName) {
               const importPath = this.resolveImportPath(
                 path.node.source.value,
                 filePath

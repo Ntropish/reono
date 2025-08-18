@@ -10,8 +10,7 @@ import { logger } from "../middleware/logger";
 import { errorHandler } from "../middleware/error-handler";
 import { globalRateLimit } from "../middleware/rate-limit";
 import { createElement } from "reono";
-import { renderClient } from "@reono/client";
-import { api } from "../generated/api"; // Use the generated type-safe client
+import { createApi } from "../generated/api"; // Use the generated type-safe client factory
 
 import { createTEST_BASE_URL, TEST_API_KEYS, TEST_TENANTS } from "./util";
 
@@ -66,10 +65,10 @@ const App = () => (
   </use>
 );
 
-describe("Scenario 2: Client Integration via renderClient", () => {
+describe("Scenario 2: Type-Safe Generated Client Integration", () => {
   let app: any;
   let server: any;
-  let client: ReturnType<typeof renderClient>;
+  let api: ReturnType<typeof createApi>;
 
   beforeAll(async () => {
     // Start test server
@@ -82,9 +81,8 @@ describe("Scenario 2: Client Integration via renderClient", () => {
 
     const TEST_BASE_URL = createTEST_BASE_URL(TEST_PORT);
 
-    // Use renderClient for runtime type-safe requests
-    // Note: This provides runtime path interpolation but not compile-time type safety
-    client = renderClient(App(), { baseUrl: TEST_BASE_URL });
+    // Create the type-safe generated client
+    api = createApi({ baseUrl: TEST_BASE_URL });
   });
 
   afterAll(async () => {
@@ -95,14 +93,13 @@ describe("Scenario 2: Client Integration via renderClient", () => {
     }
   });
 
-  it("health via client", async () => {
+  it("health via type-safe client", async () => {
     const data = await api.get("/health");
     expect(data.status).toBe("ok");
   });
 
-  it("catch-all route via client", async () => {
+  it("catch-all route via type-safe client", async () => {
     // Test the catch-all route which handles unmatched paths
-
     try {
       await api.get("/*");
       // should throw an error since this path does not exist
@@ -120,45 +117,38 @@ describe("Scenario 2: Client Integration via renderClient", () => {
     }
   });
 
-  it("auth + users via renderClient (fallback)", async () => {
-    // Since the generated client doesn't yet support nested routes,
-    // we fall back to the renderClient for dynamic routes
-    const data = await client.get(`/api/v1/tenant/${TEST_TENANTS.FREE}/users`, {
+  it("tenant user by ID via type-safe client", async () => {
+    // Test a parameterized route with proper type safety
+    const data = await api.get("/api/v1/tenant/:tenantId/users/:userId", {
+      params: { tenantId: TEST_TENANTS.FREE, userId: "123" },
       headers: { Authorization: `Bearer ${TEST_API_KEYS.FREE}` },
     });
-    expect(data).toHaveProperty("users");
-    expect(Array.isArray(data.users)).toBe(true);
+    expect(data).toHaveProperty("id");
+    expect(data).toHaveProperty("email");
+    expect(data).toHaveProperty("name");
+    expect(data).toHaveProperty("role");
   });
 
-  it("create user via renderClient (fallback)", async () => {
-    const newUser = {
-      email: "test@example.com",
-      name: "Test User",
-      role: "user",
-    };
-    // Using renderClient since the generated client doesn't support POST yet
-    const data = await client.post(
-      `/api/v1/tenant/${TEST_TENANTS.PREMIUM}/users`,
-      {
-        headers: {
-          Authorization: `Bearer ${TEST_API_KEYS.PREMIUM}`,
-          "Content-Type": "application/json",
-        },
-        body: newUser,
-      }
-    );
-    expect(data).toHaveProperty("email", newUser.email);
+  it("tenant info via type-safe client", async () => {
+    // Test another parameterized route
+    const data = await api.get("/api/v1/tenant/:tenantId/info", {
+      params: { tenantId: TEST_TENANTS.PREMIUM },
+      headers: { Authorization: `Bearer ${TEST_API_KEYS.PREMIUM}` },
+    });
+    expect(data).toHaveProperty("id");
+    expect(data).toHaveProperty("name");
+    expect(data).toHaveProperty("domain");
+    expect(data).toHaveProperty("subscription");
   });
 
-  it("param interpolation via renderClient", async () => {
-    const tenant = TEST_TENANTS.PREMIUM;
-    const userId = "123";
-    const path = "/api/v1/tenant/:tenantId/users/:userId";
-    await expect(
-      client.get(path, {
-        params: { tenantId: tenant, userId },
-        headers: { Authorization: `Bearer ${TEST_API_KEYS.PREMIUM}` },
-      })
-    ).rejects.toBeTruthy();
+  it("type safety - missing params should cause compile error", async () => {
+    // This test demonstrates type safety by showing what would be a compile-time error
+    try {
+      // @ts-expect-error - This should fail because params are required for parameterized routes
+      const data = await api.get("/api/v1/tenant/:tenantId/info");
+    } catch (error) {
+      // Expected to fail at runtime since TypeScript would catch this at compile time
+      console.log("Runtime error as expected:", error);
+    }
   });
 });

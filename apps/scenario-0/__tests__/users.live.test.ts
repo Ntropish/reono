@@ -1,4 +1,5 @@
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
+import { createApi } from "@/src/generated/api";
 
 const BASE_URL = process.env.API_BASE_URL || "http://localhost:3050";
 

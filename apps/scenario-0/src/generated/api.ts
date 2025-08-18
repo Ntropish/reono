@@ -7,22 +7,22 @@ export interface RouteDefinitions {
     "/users": {
       params: never;
       body: never;
-      response: { users: Array<{ id: string; email: string; name: string; role: string; [key: string]: any }> };
+      response: Array<{ id: number; name: string }>;
     },
     "/users/:userId": {
       params: { userId: string | number };
       body: never;
-      response: { id: string; email: string; name: string; role: string; [key: string]: any };
+      response: { id: number; name: string };
     },
     "/": {
       params: never;
       body: never;
-      response: any;
+      response: Array<{ id: number; name: string }>;
     },
     "/:userId": {
       params: { userId: string | number };
       body: never;
-      response: any;
+      response: { id: number; name: string };
     }
   },
   PUT: {
@@ -53,7 +53,7 @@ export interface RouteDefinitions {
     "/users": {
       params: never;
       body: any;
-      response: { id: string; email: string; name: string; role: string; [key: string]: any };
+      response: any;
     },
     "/": {
       params: never;

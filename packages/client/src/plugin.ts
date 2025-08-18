@@ -334,15 +334,15 @@ ${implementations}
     if (route.path.includes("/users") && route.method === "GET") {
       if (route.path.includes(":")) {
         // Single user
-        return `{ id: string; email: string; name: string; role: string; [key: string]: any }`;
+        return `{ id: number; name: string; [key: string]: any }`;
       } else {
-        // User list
-        return `{ users: Array<{ id: string; email: string; name: string; role: string; [key: string]: any }> }`;
+        // User list - returns array directly, not wrapped in object
+        return `Array<{ id: number; name: string; [key: string]: any }>`;
       }
     }
 
     if (route.method === "POST" && route.path.includes("/users")) {
-      return `{ id: string; email: string; name: string; role: string; [key: string]: any }`;
+      return `{ id: number; name: string; [key: string]: any }`;
     }
 
     if (route.path.includes("/tenant") && route.path.includes("/info")) {

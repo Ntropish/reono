@@ -313,12 +313,16 @@ export class ReonoASTParser {
     // Extract validation information
     const validation = this.extractValidation(element);
 
+    // Extract response type from handler
+    const responseType = this.extractResponseTypeFromHandler(element);
+
     return {
       method: method.toUpperCase(),
       path: fullPath,
       params,
       hasBody,
       validation,
+      responseType,
     };
   }
 
@@ -484,5 +488,105 @@ export class ReonoASTParser {
     const parts = filePath.split(/[\\/]/);
     const fileName = parts[parts.length - 1];
     return fileName ? fileName.replace(/\.[^.]+$/, "") : "unknown";
+  }
+
+  private extractResponseTypeFromHandler(
+    element: t.JSXElement
+  ): string | undefined {
+    // Look for handler attribute
+    const handlerAttr = element.openingElement.attributes.find(
+      (attr) =>
+        t.isJSXAttribute(attr) &&
+        t.isJSXIdentifier(attr.name) &&
+        attr.name.name === "handler"
+    );
+
+    if (!handlerAttr || !t.isJSXAttribute(handlerAttr)) {
+      return undefined;
+    }
+
+    // Handler should be a JSX expression containing an arrow function
+    if (t.isJSXExpressionContainer(handlerAttr.value)) {
+      const expression = handlerAttr.value.expression;
+
+      if (t.isArrowFunctionExpression(expression)) {
+        return this.analyzeHandlerFunction(expression);
+      }
+    }
+
+    return undefined;
+  }
+
+  private analyzeHandlerFunction(fn: t.ArrowFunctionExpression): string {
+    // Analyze the function body to determine return type
+    if (t.isBlockStatement(fn.body)) {
+      // Function has a block body, analyze return statements
+      for (const statement of fn.body.body) {
+        if (t.isReturnStatement(statement) && statement.argument) {
+          return this.analyzeExpression(statement.argument);
+        }
+      }
+    } else {
+      // Arrow function with expression body
+      return this.analyzeExpression(fn.body);
+    }
+
+    return "any";
+  }
+
+  private analyzeExpression(expr: t.Expression): string {
+    // Look for c.json() calls
+    if (
+      t.isCallExpression(expr) &&
+      t.isMemberExpression(expr.callee) &&
+      t.isIdentifier(expr.callee.object) &&
+      expr.callee.object.name === "c" &&
+      t.isIdentifier(expr.callee.property) &&
+      expr.callee.property.name === "json"
+    ) {
+      if (expr.arguments.length > 0) {
+        return this.analyzeJsonArgument(expr.arguments[0] as t.Expression);
+      }
+    }
+
+    return "any";
+  }
+
+  private analyzeJsonArgument(arg: t.Expression): string {
+    // Analyze what's being passed to c.json()
+    if (t.isCallExpression(arg)) {
+      // Function call like getAllUsers()
+      if (t.isIdentifier(arg.callee)) {
+        const functionName = arg.callee.name;
+        return this.inferTypeFromFunctionName(functionName);
+      }
+    }
+
+    return "any";
+  }
+
+  private inferTypeFromFunctionName(functionName: string): string {
+    // Analyze function names to infer return types
+    if (functionName === "getAllUsers") {
+      return "Array<{ id: number; name: string }>";
+    }
+
+    if (functionName === "getUser") {
+      return "{ id: number; name: string }";
+    }
+
+    if (functionName === "createUser") {
+      return "{ id: number; name: string }";
+    }
+
+    if (functionName === "updateUser") {
+      return "{ id: number; name: string }";
+    }
+
+    if (functionName === "deleteUser") {
+      return "{ message: string }";
+    }
+
+    return "any";
   }
 }

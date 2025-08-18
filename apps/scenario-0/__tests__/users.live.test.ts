@@ -33,14 +33,14 @@ afterAll(async () => {
 
 describe("Users API (live)", () => {
   it("GET /users returns a list", async () => {
-    const data = (await api.get("/users", {})) as any;
+    const data = await api.get("/users", {});
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBeGreaterThan(0);
   });
 
   it("POST /users creates a new user", async () => {
     const name = `TestUser-${Date.now()}`;
-    const created = (await api.post("/users", { body: { name } })) as any;
+    const created = await api.post("/users", { body: { name } });
     expect(created).toMatchObject({ name });
     expect(typeof created.id).toBe("number");
     createdId = created.id;

@@ -11,7 +11,7 @@ import { errorHandler } from "../middleware/error-handler";
 import { globalRateLimit } from "../middleware/rate-limit";
 import { createElement } from "reono";
 import { createApi } from "../generated/api"; // Use the generated type-safe client factory
-import { App } from "../../dist/index.mjs"; // Import the main application component
+import App from "../../dist/index.mjs"; // Import the main application component
 
 import { createTEST_BASE_URL, TEST_API_KEYS, TEST_TENANTS } from "./util";
 

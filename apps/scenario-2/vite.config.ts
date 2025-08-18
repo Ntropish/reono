@@ -28,10 +28,10 @@ export default defineConfig({
   plugins: [
     dts(),
     reonoClient({
-      serverFile: "./src/api-definition.tsx",
+      serverFile: "./src/index.tsx",
       outputDir: "./src/generated",
       clientName: "api",
-      baseUrl: "http://localhost:8082",
+      baseUrl: "http://localhost:8200", // Use correct port
     }),
   ],
   test: {},

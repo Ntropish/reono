@@ -10,7 +10,7 @@ import { logger } from "./middleware/logger";
 import { errorHandler } from "./middleware/error-handler";
 import { globalRateLimit } from "./middleware/rate-limit";
 
-export const App = () => {
+const App = () => {
   return (
     <use handler={errorHandler}>
       <use handler={cors}>
@@ -137,3 +137,5 @@ export const App = () => {
     </use>
   );
 };
+
+export default App;

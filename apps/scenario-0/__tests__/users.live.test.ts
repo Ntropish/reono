@@ -105,7 +105,7 @@ describe("Users API (live)", () => {
 
   it("POST /users rejects invalid body (400)", async () => {
     try {
-      await api.post("/users", { body: { name: 123 } });
+      await api.post("/users", { body: { name: "123" } });
       // If we get here without an error, the test should fail
       expect(true).toBe(false);
     } catch (error) {

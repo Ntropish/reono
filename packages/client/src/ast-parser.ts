@@ -14,10 +14,17 @@ export interface RouteInfo {
   bodyType?: string;
   responseType?: string;
   validation?: {
-    params?: string;
-    body?: string;
-    query?: string;
+    params?: string | SchemaRef;
+    body?: string | SchemaRef;
+    query?: string | SchemaRef;
   };
+}
+
+export interface SchemaRef {
+  kind: "schemaRef";
+  name: string;
+  importPath: string; // absolute path to the module exporting the schema
+  partial?: boolean;
 }
 
 export interface ComponentInfo {
@@ -77,7 +84,7 @@ export class ReonoASTParser {
 
     // @ts-ignore
     traverse.default(ast, {
-      ImportDeclaration: (path) => {
+      ImportDeclaration: (path: any) => {
         if (path.node.source.value.startsWith(".")) {
           console.log(
             `[reono-client] Processing import from: ${path.node.source.value}`
@@ -152,6 +159,22 @@ export class ReonoASTParser {
       plugins: ["typescript", "jsx"],
     });
 
+      // Build local import map: local name -> resolved absolute path
+      const importMap = new Map<string, string>();
+      // @ts-ignore
+      traverse.default(ast, {
+        ImportDeclaration: (path: any) => {
+          const src = path.node.source.value as string;
+          if (!src.startsWith(".")) return; // only local
+          path.node.specifiers.forEach((spec: any) => {
+            const localName = spec.local?.name as string | undefined;
+            if (!localName) return;
+            const resolved = this.resolveImportPath(src, component.path);
+            if (resolved) importMap.set(localName, resolved);
+          });
+        },
+      });
+
     // First pass: collect all the async work we need to do
     const asyncTasks: Promise<void>[] = [];
 
@@ -167,7 +190,8 @@ export class ReonoASTParser {
             const route = this.extractRouteFromElement(
               element,
               tagName,
-              basePath
+              basePath,
+              importMap
             );
             if (route) {
               routes.push(route);
@@ -182,7 +206,7 @@ export class ReonoASTParser {
 
               // Process child elements recursively
               asyncTasks.push(
-                this.processJSXChildren(element, routes, newBasePath)
+                this.processJSXChildren(element, routes, newBasePath, importMap)
               );
             }
           }
@@ -224,7 +248,8 @@ export class ReonoASTParser {
   private async processJSXChildren(
     element: t.JSXElement,
     routes: RouteInfo[],
-    basePath: string
+    basePath: string,
+    importMap: Map<string, string>
   ): Promise<void> {
     const asyncTasks: Promise<void>[] = [];
 
@@ -240,7 +265,8 @@ export class ReonoASTParser {
             const route = this.extractRouteFromElement(
               child,
               tagName,
-              basePath
+              basePath,
+              importMap
             );
             if (route) {
               console.log(
@@ -259,7 +285,7 @@ export class ReonoASTParser {
                 `[reono-client] Found router with path: ${routerPath}, new basePath: ${newBasePath}`
               );
               asyncTasks.push(
-                this.processJSXChildren(child, routes, newBasePath)
+                this.processJSXChildren(child, routes, newBasePath, importMap)
               );
             }
           } else if (tagName.endsWith("Router")) {
@@ -288,7 +314,7 @@ export class ReonoASTParser {
             }
           } else {
             // Process other elements recursively (like <use> elements)
-            asyncTasks.push(this.processJSXChildren(child, routes, basePath));
+            asyncTasks.push(this.processJSXChildren(child, routes, basePath, importMap));
           }
         }
       }
@@ -301,7 +327,8 @@ export class ReonoASTParser {
   private extractRouteFromElement(
     element: t.JSXElement,
     method: string,
-    basePath: string
+    basePath: string,
+    importMap: Map<string, string>
   ): RouteInfo | null {
     const pathAttr = this.getAttributeValue(element, "path");
     if (pathAttr === null) return null;
@@ -311,7 +338,7 @@ export class ReonoASTParser {
     const hasBody = ["POST", "PUT", "PATCH"].includes(method.toUpperCase());
 
     // Extract validation information
-    const validation = this.extractValidation(element);
+  const validation = this.extractValidation(element, importMap);
 
     // Extract response type from handler
     const responseType = this.extractResponseTypeFromHandler(element);
@@ -326,7 +353,10 @@ export class ReonoASTParser {
     };
   }
 
-  private extractValidation(element: t.JSXElement): RouteInfo["validation"] {
+  private extractValidation(
+    element: t.JSXElement,
+    importMap: Map<string, string>
+  ): RouteInfo["validation"] {
     const validateAttr = element.openingElement.attributes.find(
       (attr) =>
         t.isJSXAttribute(attr) &&
@@ -348,9 +378,8 @@ export class ReonoASTParser {
 
             // Try to extract type information from validation schema
             if (key === "params" || key === "body" || key === "query") {
-              // For now, we'll use a simplified type extraction
-              // In a full implementation, we'd parse the Zod schema AST
-              validation[key] = this.extractSchemaType(prop.value);
+              // Attempt to resolve identifier refs and .partial()
+              validation[key] = this.extractSchemaType(prop.value, importMap);
             }
           }
         });
@@ -366,7 +395,10 @@ export class ReonoASTParser {
     };
   }
 
-  private extractSchemaType(node: t.Node): string {
+  private extractSchemaType(
+    node: t.Node,
+    importMap: Map<string, string>
+  ): string | SchemaRef {
     // Simplified schema type extraction
     // In production, this would be more sophisticated and handle:
     // - z.object({ id: z.string(), name: z.string() }) -> { id: string; name: string }
@@ -374,7 +406,21 @@ export class ReonoASTParser {
     // - z.number() -> number
     // - etc.
 
-    if (t.isCallExpression(node)) {
+  if (t.isCallExpression(node)) {
+      // Handle schemaRef.partial()
+      if (
+        t.isMemberExpression(node.callee) &&
+        t.isIdentifier(node.callee.property) &&
+        node.callee.property.name === "partial"
+      ) {
+        const obj = node.callee.object;
+        if (t.isIdentifier(obj)) {
+          const imp = importMap.get(obj.name);
+          if (imp) {
+            return { kind: "schemaRef", name: obj.name, importPath: imp, partial: true };
+          }
+        }
+      }
       if (
         t.isMemberExpression(node.callee) &&
         t.isIdentifier(node.callee.property)
@@ -394,6 +440,14 @@ export class ReonoASTParser {
           default:
             return "any";
         }
+      }
+  }
+
+    // Identifier referencing an imported schema
+    if (t.isIdentifier(node)) {
+      const imp = importMap.get(node.name);
+      if (imp) {
+        return { kind: "schemaRef", name: node.name, importPath: imp };
       }
     }
 

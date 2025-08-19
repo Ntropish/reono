@@ -94,65 +94,108 @@ interface PathParamMap {
   '/:userId': { userId: string | number }
 }
 
+// Helper types to drive options/response from path
+type ParamsOf<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  RouteDefinitions[M][P] extends { params: infer T } ? T : never;
+type BodyOf<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  RouteDefinitions[M][P] extends { body: infer T } ? T : never;
+export type ResponseFor<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  RouteDefinitions[M][P] extends { response: infer R } ? R : never;
+type MaybeParams<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  [ParamsOf<M, P>] extends [never] ? {} : { params: ParamsOf<M, P> };
+type MaybeBody<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  [BodyOf<M, P>] extends [never] ? {} : { body: BodyOf<M, P> };
+export type OptionsFor<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  Omit<ClientRequestOptions, 'params' | 'body'> & MaybeParams<M, P> & MaybeBody<M, P>;
+type HasParams<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  [ParamsOf<M, P>] extends [never] ? false : true;
+type HasBody<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  [BodyOf<M, P>] extends [never] ? false : true;
+type RequiresOptions<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  HasParams<M, P> extends true ? true : HasBody<M, P> extends true ? true : false;
+
 // Generated client interface
 export interface GeneratedApiClient {
-  get(path: '/users', options?: ClientRequestOptions): Promise<RouteDefinitions["GET"]["/users"]["response"]>;
-  get(path: '/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/users/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/users/:userId"]["response"]>;
-  get(path: '/', options?: ClientRequestOptions): Promise<RouteDefinitions["GET"]["/"]["response"]>;
-  get(path: '/:userId', options: ClientRequestOptions & { params: RouteDefinitions["GET"]["/:userId"]["params"] }): Promise<RouteDefinitions["GET"]["/:userId"]["response"]>;
-  put(path: '/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/users/:userId"]["params"] } & { body: RouteDefinitions["PUT"]["/users/:userId"]["body"] }): Promise<RouteDefinitions["PUT"]["/users/:userId"]["response"]>;
-  put(path: '/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PUT"]["/:userId"]["params"] } & { body: RouteDefinitions["PUT"]["/:userId"]["body"] }): Promise<RouteDefinitions["PUT"]["/:userId"]["response"]>;
-  delete(path: '/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["DELETE"]["/users/:userId"]["params"] }): Promise<RouteDefinitions["DELETE"]["/users/:userId"]["response"]>;
-  delete(path: '/:userId', options: ClientRequestOptions & { params: RouteDefinitions["DELETE"]["/:userId"]["params"] }): Promise<RouteDefinitions["DELETE"]["/:userId"]["response"]>;
-  post(path: '/users', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/users"]["body"] }): Promise<RouteDefinitions["POST"]["/users"]["response"]>;
-  post(path: '/', options: ClientRequestOptions & { body: RouteDefinitions["POST"]["/"]["body"] }): Promise<RouteDefinitions["POST"]["/"]["response"]>;
-  patch(path: '/users/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PATCH"]["/users/:userId"]["params"] } & { body: RouteDefinitions["PATCH"]["/users/:userId"]["body"] }): Promise<RouteDefinitions["PATCH"]["/users/:userId"]["response"]>;
-  patch(path: '/:userId', options: ClientRequestOptions & { params: RouteDefinitions["PATCH"]["/:userId"]["params"] } & { body: RouteDefinitions["PATCH"]["/:userId"]["body"] }): Promise<RouteDefinitions["PATCH"]["/:userId"]["response"]>;
+  get<TPath extends GETPaths>(...args: RequiresOptions<'GET', TPath> extends true
+    ? [path: TPath, options: OptionsFor<'GET', TPath>]
+    : [path: TPath, options?: Omit<ClientRequestOptions, 'params' | 'body'>]
+  ): Promise<ResponseFor<'GET', TPath>>;
+  put<TPath extends PUTPaths>(...args: RequiresOptions<'PUT', TPath> extends true
+    ? [path: TPath, options: OptionsFor<'PUT', TPath>]
+    : [path: TPath, options?: Omit<ClientRequestOptions, 'params' | 'body'>]
+  ): Promise<ResponseFor<'PUT', TPath>>;
+  delete<TPath extends DELETEPaths>(...args: RequiresOptions<'DELETE', TPath> extends true
+    ? [path: TPath, options: OptionsFor<'DELETE', TPath>]
+    : [path: TPath, options?: Omit<ClientRequestOptions, 'params' | 'body'>]
+  ): Promise<ResponseFor<'DELETE', TPath>>;
+  post<TPath extends POSTPaths>(...args: RequiresOptions<'POST', TPath> extends true
+    ? [path: TPath, options: OptionsFor<'POST', TPath>]
+    : [path: TPath, options?: Omit<ClientRequestOptions, 'params' | 'body'>]
+  ): Promise<ResponseFor<'POST', TPath>>;
+  patch<TPath extends PATCHPaths>(...args: RequiresOptions<'PATCH', TPath> extends true
+    ? [path: TPath, options: OptionsFor<'PATCH', TPath>]
+    : [path: TPath, options?: Omit<ClientRequestOptions, 'params' | 'body'>]
+  ): Promise<ResponseFor<'PATCH', TPath>>;
 }
 
 // Create the typed client
 function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClient {
   const client = createClient({ baseUrl: 'http://localhost:8082', ...options });
-  
-  return {
-    get: (path: string, options?: ClientRequestOptions) => {
+
+  const get: GeneratedApiClient["get"] = ((...args: any[]) => {
+      const [path, options] = args as [any, any];
       switch (path) {
-      case '/users': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/users"]["response"]>;
-      case '/users/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/users/:userId"]["response"]>;
-      case '/': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/"]["response"]>;
-      case '/:userId': return client.get(path, options) as Promise<RouteDefinitions["GET"]["/:userId"]["response"]>;
+      case '/users': return client.get(path, options) as Promise<ResponseFor<'GET', '/users'>>;
+      case '/users/:userId': return client.get(path, options) as Promise<ResponseFor<'GET', '/users/:userId'>>;
+      case '/': return client.get(path, options) as Promise<ResponseFor<'GET', '/'>>;
+      case '/:userId': return client.get(path, options) as Promise<ResponseFor<'GET', '/:userId'>>;
         default: throw new Error(`Invalid path for GET: ${path}`);
       }
-    },
-    put: (path: string, options?: ClientRequestOptions) => {
+    }) as any;
+
+  const put: GeneratedApiClient["put"] = ((...args: any[]) => {
+      const [path, options] = args as [any, any];
       switch (path) {
-      case '/users/:userId': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/users/:userId"]["response"]>;
-      case '/:userId': return client.put(path, options) as Promise<RouteDefinitions["PUT"]["/:userId"]["response"]>;
+      case '/users/:userId': return client.put(path, options) as Promise<ResponseFor<'PUT', '/users/:userId'>>;
+      case '/:userId': return client.put(path, options) as Promise<ResponseFor<'PUT', '/:userId'>>;
         default: throw new Error(`Invalid path for PUT: ${path}`);
       }
-    },
-    delete: (path: string, options?: ClientRequestOptions) => {
+    }) as any;
+
+  const del: GeneratedApiClient["delete"] = ((...args: any[]) => {
+      const [path, options] = args as [any, any];
       switch (path) {
-      case '/users/:userId': return client.delete(path, options) as Promise<RouteDefinitions["DELETE"]["/users/:userId"]["response"]>;
-      case '/:userId': return client.delete(path, options) as Promise<RouteDefinitions["DELETE"]["/:userId"]["response"]>;
+      case '/users/:userId': return client.delete(path, options) as Promise<ResponseFor<'DELETE', '/users/:userId'>>;
+      case '/:userId': return client.delete(path, options) as Promise<ResponseFor<'DELETE', '/:userId'>>;
         default: throw new Error(`Invalid path for DELETE: ${path}`);
       }
-    },
-    post: (path: string, options?: ClientRequestOptions) => {
+    }) as any;
+
+  const post: GeneratedApiClient["post"] = ((...args: any[]) => {
+      const [path, options] = args as [any, any];
       switch (path) {
-      case '/users': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/users"]["response"]>;
-      case '/': return client.post(path, options) as Promise<RouteDefinitions["POST"]["/"]["response"]>;
+      case '/users': return client.post(path, options) as Promise<ResponseFor<'POST', '/users'>>;
+      case '/': return client.post(path, options) as Promise<ResponseFor<'POST', '/'>>;
         default: throw new Error(`Invalid path for POST: ${path}`);
       }
-    },
-    patch: (path: string, options?: ClientRequestOptions) => {
+    }) as any;
+
+  const patch: GeneratedApiClient["patch"] = ((...args: any[]) => {
+      const [path, options] = args as [any, any];
       switch (path) {
-      case '/users/:userId': return client.patch(path, options) as Promise<RouteDefinitions["PATCH"]["/users/:userId"]["response"]>;
-      case '/:userId': return client.patch(path, options) as Promise<RouteDefinitions["PATCH"]["/:userId"]["response"]>;
+      case '/users/:userId': return client.patch(path, options) as Promise<ResponseFor<'PATCH', '/users/:userId'>>;
+      case '/:userId': return client.patch(path, options) as Promise<ResponseFor<'PATCH', '/:userId'>>;
         default: throw new Error(`Invalid path for PATCH: ${path}`);
       }
-    }
-  };
+    }) as any;
+
+  return {
+    get,
+    put,
+    delete: del,
+    post,
+    patch
+  } as GeneratedApiClient;
 }
 
 // Export the client instance

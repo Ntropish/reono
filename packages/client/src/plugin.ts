@@ -198,6 +198,26 @@ ${generateMethodSpecificPathTypes(routes)}
 
 ${generatePathParamTypes(routes)}
 
+// Helper types to drive options/response from path
+type ParamsOf<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  RouteDefinitions[M][P] extends { params: infer T } ? T : never;
+type BodyOf<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  RouteDefinitions[M][P] extends { body: infer T } ? T : never;
+export type ResponseFor<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  RouteDefinitions[M][P] extends { response: infer R } ? R : never;
+type MaybeParams<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  [ParamsOf<M, P>] extends [never] ? {} : { params: ParamsOf<M, P> };
+type MaybeBody<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  [BodyOf<M, P>] extends [never] ? {} : { body: BodyOf<M, P> };
+export type OptionsFor<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  Omit<ClientRequestOptions, 'params' | 'body'> & MaybeParams<M, P> & MaybeBody<M, P>;
+type HasParams<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  [ParamsOf<M, P>] extends [never] ? false : true;
+type HasBody<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  [BodyOf<M, P>] extends [never] ? false : true;
+type RequiresOptions<M extends keyof RouteDefinitions, P extends keyof RouteDefinitions[M]> =
+  HasParams<M, P> extends true ? true : HasBody<M, P> extends true ? true : false;
+
 // Generated client interface
 export interface GeneratedApiClient {
 ${routeMethods}
@@ -206,14 +226,16 @@ ${routeMethods}
 // Create the typed client
 function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClient {
   const client = createClient({ baseUrl: '${baseUrl}', ...options });
-  
-  return {
+
 ${Array.from(methodGroups.entries())
-  .map(([method, methodRoutes]) =>
-    generateMethodImplementation(method, methodRoutes)
-  )
+  .map(([method, methodRoutes]) => generateMethodImplementation(method, methodRoutes))
+  .join("\n\n")}
+
+  return {
+${Array.from(methodGroups.keys())
+  .map((method) => (method === "delete" ? "    delete: del" : `    ${method}`))
   .join(",\n")}
-  };
+  } as GeneratedApiClient;
 }
 
 // Export the client instance
@@ -282,47 +304,35 @@ ${pathTypes || "  // No paths with parameters"}
     method: string,
     routes: RouteInfo[]
   ): string {
-    const overloads = routes.map((route) => {
-      const methodUpper = method.toUpperCase();
-      const paramType =
-        route.params.length > 0
-          ? `ClientRequestOptions & { params: RouteDefinitions["${methodUpper}"]["${route.path}"]["params"] }`
-          : "ClientRequestOptions";
-
-      const bodyConstraint = route.hasBody
-        ? ` & { body: RouteDefinitions["${methodUpper}"]["${route.path}"]["body"] }`
-        : "";
-
-      const optionsType =
-        route.params.length > 0 || route.hasBody
-          ? `${paramType}${bodyConstraint}`
-          : "ClientRequestOptions";
-
-      const isOptional = route.params.length === 0 && !route.hasBody ? "?" : "";
-
-      return `  ${method}(path: '${route.path}', options${isOptional}: ${optionsType}): Promise<RouteDefinitions["${methodUpper}"]["${route.path}"]["response"]>;`;
-    });
-
-    return overloads.join("\n");
+    const methodUpper = method.toUpperCase();
+    const pathsType = `${methodUpper}Paths`;
+    return `  ${method}<TPath extends ${pathsType}>(...args: RequiresOptions<'${methodUpper}', TPath> extends true
+    ? [path: TPath, options: OptionsFor<'${methodUpper}', TPath>]
+    : [path: TPath, options?: Omit<ClientRequestOptions, 'params' | 'body'>]
+  ): Promise<ResponseFor<'${methodUpper}', TPath>>;`;
   }
 
   function generateMethodImplementation(
     method: string,
     routes: RouteInfo[]
   ): string {
-    const implementations = routes
+  const implementations = routes
       .map((route) => {
         const methodUpper = method.toUpperCase();
-        return `      case '${route.path}': return client.${method}(path, options) as Promise<RouteDefinitions["${methodUpper}"]["${route.path}"]["response"]>;`;
+    return `      case '${route.path}': return client.${method}(path, options) as Promise<ResponseFor<'${methodUpper}', '${route.path}'>>;`;
       })
       .join("\n");
 
-    return `    ${method}: (path: string, options?: ClientRequestOptions) => {
+    const varName = method === "delete" ? "del" : method;
+    const methodUpper = method.toUpperCase();
+
+  return `  const ${varName}: GeneratedApiClient["${method}"] = ((...args: any[]) => {
+      const [path, options] = args as [any, any];
       switch (path) {
 ${implementations}
-        default: throw new Error(\`Invalid path for ${method.toUpperCase()}: \${path}\`);
+        default: throw new Error(\`Invalid path for ${methodUpper}: \${path}\`);
       }
-    }`;
+    }) as any;`;
   }
 
   function inferResponseType(route: RouteInfo): string {

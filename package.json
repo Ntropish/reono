@@ -17,6 +17,7 @@
     "publish-packages": "turbo run build lint test && changeset version && changeset publish"
   },
   "devDependencies": {
+    "@codemod.com/workflow": "^0.0.31",
     "@reono/eslint-config": "workspace:*",
     "@reono/typescript-config": "workspace:*",
     "prettier": "^3.6.2",

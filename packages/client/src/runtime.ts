@@ -13,6 +13,26 @@ export interface ClientResponse<T = any> extends Response {
   data: T;
 }
 
+export interface ReonoClientError<T = any> extends Error {
+  status?: number;
+  response?: Response;
+  data?: T;
+  // Convenience properties populated from Problem Details when available
+  title?: string;
+  type?: string;
+  detail?: string;
+}
+export function isReonoClientError<T = any>(
+  e: unknown
+): e is ReonoClientError<T> {
+  return (
+    !!e &&
+    typeof e === "object" &&
+    (e as any).name === "Error" &&
+    ("status" in (e as any) || "response" in (e as any))
+  );
+}
+
 export interface ApiClient {
   request<T = any>(
     method: string,
@@ -202,13 +222,27 @@ export function createClient(options: CreateClientOptions = {}): ApiClient {
 
     // Handle errors
     if (!response.ok) {
-      const error: any = new Error(
+      const err: ReonoClientError<any> = new Error(
         `HTTP ${response.status}: ${response.statusText}`
       );
-      error.status = response.status;
-      error.response = response;
-      error.data = data;
-      throw error;
+      err.status = response.status;
+      err.response = response;
+      err.data = data;
+      // If server sent Problem Details, project common fields in a public-safe way
+      const ct = response.headers.get("content-type") || "";
+      if (
+        /application\/problem\+json/i.test(ct) &&
+        data &&
+        typeof data === "object"
+      ) {
+        const pd: any = data;
+        if (typeof pd.title === "string") err.title = pd.title;
+        if (typeof pd.type === "string") err.type = pd.type;
+        if (typeof pd.detail === "string") err.detail = pd.detail;
+        // message prefers problem title
+        if (err.title) err.message = `${response.status} ${err.title}`;
+      }
+      throw err;
     }
 
     return data;

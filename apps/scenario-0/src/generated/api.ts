@@ -7,6 +7,96 @@ import type * as Schema_0 from '../routes/users/repo.ts';
 // Route type definitions grouped by HTTP method
 export interface RouteDefinitions {
   GET: {
+    "/errors/bad-request": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/errors/unauthorized": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/errors/forbidden": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/errors/not-found": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/errors/conflict": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/errors/unprocessable": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/errors/too-many-requests": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/errors/internal": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/errors/custom": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/bad-request": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/unauthorized": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/forbidden": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/not-found": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/conflict": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/unprocessable": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/too-many-requests": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/internal": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/custom": {
+      params: never;
+      body: never;
+      response: any;
+    },
     "/users": {
       params: never;
       body: never;
@@ -79,14 +169,14 @@ export interface RouteDefinitions {
 }
 
 // Method-specific path types
-export type GETPaths = '/users' | '/users/:userId' | '/' | '/:userId';
+export type GETPaths = '/errors/bad-request' | '/errors/unauthorized' | '/errors/forbidden' | '/errors/not-found' | '/errors/conflict' | '/errors/unprocessable' | '/errors/too-many-requests' | '/errors/internal' | '/errors/custom' | '/bad-request' | '/unauthorized' | '/forbidden' | '/not-found' | '/conflict' | '/unprocessable' | '/too-many-requests' | '/internal' | '/custom' | '/users' | '/users/:userId' | '/' | '/:userId';
 export type PUTPaths = '/users/:userId' | '/:userId';
 export type DELETEPaths = '/users/:userId' | '/:userId';
 export type POSTPaths = '/users' | '/';
 export type PATCHPaths = '/users/:userId' | '/:userId';
 
 // Union type of all valid paths
-export type ValidPaths = '/users' | '/users/:userId' | '/users/:userId' | '/users/:userId' | '/users' | '/users/:userId' | '/' | '/:userId' | '/:userId' | '/:userId' | '/' | '/:userId';
+export type ValidPaths = '/errors/bad-request' | '/errors/unauthorized' | '/errors/forbidden' | '/errors/not-found' | '/errors/conflict' | '/errors/unprocessable' | '/errors/too-many-requests' | '/errors/internal' | '/errors/custom' | '/bad-request' | '/unauthorized' | '/forbidden' | '/not-found' | '/conflict' | '/unprocessable' | '/too-many-requests' | '/internal' | '/custom' | '/users' | '/users/:userId' | '/users/:userId' | '/users/:userId' | '/users' | '/users/:userId' | '/' | '/:userId' | '/:userId' | '/:userId' | '/' | '/:userId';
 
 export type PathParams<T extends ValidPaths> = T extends keyof PathParamMap 
   ? PathParamMap[T] 
@@ -148,6 +238,24 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
   const get: GeneratedApiClient["get"] = ((...args: any[]) => {
       const [path, options] = args as [any, any];
       switch (path) {
+      case '/errors/bad-request': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/bad-request'>>;
+      case '/errors/unauthorized': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/unauthorized'>>;
+      case '/errors/forbidden': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/forbidden'>>;
+      case '/errors/not-found': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/not-found'>>;
+      case '/errors/conflict': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/conflict'>>;
+      case '/errors/unprocessable': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/unprocessable'>>;
+      case '/errors/too-many-requests': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/too-many-requests'>>;
+      case '/errors/internal': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/internal'>>;
+      case '/errors/custom': return client.get(path, options) as Promise<ResponseFor<'GET', '/errors/custom'>>;
+      case '/bad-request': return client.get(path, options) as Promise<ResponseFor<'GET', '/bad-request'>>;
+      case '/unauthorized': return client.get(path, options) as Promise<ResponseFor<'GET', '/unauthorized'>>;
+      case '/forbidden': return client.get(path, options) as Promise<ResponseFor<'GET', '/forbidden'>>;
+      case '/not-found': return client.get(path, options) as Promise<ResponseFor<'GET', '/not-found'>>;
+      case '/conflict': return client.get(path, options) as Promise<ResponseFor<'GET', '/conflict'>>;
+      case '/unprocessable': return client.get(path, options) as Promise<ResponseFor<'GET', '/unprocessable'>>;
+      case '/too-many-requests': return client.get(path, options) as Promise<ResponseFor<'GET', '/too-many-requests'>>;
+      case '/internal': return client.get(path, options) as Promise<ResponseFor<'GET', '/internal'>>;
+      case '/custom': return client.get(path, options) as Promise<ResponseFor<'GET', '/custom'>>;
       case '/users': return client.get(path, options) as Promise<ResponseFor<'GET', '/users'>>;
       case '/users/:userId': return client.get(path, options) as Promise<ResponseFor<'GET', '/users/:userId'>>;
       case '/': return client.get(path, options) as Promise<ResponseFor<'GET', '/'>>;

@@ -2,6 +2,7 @@ import { describe, it, beforeAll, afterAll, expect } from "vitest";
 import { createApi } from "../src/generated/api";
 import { App } from "../dist/index.mjs"; // Import the main application component
 import { createApp } from "@reono/node-server";
+import { createClient } from "@reono/client/runtime";
 
 const PORT = 3060;
 const BASE_URL = `http://localhost:${PORT}`;

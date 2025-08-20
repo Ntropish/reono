@@ -1,5 +1,6 @@
 import type { Element, ApiContext, MiddlewareHandler } from "../components";
 import { createElement } from "../jsx";
+import { HTTPException } from "../runtime/http-exception";
 
 export interface StaticProps {
   path: string;
@@ -98,7 +99,7 @@ export function Static({
       const isValidFile = validFiles.some((file) => filePath.endsWith(file));
 
       if (!isValidFile) {
-        return new Response("Not Found", { status: 404 });
+        throw HTTPException.notFound();
       }
 
       // Return mock file content
@@ -109,7 +110,7 @@ export function Static({
         content: `Mock content for ${filePath}`,
       });
     } catch {
-      return new Response("Not Found", { status: 404 });
+      throw HTTPException.notFound();
     }
   };
 

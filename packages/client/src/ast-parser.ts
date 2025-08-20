@@ -803,7 +803,7 @@ export class ReonoASTParser {
     if (t.isNumericLiteral(expr)) return "number";
     if (t.isBooleanLiteral(expr)) return "boolean";
     if (t.isNullLiteral(expr)) return "null";
-  if (t.isUpdateExpression(expr)) return "number";
+    if (t.isUpdateExpression(expr)) return "number";
     if (t.isArrayExpression(expr)) return "Array<any>";
     if (t.isObjectExpression(expr)) return this.objectExpressionToType(expr);
     return "any";
@@ -1138,9 +1138,9 @@ export class ReonoASTParser {
     body: t.Statement[],
     fileAst: t.File
   ): string | undefined {
-  let recordBased: string | undefined;
-  let objectBased: string | undefined;
-  for (const stmt of body) {
+    let recordBased: string | undefined;
+    let objectBased: string | undefined;
+    for (const stmt of body) {
       if (t.isVariableDeclaration(stmt)) {
         for (const d of stmt.declarations) {
           if (
@@ -1159,10 +1159,10 @@ export class ReonoASTParser {
                 init.object.name,
                 fileAst
               );
-        if (valType) recordBased = valType;
+              if (valType) recordBased = valType;
             }
             if (t.isObjectExpression(init)) {
-        objectBased = this.objectExpressionToType(init);
+              objectBased = this.objectExpressionToType(init);
             }
           }
         }
@@ -1184,11 +1184,11 @@ export class ReonoASTParser {
             asg.left.object.name,
             fileAst
           );
-      if (valType) recordBased = valType;
+          if (valType) recordBased = valType;
         }
       }
     }
-  return recordBased ?? objectBased;
+    return recordBased ?? objectBased;
   }
 
   private getRecordValueTypeFromIdentifier(

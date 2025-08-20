@@ -42,6 +42,8 @@ export type ContextWithParams<S> = Omit<
 // --- Core runtime exports ---
 export { render } from "./runtime/render";
 export type { Listener } from "./runtime/types";
+export { HTTPException, problemJson } from "./runtime/http-exception";
+export type { ProblemDetails } from "./runtime/http-exception";
 
 // --- Utility Components (Sugar Elements) ---
 export * from "./utilities";

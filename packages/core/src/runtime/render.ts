@@ -8,6 +8,11 @@ import {
   compose,
   ValidationError,
 } from "./pipeline";
+import {
+  HTTPException,
+  isHTTPExceptionLike,
+  problemJson,
+} from "./http-exception";
 
 export function render(element: Element): Listener {
   const flat = traverse(element);
@@ -28,7 +33,7 @@ export function render(element: Element): Listener {
 
     // If no path match at all, return 404
     if (!match) {
-      return new Response("Not Found", { status: 404 });
+      return problemJson(404);
     }
 
     // If path matches but no method handler, we still run middleware
@@ -55,17 +60,15 @@ export function render(element: Element): Listener {
       try {
         await applyValidation(match, ctx);
       } catch (err: any) {
-        const errorResponse: any = {
+        // Back-compat: validation errors return JSON with { error, message, issues? }
+        const payload: any = {
           error: "ValidationError",
-          message: String(err?.message ?? err),
+          message: String(err?.message ?? "Validation failed"),
         };
-
-        // Include issues if available (from standard schema format)
         if (err instanceof ValidationError && err.issues) {
-          errorResponse.issues = err.issues;
+          payload.issues = err.issues;
         }
-
-        return new Response(JSON.stringify(errorResponse), {
+        return new Response(JSON.stringify(payload), {
           status: 400,
           headers: { "content-type": "application/json; charset=utf-8" },
         });
@@ -80,7 +83,7 @@ export function render(element: Element): Listener {
 
       if (!match.route) {
         // No handler for this method, return 405
-        return new Response("Method Not Allowed", { status: 405 });
+        return problemJson(405);
       }
       const out = await match.route(c);
       if (out instanceof Response) return out;
@@ -98,7 +101,13 @@ export function render(element: Element): Listener {
         headers: { "content-type": "application/json; charset=utf-8" },
       });
     } catch (e: any) {
-      return new Response("Internal Server Error", { status: 500 });
+      if (e instanceof HTTPException || isHTTPExceptionLike(e)) {
+        return (
+          (e as HTTPException).toResponse?.() ?? problemJson(e.status ?? 500)
+        );
+      }
+      // Unknown error -> public-safe 500
+      return problemJson(500);
     }
   };
 }

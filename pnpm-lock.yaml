@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@changesets/cli':
+        specifier: ^2.29.6
+        version: 2.29.6(@types/node@22.17.2)
     devDependencies:
       '@reono/eslint-config':
         specifier: workspace:*
@@ -259,9 +263,6 @@ importers:
       '@babel/types':
         specifier: ^7.25.0
         version: 7.28.2
-      '@changesets/cli':
-        specifier: ^2.29.6
-        version: 2.29.6(@types/node@22.17.2)
       reono:
         specifier: workspace:*
         version: link:../core

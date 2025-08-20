@@ -13,7 +13,8 @@
     "test": "turbo test",
     "test:watch": "turbo test --watch",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "publish-packages": "turbo run build lint test && changeset version && changeset publish"
   },
   "devDependencies": {
     "@reono/eslint-config": "workspace:*",
@@ -25,5 +26,8 @@
   "packageManager": "pnpm@10.4.1",
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.29.6"
   }
 }

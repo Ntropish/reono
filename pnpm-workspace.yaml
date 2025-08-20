@@ -27,3 +27,16 @@ catalog:
   vite: ^6.3.5
   vitest: ^3.0.5
   web-vitals: ^4.2.4
+catalogs:
+  conflicts_@tailwindcss/vite_catalog:
+    "@tailwindcss/vite": catalog
+  conflicts_@tanstack/react-devtools_catalog:
+    "@tanstack/react-devtools": catalog
+  conflicts_@tanstack/react-router_catalog:
+    "@tanstack/react-router": catalog
+  conflicts_@tanstack/react-router-devtools_catalog:
+    "@tanstack/react-router-devtools": catalog
+  conflicts_@tanstack/router-plugin_catalog:
+    "@tanstack/router-plugin": catalog
+  conflicts_class-variance-authority_catalog:
+    class-variance-authority: catalog

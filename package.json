@@ -1,7 +1,7 @@
 {
   "name": "@reono/root",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
   "description": "Reono monorepo root package",
   "repository": {
     "type": "git",

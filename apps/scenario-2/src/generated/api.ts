@@ -211,6 +211,11 @@ export interface RouteDefinitions {
       body: never;
       response: any;
     },
+    "/api/v1/tenant/:tenantId/billing": {
+      params: { tenantId: string | number };
+      body: never;
+      response: any;
+    },
     "/v1/tenant/:tenantId/info": {
       params: { tenantId: string | number };
       body: never;
@@ -321,11 +326,6 @@ export interface RouteDefinitions {
       body: never;
       response: { tenantId: any; invoices: any; total: any };
     },
-    "/api/v1/tenant/:tenantId/billing": {
-      params: { tenantId: string | number };
-      body: never;
-      response: any;
-    },
     "/v1/tenant/:tenantId/analytics/enterprise": {
       params: { tenantId: string | number };
       body: never;
@@ -343,41 +343,6 @@ export interface RouteDefinitions {
     },
     "/v1/tenant/:tenantId/billing": {
       params: { tenantId: string | number };
-      body: never;
-      response: any;
-    },
-    "/v1/content/articles": {
-      params: never;
-      body: never;
-      response: any;
-    },
-    "/v1/content/articles/:id": {
-      params: { id: string | number };
-      body: never;
-      response: any;
-    },
-    "/v1/content/images": {
-      params: never;
-      body: never;
-      response: any;
-    },
-    "/v1/articles": {
-      params: never;
-      body: never;
-      response: any;
-    },
-    "/v1/articles/:id": {
-      params: { id: string | number };
-      body: never;
-      response: any;
-    },
-    "/v1/:id": {
-      params: { id: string | number };
-      body: never;
-      response: any;
-    },
-    "/v1/images": {
-      params: never;
       body: never;
       response: any;
     },
@@ -491,6 +456,41 @@ export interface RouteDefinitions {
       body: never;
       response: { tenantId: any; invoices: any; total: any };
     },
+    "/v1/content/articles": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/v1/content/articles/:id": {
+      params: { id: string | number };
+      body: never;
+      response: any;
+    },
+    "/v1/content/images": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/v1/articles": {
+      params: never;
+      body: never;
+      response: any;
+    },
+    "/v1/articles/:id": {
+      params: { id: string | number };
+      body: never;
+      response: any;
+    },
+    "/v1/:id": {
+      params: { id: string | number };
+      body: never;
+      response: any;
+    },
+    "/v1/images": {
+      params: never;
+      body: never;
+      response: any;
+    },
     "/tenant/:tenantId/analytics/enterprise": {
       params: { tenantId: string | number };
       body: never;
@@ -603,6 +603,16 @@ export interface RouteDefinitions {
       body: any;
       response: any;
     },
+    "/tenant/:tenantId/settings": {
+      params: { tenantId: string | number };
+      body: any;
+      response: { message: string; tenant: any; updatedBy: any; updates: any; timestamp: any };
+    },
+    "/settings": {
+      params: never;
+      body: any;
+      response: { message: string; tenant: any; updatedBy: any; updates: any; timestamp: any };
+    },
     "/v1/content/articles/:id": {
       params: { id: string | number };
       body: any;
@@ -617,16 +627,6 @@ export interface RouteDefinitions {
       params: { id: string | number };
       body: any;
       response: any;
-    },
-    "/tenant/:tenantId/settings": {
-      params: { tenantId: string | number };
-      body: any;
-      response: { message: string; tenant: any; updatedBy: any; updates: any; timestamp: any };
-    },
-    "/settings": {
-      params: never;
-      body: any;
-      response: { message: string; tenant: any; updatedBy: any; updates: any; timestamp: any };
     },
     "/tenant/:tenantId/users/:userId": {
       params: { tenantId: string | number; userId: string | number };
@@ -715,6 +715,16 @@ export interface RouteDefinitions {
       body: any;
       response: any;
     },
+    "/api/v1/tenant/:tenantId/billing/cancel": {
+      params: { tenantId: string | number };
+      body: any;
+      response: any;
+    },
+    "/api/v1/cancel": {
+      params: never;
+      body: any;
+      response: any;
+    },
     "/v1/tenant/:tenantId/users": {
       params: { tenantId: string | number };
       body: any;
@@ -745,16 +755,6 @@ export interface RouteDefinitions {
       body: any;
       response: { message: string; tenantId: any; currentTier: any; targetTier: any; estimatedActivation: any; initiatedBy: any; upgradeId: string };
     },
-    "/api/v1/tenant/:tenantId/billing/cancel": {
-      params: { tenantId: string | number };
-      body: any;
-      response: any;
-    },
-    "/api/v1/cancel": {
-      params: never;
-      body: any;
-      response: any;
-    },
     "/v1/tenant/:tenantId/analytics/export": {
       params: { tenantId: string | number };
       body: any;
@@ -771,26 +771,6 @@ export interface RouteDefinitions {
       response: any;
     },
     "/v1/cancel": {
-      params: never;
-      body: any;
-      response: any;
-    },
-    "/v1/content/articles": {
-      params: never;
-      body: any;
-      response: any;
-    },
-    "/v1/content/images": {
-      params: never;
-      body: any;
-      response: any;
-    },
-    "/v1/articles": {
-      params: never;
-      body: any;
-      response: any;
-    },
-    "/v1/images": {
       params: never;
       body: any;
       response: any;
@@ -824,6 +804,26 @@ export interface RouteDefinitions {
       params: never;
       body: any;
       response: { message: string; tenantId: any; currentTier: any; targetTier: any; estimatedActivation: any; initiatedBy: any; upgradeId: string };
+    },
+    "/v1/content/articles": {
+      params: never;
+      body: any;
+      response: any;
+    },
+    "/v1/content/images": {
+      params: never;
+      body: any;
+      response: any;
+    },
+    "/v1/articles": {
+      params: never;
+      body: any;
+      response: any;
+    },
+    "/v1/images": {
+      params: never;
+      body: any;
+      response: any;
     },
     "/tenant/:tenantId/analytics/export": {
       params: { tenantId: string | number };
@@ -946,13 +946,13 @@ export interface RouteDefinitions {
 }
 
 // Method-specific path types
-export type GETPaths = '/health' | '/api/v2/*' | '/v2/*' | '/*' | '/docs' | '/docs/v1' | '/' | '/v1' | '/api/v1/tenant/:tenantId/info' | '/api/v1/tenant/:tenantId/usage' | '/api/v1/tenant/:tenantId/users' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/analytics' | '/api/v1/tenant/:tenantId/analytics/advanced' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/billing/usage' | '/api/v1/tenant/:tenantId/billing/invoices' | '/api/v1/info' | '/api/v1/usage' | '/api/v1/users' | '/api/v1/users/:userId' | '/api/v1' | '/api/v1/:userId' | '/api/v1/analytics' | '/api/v1/analytics/advanced' | '/api/v1/analytics/export' | '/api/v1/advanced' | '/api/v1/export' | '/api/v1/billing/usage' | '/api/v1/billing/invoices' | '/api/v1/invoices' | '/api/v1/tenant/:tenantId/analytics/enterprise' | '/api/v1/tenant/:tenantId/analytics/usage' | '/api/v1/enterprise' | '/api/v1/content/articles' | '/api/v1/content/articles/:id' | '/api/v1/content/images' | '/api/v1/articles' | '/api/v1/articles/:id' | '/api/v1/:id' | '/api/v1/images' | '/v1/tenant/:tenantId/info' | '/v1/tenant/:tenantId/usage' | '/v1/tenant/:tenantId/users' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/analytics' | '/v1/tenant/:tenantId/analytics/advanced' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/billing/usage' | '/v1/tenant/:tenantId/billing/invoices' | '/v1/info' | '/v1/usage' | '/v1/users' | '/v1/users/:userId' | '/v1/:userId' | '/v1/analytics' | '/v1/analytics/advanced' | '/v1/analytics/export' | '/v1/advanced' | '/v1/export' | '/v1/billing/usage' | '/v1/billing/invoices' | '/v1/invoices' | '/api/v1/tenant/:tenantId/billing' | '/v1/tenant/:tenantId/analytics/enterprise' | '/v1/tenant/:tenantId/analytics/usage' | '/v1/enterprise' | '/v1/tenant/:tenantId/billing' | '/v1/content/articles' | '/v1/content/articles/:id' | '/v1/content/images' | '/v1/articles' | '/v1/articles/:id' | '/v1/:id' | '/v1/images' | '/tenant/:tenantId/info' | '/tenant/:tenantId/usage' | '/tenant/:tenantId/users' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/analytics' | '/tenant/:tenantId/analytics/advanced' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/billing/usage' | '/tenant/:tenantId/billing/invoices' | '/info' | '/usage' | '/users' | '/users/:userId' | '/:userId' | '/analytics' | '/analytics/advanced' | '/analytics/export' | '/advanced' | '/export' | '/billing/usage' | '/billing/invoices' | '/invoices' | '/tenant/:tenantId/analytics/enterprise' | '/tenant/:tenantId/analytics/usage' | '/enterprise' | '/tenant/:tenantId/billing' | '/content/articles' | '/content/articles/:id' | '/content/images' | '/articles' | '/articles/:id' | '/:id' | '/images';
-export type PUTPaths = '/api/v1/tenant/:tenantId/settings' | '/api/v1/settings' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/settings' | '/v1/settings' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/tenant/:tenantId/settings' | '/settings' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/content/articles/:id' | '/articles/:id' | '/:id';
-export type POSTPaths = '/api/v1/tenant/:tenantId/users' | '/api/v1/tenant/:tenantId/billing/upgrade' | '/api/v1/users' | '/api/v1' | '/api/v1/billing/upgrade' | '/api/v1/upgrade' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/export' | '/api/v1/content/articles' | '/api/v1/content/images' | '/api/v1/articles' | '/api/v1/images' | '/v1/tenant/:tenantId/users' | '/v1/tenant/:tenantId/billing/upgrade' | '/v1/users' | '/v1' | '/v1/billing/upgrade' | '/v1/upgrade' | '/api/v1/tenant/:tenantId/billing/cancel' | '/api/v1/cancel' | '/v1/tenant/:tenantId/analytics/export' | '/v1/export' | '/v1/tenant/:tenantId/billing/cancel' | '/v1/cancel' | '/v1/content/articles' | '/v1/content/images' | '/v1/articles' | '/v1/images' | '/tenant/:tenantId/users' | '/tenant/:tenantId/billing/upgrade' | '/users' | '/' | '/billing/upgrade' | '/upgrade' | '/tenant/:tenantId/analytics/export' | '/export' | '/tenant/:tenantId/billing/cancel' | '/cancel' | '/content/articles' | '/content/images' | '/articles' | '/images';
+export type GETPaths = '/health' | '/api/v2/*' | '/v2/*' | '/*' | '/docs' | '/docs/v1' | '/' | '/v1' | '/api/v1/tenant/:tenantId/info' | '/api/v1/tenant/:tenantId/usage' | '/api/v1/tenant/:tenantId/users' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/analytics' | '/api/v1/tenant/:tenantId/analytics/advanced' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/billing/usage' | '/api/v1/tenant/:tenantId/billing/invoices' | '/api/v1/info' | '/api/v1/usage' | '/api/v1/users' | '/api/v1/users/:userId' | '/api/v1' | '/api/v1/:userId' | '/api/v1/analytics' | '/api/v1/analytics/advanced' | '/api/v1/analytics/export' | '/api/v1/advanced' | '/api/v1/export' | '/api/v1/billing/usage' | '/api/v1/billing/invoices' | '/api/v1/invoices' | '/api/v1/tenant/:tenantId/analytics/enterprise' | '/api/v1/tenant/:tenantId/analytics/usage' | '/api/v1/enterprise' | '/api/v1/content/articles' | '/api/v1/content/articles/:id' | '/api/v1/content/images' | '/api/v1/articles' | '/api/v1/articles/:id' | '/api/v1/:id' | '/api/v1/images' | '/api/v1/tenant/:tenantId/billing' | '/v1/tenant/:tenantId/info' | '/v1/tenant/:tenantId/usage' | '/v1/tenant/:tenantId/users' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/analytics' | '/v1/tenant/:tenantId/analytics/advanced' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/billing/usage' | '/v1/tenant/:tenantId/billing/invoices' | '/v1/info' | '/v1/usage' | '/v1/users' | '/v1/users/:userId' | '/v1/:userId' | '/v1/analytics' | '/v1/analytics/advanced' | '/v1/analytics/export' | '/v1/advanced' | '/v1/export' | '/v1/billing/usage' | '/v1/billing/invoices' | '/v1/invoices' | '/v1/tenant/:tenantId/analytics/enterprise' | '/v1/tenant/:tenantId/analytics/usage' | '/v1/enterprise' | '/v1/tenant/:tenantId/billing' | '/tenant/:tenantId/info' | '/tenant/:tenantId/usage' | '/tenant/:tenantId/users' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/analytics' | '/tenant/:tenantId/analytics/advanced' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/billing/usage' | '/tenant/:tenantId/billing/invoices' | '/info' | '/usage' | '/users' | '/users/:userId' | '/:userId' | '/analytics' | '/analytics/advanced' | '/analytics/export' | '/advanced' | '/export' | '/billing/usage' | '/billing/invoices' | '/invoices' | '/v1/content/articles' | '/v1/content/articles/:id' | '/v1/content/images' | '/v1/articles' | '/v1/articles/:id' | '/v1/:id' | '/v1/images' | '/tenant/:tenantId/analytics/enterprise' | '/tenant/:tenantId/analytics/usage' | '/enterprise' | '/tenant/:tenantId/billing' | '/content/articles' | '/content/articles/:id' | '/content/images' | '/articles' | '/articles/:id' | '/:id' | '/images';
+export type PUTPaths = '/api/v1/tenant/:tenantId/settings' | '/api/v1/settings' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/settings' | '/v1/settings' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/tenant/:tenantId/settings' | '/settings' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/content/articles/:id' | '/articles/:id' | '/:id';
+export type POSTPaths = '/api/v1/tenant/:tenantId/users' | '/api/v1/tenant/:tenantId/billing/upgrade' | '/api/v1/users' | '/api/v1' | '/api/v1/billing/upgrade' | '/api/v1/upgrade' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/export' | '/api/v1/content/articles' | '/api/v1/content/images' | '/api/v1/articles' | '/api/v1/images' | '/api/v1/tenant/:tenantId/billing/cancel' | '/api/v1/cancel' | '/v1/tenant/:tenantId/users' | '/v1/tenant/:tenantId/billing/upgrade' | '/v1/users' | '/v1' | '/v1/billing/upgrade' | '/v1/upgrade' | '/v1/tenant/:tenantId/analytics/export' | '/v1/export' | '/v1/tenant/:tenantId/billing/cancel' | '/v1/cancel' | '/tenant/:tenantId/users' | '/tenant/:tenantId/billing/upgrade' | '/users' | '/' | '/billing/upgrade' | '/upgrade' | '/v1/content/articles' | '/v1/content/images' | '/v1/articles' | '/v1/images' | '/tenant/:tenantId/analytics/export' | '/export' | '/tenant/:tenantId/billing/cancel' | '/cancel' | '/content/articles' | '/content/images' | '/articles' | '/images';
 export type DELETEPaths = '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/content/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/content/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/content/articles/:id' | '/articles/:id' | '/:id';
 
 // Union type of all valid paths
-export type ValidPaths = '/health' | '/api/v2/*' | '/v2/*' | '/*' | '/docs' | '/docs/v1' | '/' | '/v1' | '/api/v1/tenant/:tenantId/info' | '/api/v1/tenant/:tenantId/settings' | '/api/v1/tenant/:tenantId/usage' | '/api/v1/tenant/:tenantId/users' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/users' | '/api/v1/tenant/:tenantId/analytics' | '/api/v1/tenant/:tenantId/analytics/advanced' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/billing/usage' | '/api/v1/tenant/:tenantId/billing/invoices' | '/api/v1/tenant/:tenantId/billing/upgrade' | '/api/v1/info' | '/api/v1/settings' | '/api/v1/usage' | '/api/v1/users' | '/api/v1/users/:userId' | '/api/v1/users' | '/api/v1' | '/api/v1/:userId' | '/api/v1' | '/api/v1/analytics' | '/api/v1/analytics/advanced' | '/api/v1/analytics/export' | '/api/v1/advanced' | '/api/v1/export' | '/api/v1/billing/usage' | '/api/v1/billing/invoices' | '/api/v1/billing/upgrade' | '/api/v1/invoices' | '/api/v1/upgrade' | '/api/v1/tenant/:tenantId/analytics/enterprise' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/analytics/usage' | '/api/v1/enterprise' | '/api/v1/export' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/:userId' | '/api/v1/content/articles' | '/api/v1/content/articles/:id' | '/api/v1/content/articles' | '/api/v1/content/articles/:id' | '/api/v1/content/articles/:id' | '/api/v1/content/images' | '/api/v1/content/images' | '/api/v1/articles' | '/api/v1/articles/:id' | '/api/v1/articles' | '/api/v1/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/api/v1/:id' | '/api/v1/:id' | '/api/v1/images' | '/api/v1/images' | '/v1/tenant/:tenantId/info' | '/v1/tenant/:tenantId/settings' | '/v1/tenant/:tenantId/usage' | '/v1/tenant/:tenantId/users' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/users' | '/v1/tenant/:tenantId/analytics' | '/v1/tenant/:tenantId/analytics/advanced' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/billing/usage' | '/v1/tenant/:tenantId/billing/invoices' | '/v1/tenant/:tenantId/billing/upgrade' | '/v1/info' | '/v1/settings' | '/v1/usage' | '/v1/users' | '/v1/users/:userId' | '/v1/users' | '/v1/:userId' | '/v1' | '/v1/analytics' | '/v1/analytics/advanced' | '/v1/analytics/export' | '/v1/advanced' | '/v1/export' | '/v1/billing/usage' | '/v1/billing/invoices' | '/v1/billing/upgrade' | '/v1/invoices' | '/v1/upgrade' | '/api/v1/tenant/:tenantId/billing' | '/api/v1/tenant/:tenantId/billing/cancel' | '/api/v1/cancel' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/:userId' | '/v1/tenant/:tenantId/analytics/enterprise' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/analytics/usage' | '/v1/enterprise' | '/v1/export' | '/v1/tenant/:tenantId/billing' | '/v1/tenant/:tenantId/billing/cancel' | '/v1/cancel' | '/v1/content/articles' | '/v1/content/articles/:id' | '/v1/content/articles' | '/v1/content/articles/:id' | '/v1/content/articles/:id' | '/v1/content/images' | '/v1/content/images' | '/v1/articles' | '/v1/articles/:id' | '/v1/articles' | '/v1/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/v1/:id' | '/v1/:id' | '/v1/images' | '/v1/images' | '/tenant/:tenantId/info' | '/tenant/:tenantId/settings' | '/tenant/:tenantId/usage' | '/tenant/:tenantId/users' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/users' | '/tenant/:tenantId/analytics' | '/tenant/:tenantId/analytics/advanced' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/billing/usage' | '/tenant/:tenantId/billing/invoices' | '/tenant/:tenantId/billing/upgrade' | '/info' | '/settings' | '/usage' | '/users' | '/users/:userId' | '/users' | '/:userId' | '/' | '/analytics' | '/analytics/advanced' | '/analytics/export' | '/advanced' | '/export' | '/billing/usage' | '/billing/invoices' | '/billing/upgrade' | '/invoices' | '/upgrade' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/:userId' | '/tenant/:tenantId/analytics/enterprise' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/analytics/usage' | '/enterprise' | '/export' | '/tenant/:tenantId/billing' | '/tenant/:tenantId/billing/cancel' | '/cancel' | '/content/articles' | '/content/articles/:id' | '/content/articles' | '/content/articles/:id' | '/content/articles/:id' | '/content/images' | '/content/images' | '/articles' | '/articles/:id' | '/articles' | '/articles/:id' | '/articles/:id' | '/:id' | '/:id' | '/:id' | '/images' | '/images';
+export type ValidPaths = '/health' | '/api/v2/*' | '/v2/*' | '/*' | '/docs' | '/docs/v1' | '/' | '/v1' | '/api/v1/tenant/:tenantId/info' | '/api/v1/tenant/:tenantId/settings' | '/api/v1/tenant/:tenantId/usage' | '/api/v1/tenant/:tenantId/users' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/users' | '/api/v1/tenant/:tenantId/analytics' | '/api/v1/tenant/:tenantId/analytics/advanced' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/billing/usage' | '/api/v1/tenant/:tenantId/billing/invoices' | '/api/v1/tenant/:tenantId/billing/upgrade' | '/api/v1/info' | '/api/v1/settings' | '/api/v1/usage' | '/api/v1/users' | '/api/v1/users/:userId' | '/api/v1/users' | '/api/v1' | '/api/v1/:userId' | '/api/v1' | '/api/v1/analytics' | '/api/v1/analytics/advanced' | '/api/v1/analytics/export' | '/api/v1/advanced' | '/api/v1/export' | '/api/v1/billing/usage' | '/api/v1/billing/invoices' | '/api/v1/billing/upgrade' | '/api/v1/invoices' | '/api/v1/upgrade' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/tenant/:tenantId/users/:userId' | '/api/v1/:userId' | '/api/v1/:userId' | '/api/v1/tenant/:tenantId/analytics/enterprise' | '/api/v1/tenant/:tenantId/analytics/export' | '/api/v1/tenant/:tenantId/analytics/usage' | '/api/v1/enterprise' | '/api/v1/export' | '/api/v1/content/articles' | '/api/v1/content/articles/:id' | '/api/v1/content/articles' | '/api/v1/content/articles/:id' | '/api/v1/content/articles/:id' | '/api/v1/content/images' | '/api/v1/content/images' | '/api/v1/articles' | '/api/v1/articles/:id' | '/api/v1/articles' | '/api/v1/articles/:id' | '/api/v1/articles/:id' | '/api/v1/:id' | '/api/v1/:id' | '/api/v1/:id' | '/api/v1/images' | '/api/v1/images' | '/api/v1/tenant/:tenantId/billing' | '/api/v1/tenant/:tenantId/billing/cancel' | '/api/v1/cancel' | '/v1/tenant/:tenantId/info' | '/v1/tenant/:tenantId/settings' | '/v1/tenant/:tenantId/usage' | '/v1/tenant/:tenantId/users' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/users' | '/v1/tenant/:tenantId/analytics' | '/v1/tenant/:tenantId/analytics/advanced' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/billing/usage' | '/v1/tenant/:tenantId/billing/invoices' | '/v1/tenant/:tenantId/billing/upgrade' | '/v1/info' | '/v1/settings' | '/v1/usage' | '/v1/users' | '/v1/users/:userId' | '/v1/users' | '/v1/:userId' | '/v1' | '/v1/analytics' | '/v1/analytics/advanced' | '/v1/analytics/export' | '/v1/advanced' | '/v1/export' | '/v1/billing/usage' | '/v1/billing/invoices' | '/v1/billing/upgrade' | '/v1/invoices' | '/v1/upgrade' | '/v1/tenant/:tenantId/users/:userId' | '/v1/tenant/:tenantId/users/:userId' | '/v1/:userId' | '/v1/:userId' | '/v1/tenant/:tenantId/analytics/enterprise' | '/v1/tenant/:tenantId/analytics/export' | '/v1/tenant/:tenantId/analytics/usage' | '/v1/enterprise' | '/v1/export' | '/v1/tenant/:tenantId/billing' | '/v1/tenant/:tenantId/billing/cancel' | '/v1/cancel' | '/tenant/:tenantId/info' | '/tenant/:tenantId/settings' | '/tenant/:tenantId/usage' | '/tenant/:tenantId/users' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/users' | '/tenant/:tenantId/analytics' | '/tenant/:tenantId/analytics/advanced' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/billing/usage' | '/tenant/:tenantId/billing/invoices' | '/tenant/:tenantId/billing/upgrade' | '/info' | '/settings' | '/usage' | '/users' | '/users/:userId' | '/users' | '/:userId' | '/' | '/analytics' | '/analytics/advanced' | '/analytics/export' | '/advanced' | '/export' | '/billing/usage' | '/billing/invoices' | '/billing/upgrade' | '/invoices' | '/upgrade' | '/v1/content/articles' | '/v1/content/articles/:id' | '/v1/content/articles' | '/v1/content/articles/:id' | '/v1/content/articles/:id' | '/v1/content/images' | '/v1/content/images' | '/v1/articles' | '/v1/articles/:id' | '/v1/articles' | '/v1/articles/:id' | '/v1/articles/:id' | '/v1/:id' | '/v1/:id' | '/v1/:id' | '/v1/images' | '/v1/images' | '/tenant/:tenantId/users/:userId' | '/tenant/:tenantId/users/:userId' | '/:userId' | '/:userId' | '/tenant/:tenantId/analytics/enterprise' | '/tenant/:tenantId/analytics/export' | '/tenant/:tenantId/analytics/usage' | '/enterprise' | '/export' | '/tenant/:tenantId/billing' | '/tenant/:tenantId/billing/cancel' | '/cancel' | '/content/articles' | '/content/articles/:id' | '/content/articles' | '/content/articles/:id' | '/content/articles/:id' | '/content/images' | '/content/images' | '/articles' | '/articles/:id' | '/articles' | '/articles/:id' | '/articles/:id' | '/:id' | '/:id' | '/:id' | '/images' | '/images';
 
 export type PathParams<T extends ValidPaths> = T extends keyof PathParamMap 
   ? PathParamMap[T] 
@@ -977,6 +977,8 @@ interface PathParamMap {
   '/api/v1/content/articles/:id': { id: string | number };
   '/api/v1/articles/:id': { id: string | number };
   '/api/v1/:id': { id: string | number };
+  '/api/v1/tenant/:tenantId/billing': { tenantId: string | number };
+  '/api/v1/tenant/:tenantId/billing/cancel': { tenantId: string | number };
   '/v1/tenant/:tenantId/info': { tenantId: string | number };
   '/v1/tenant/:tenantId/settings': { tenantId: string | number };
   '/v1/tenant/:tenantId/usage': { tenantId: string | number };
@@ -990,15 +992,10 @@ interface PathParamMap {
   '/v1/tenant/:tenantId/billing/upgrade': { tenantId: string | number };
   '/v1/users/:userId': { userId: string | number };
   '/v1/:userId': { userId: string | number };
-  '/api/v1/tenant/:tenantId/billing': { tenantId: string | number };
-  '/api/v1/tenant/:tenantId/billing/cancel': { tenantId: string | number };
   '/v1/tenant/:tenantId/analytics/enterprise': { tenantId: string | number };
   '/v1/tenant/:tenantId/analytics/usage': { tenantId: string | number };
   '/v1/tenant/:tenantId/billing': { tenantId: string | number };
   '/v1/tenant/:tenantId/billing/cancel': { tenantId: string | number };
-  '/v1/content/articles/:id': { id: string | number };
-  '/v1/articles/:id': { id: string | number };
-  '/v1/:id': { id: string | number };
   '/tenant/:tenantId/info': { tenantId: string | number };
   '/tenant/:tenantId/settings': { tenantId: string | number };
   '/tenant/:tenantId/usage': { tenantId: string | number };
@@ -1012,6 +1009,9 @@ interface PathParamMap {
   '/tenant/:tenantId/billing/upgrade': { tenantId: string | number };
   '/users/:userId': { userId: string | number };
   '/:userId': { userId: string | number };
+  '/v1/content/articles/:id': { id: string | number };
+  '/v1/articles/:id': { id: string | number };
+  '/v1/:id': { id: string | number };
   '/tenant/:tenantId/analytics/enterprise': { tenantId: string | number };
   '/tenant/:tenantId/analytics/usage': { tenantId: string | number };
   '/tenant/:tenantId/billing': { tenantId: string | number };
@@ -1109,6 +1109,7 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/api/v1/articles/:id': return client.get(path, options) as Promise<ResponseFor<'GET', '/api/v1/articles/:id'>>;
       case '/api/v1/:id': return client.get(path, options) as Promise<ResponseFor<'GET', '/api/v1/:id'>>;
       case '/api/v1/images': return client.get(path, options) as Promise<ResponseFor<'GET', '/api/v1/images'>>;
+      case '/api/v1/tenant/:tenantId/billing': return client.get(path, options) as Promise<ResponseFor<'GET', '/api/v1/tenant/:tenantId/billing'>>;
       case '/v1/tenant/:tenantId/info': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/tenant/:tenantId/info'>>;
       case '/v1/tenant/:tenantId/usage': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/tenant/:tenantId/usage'>>;
       case '/v1/tenant/:tenantId/users': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/tenant/:tenantId/users'>>;
@@ -1131,18 +1132,10 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/v1/billing/usage': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/billing/usage'>>;
       case '/v1/billing/invoices': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/billing/invoices'>>;
       case '/v1/invoices': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/invoices'>>;
-      case '/api/v1/tenant/:tenantId/billing': return client.get(path, options) as Promise<ResponseFor<'GET', '/api/v1/tenant/:tenantId/billing'>>;
       case '/v1/tenant/:tenantId/analytics/enterprise': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/tenant/:tenantId/analytics/enterprise'>>;
       case '/v1/tenant/:tenantId/analytics/usage': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/tenant/:tenantId/analytics/usage'>>;
       case '/v1/enterprise': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/enterprise'>>;
       case '/v1/tenant/:tenantId/billing': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/tenant/:tenantId/billing'>>;
-      case '/v1/content/articles': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/content/articles'>>;
-      case '/v1/content/articles/:id': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/content/articles/:id'>>;
-      case '/v1/content/images': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/content/images'>>;
-      case '/v1/articles': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/articles'>>;
-      case '/v1/articles/:id': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/articles/:id'>>;
-      case '/v1/:id': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/:id'>>;
-      case '/v1/images': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/images'>>;
       case '/tenant/:tenantId/info': return client.get(path, options) as Promise<ResponseFor<'GET', '/tenant/:tenantId/info'>>;
       case '/tenant/:tenantId/usage': return client.get(path, options) as Promise<ResponseFor<'GET', '/tenant/:tenantId/usage'>>;
       case '/tenant/:tenantId/users': return client.get(path, options) as Promise<ResponseFor<'GET', '/tenant/:tenantId/users'>>;
@@ -1165,6 +1158,13 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/billing/usage': return client.get(path, options) as Promise<ResponseFor<'GET', '/billing/usage'>>;
       case '/billing/invoices': return client.get(path, options) as Promise<ResponseFor<'GET', '/billing/invoices'>>;
       case '/invoices': return client.get(path, options) as Promise<ResponseFor<'GET', '/invoices'>>;
+      case '/v1/content/articles': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/content/articles'>>;
+      case '/v1/content/articles/:id': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/content/articles/:id'>>;
+      case '/v1/content/images': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/content/images'>>;
+      case '/v1/articles': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/articles'>>;
+      case '/v1/articles/:id': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/articles/:id'>>;
+      case '/v1/:id': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/:id'>>;
+      case '/v1/images': return client.get(path, options) as Promise<ResponseFor<'GET', '/v1/images'>>;
       case '/tenant/:tenantId/analytics/enterprise': return client.get(path, options) as Promise<ResponseFor<'GET', '/tenant/:tenantId/analytics/enterprise'>>;
       case '/tenant/:tenantId/analytics/usage': return client.get(path, options) as Promise<ResponseFor<'GET', '/tenant/:tenantId/analytics/usage'>>;
       case '/enterprise': return client.get(path, options) as Promise<ResponseFor<'GET', '/enterprise'>>;
@@ -1194,11 +1194,11 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/v1/settings': return client.put(path, options) as Promise<ResponseFor<'PUT', '/v1/settings'>>;
       case '/v1/tenant/:tenantId/users/:userId': return client.put(path, options) as Promise<ResponseFor<'PUT', '/v1/tenant/:tenantId/users/:userId'>>;
       case '/v1/:userId': return client.put(path, options) as Promise<ResponseFor<'PUT', '/v1/:userId'>>;
+      case '/tenant/:tenantId/settings': return client.put(path, options) as Promise<ResponseFor<'PUT', '/tenant/:tenantId/settings'>>;
+      case '/settings': return client.put(path, options) as Promise<ResponseFor<'PUT', '/settings'>>;
       case '/v1/content/articles/:id': return client.put(path, options) as Promise<ResponseFor<'PUT', '/v1/content/articles/:id'>>;
       case '/v1/articles/:id': return client.put(path, options) as Promise<ResponseFor<'PUT', '/v1/articles/:id'>>;
       case '/v1/:id': return client.put(path, options) as Promise<ResponseFor<'PUT', '/v1/:id'>>;
-      case '/tenant/:tenantId/settings': return client.put(path, options) as Promise<ResponseFor<'PUT', '/tenant/:tenantId/settings'>>;
-      case '/settings': return client.put(path, options) as Promise<ResponseFor<'PUT', '/settings'>>;
       case '/tenant/:tenantId/users/:userId': return client.put(path, options) as Promise<ResponseFor<'PUT', '/tenant/:tenantId/users/:userId'>>;
       case '/:userId': return client.put(path, options) as Promise<ResponseFor<'PUT', '/:userId'>>;
       case '/content/articles/:id': return client.put(path, options) as Promise<ResponseFor<'PUT', '/content/articles/:id'>>;
@@ -1223,28 +1223,28 @@ function createTypedClient(options: CreateClientOptions = {}): GeneratedApiClien
       case '/api/v1/content/images': return client.post(path, options) as Promise<ResponseFor<'POST', '/api/v1/content/images'>>;
       case '/api/v1/articles': return client.post(path, options) as Promise<ResponseFor<'POST', '/api/v1/articles'>>;
       case '/api/v1/images': return client.post(path, options) as Promise<ResponseFor<'POST', '/api/v1/images'>>;
+      case '/api/v1/tenant/:tenantId/billing/cancel': return client.post(path, options) as Promise<ResponseFor<'POST', '/api/v1/tenant/:tenantId/billing/cancel'>>;
+      case '/api/v1/cancel': return client.post(path, options) as Promise<ResponseFor<'POST', '/api/v1/cancel'>>;
       case '/v1/tenant/:tenantId/users': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/tenant/:tenantId/users'>>;
       case '/v1/tenant/:tenantId/billing/upgrade': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/tenant/:tenantId/billing/upgrade'>>;
       case '/v1/users': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/users'>>;
       case '/v1': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1'>>;
       case '/v1/billing/upgrade': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/billing/upgrade'>>;
       case '/v1/upgrade': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/upgrade'>>;
-      case '/api/v1/tenant/:tenantId/billing/cancel': return client.post(path, options) as Promise<ResponseFor<'POST', '/api/v1/tenant/:tenantId/billing/cancel'>>;
-      case '/api/v1/cancel': return client.post(path, options) as Promise<ResponseFor<'POST', '/api/v1/cancel'>>;
       case '/v1/tenant/:tenantId/analytics/export': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/tenant/:tenantId/analytics/export'>>;
       case '/v1/export': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/export'>>;
       case '/v1/tenant/:tenantId/billing/cancel': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/tenant/:tenantId/billing/cancel'>>;
       case '/v1/cancel': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/cancel'>>;
-      case '/v1/content/articles': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/content/articles'>>;
-      case '/v1/content/images': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/content/images'>>;
-      case '/v1/articles': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/articles'>>;
-      case '/v1/images': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/images'>>;
       case '/tenant/:tenantId/users': return client.post(path, options) as Promise<ResponseFor<'POST', '/tenant/:tenantId/users'>>;
       case '/tenant/:tenantId/billing/upgrade': return client.post(path, options) as Promise<ResponseFor<'POST', '/tenant/:tenantId/billing/upgrade'>>;
       case '/users': return client.post(path, options) as Promise<ResponseFor<'POST', '/users'>>;
       case '/': return client.post(path, options) as Promise<ResponseFor<'POST', '/'>>;
       case '/billing/upgrade': return client.post(path, options) as Promise<ResponseFor<'POST', '/billing/upgrade'>>;
       case '/upgrade': return client.post(path, options) as Promise<ResponseFor<'POST', '/upgrade'>>;
+      case '/v1/content/articles': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/content/articles'>>;
+      case '/v1/content/images': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/content/images'>>;
+      case '/v1/articles': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/articles'>>;
+      case '/v1/images': return client.post(path, options) as Promise<ResponseFor<'POST', '/v1/images'>>;
       case '/tenant/:tenantId/analytics/export': return client.post(path, options) as Promise<ResponseFor<'POST', '/tenant/:tenantId/analytics/export'>>;
       case '/export': return client.post(path, options) as Promise<ResponseFor<'POST', '/export'>>;
       case '/tenant/:tenantId/billing/cancel': return client.post(path, options) as Promise<ResponseFor<'POST', '/tenant/:tenantId/billing/cancel'>>;

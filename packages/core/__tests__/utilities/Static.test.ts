@@ -85,7 +85,9 @@ describe("Static Component", () => {
     expect(res.status).toBe(404);
 
     const text = await res.text();
-    expect(text).toBe("Not Found");
+    expect(text).toBe(
+      `{"type":"about:blank","title":"Not Found","status":404}`
+    );
   });
 
   it("blocks path traversal with backslashes", async () => {

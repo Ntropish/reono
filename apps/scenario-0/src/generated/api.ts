@@ -32,48 +32,48 @@ export interface RouteDefinitions {
     "/users/:userId": {
       params: { userId: string | number };
       body: ZodInfer<typeof Schema_0.userInputSchema>;
-      response: any;
+      response: { id: number; name: string };
     },
     "/:userId": {
       params: { userId: string | number };
       body: ZodInfer<typeof Schema_0.userInputSchema>;
-      response: any;
+      response: { id: number; name: string };
     }
   },
   DELETE: {
     "/users/:userId": {
       params: { userId: string | number };
       body: never;
-      response: any;
+      response: { message: string };
     },
     "/:userId": {
       params: { userId: string | number };
       body: never;
-      response: any;
+      response: { message: string };
     }
   },
   POST: {
     "/users": {
       params: never;
       body: ZodInfer<typeof Schema_0.userInputSchema>;
-      response: any;
+      response: { id: number; name: string };
     },
     "/": {
       params: never;
       body: ZodInfer<typeof Schema_0.userInputSchema>;
-      response: any;
+      response: { id: number; name: string };
     }
   },
   PATCH: {
     "/users/:userId": {
       params: { userId: string | number };
       body: Partial<ZodInfer<typeof Schema_0.userInputSchema>>;
-      response: any;
+      response: { id: number; name: string };
     },
     "/:userId": {
       params: { userId: string | number };
       body: Partial<ZodInfer<typeof Schema_0.userInputSchema>>;
-      response: any;
+      response: { id: number; name: string };
     }
   }
 }

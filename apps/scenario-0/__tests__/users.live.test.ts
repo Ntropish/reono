@@ -3,7 +3,8 @@ import { createApi } from "../src/generated/api";
 import { App } from "../dist/index.mjs"; // Import the main application component
 import { createApp } from "@reono/node-server";
 
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:3060";
+const PORT = 3060;
+const BASE_URL = `http://localhost:${PORT}`;
 
 let createdId: number | null = null;
 let app: any;
@@ -16,7 +17,7 @@ beforeAll(async () => {
   app.serve(App());
 
   await new Promise<void>((resolve) => {
-    server = app.listen(3060, () => resolve());
+    server = app.listen(PORT, () => resolve());
   });
 
   // Create the type-safe client

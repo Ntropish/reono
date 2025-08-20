@@ -43,7 +43,7 @@
     "@babel/parser": "^7.25.0",
     "@babel/traverse": "^7.25.0",
     "@babel/types": "^7.25.0",
-    "reono": "workspace:*",
+    "reono": "1.0.5",
     "typescript": "^5.0.0"
   },
   "devDependencies": {

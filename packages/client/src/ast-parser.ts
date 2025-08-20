@@ -159,21 +159,21 @@ export class ReonoASTParser {
       plugins: ["typescript", "jsx"],
     });
 
-      // Build local import map: local name -> resolved absolute path
-      const importMap = new Map<string, string>();
-      // @ts-ignore
-      traverse.default(ast, {
-        ImportDeclaration: (path: any) => {
-          const src = path.node.source.value as string;
-          if (!src.startsWith(".")) return; // only local
-          path.node.specifiers.forEach((spec: any) => {
-            const localName = spec.local?.name as string | undefined;
-            if (!localName) return;
-            const resolved = this.resolveImportPath(src, component.path);
-            if (resolved) importMap.set(localName, resolved);
-          });
-        },
-      });
+    // Build local import map: local name -> resolved absolute path
+    const importMap = new Map<string, string>();
+    // @ts-ignore
+    traverse.default(ast, {
+      ImportDeclaration: (path: any) => {
+        const src = path.node.source.value as string;
+        if (!src.startsWith(".")) return; // only local
+        path.node.specifiers.forEach((spec: any) => {
+          const localName = spec.local?.name as string | undefined;
+          if (!localName) return;
+          const resolved = this.resolveImportPath(src, component.path);
+          if (resolved) importMap.set(localName, resolved);
+        });
+      },
+    });
 
     // First pass: collect all the async work we need to do
     const asyncTasks: Promise<void>[] = [];
@@ -314,7 +314,9 @@ export class ReonoASTParser {
             }
           } else {
             // Process other elements recursively (like <use> elements)
-            asyncTasks.push(this.processJSXChildren(child, routes, basePath, importMap));
+            asyncTasks.push(
+              this.processJSXChildren(child, routes, basePath, importMap)
+            );
           }
         }
       }
@@ -338,7 +340,7 @@ export class ReonoASTParser {
     const hasBody = ["POST", "PUT", "PATCH"].includes(method.toUpperCase());
 
     // Extract validation information
-  const validation = this.extractValidation(element, importMap);
+    const validation = this.extractValidation(element, importMap);
 
     // Extract response type from handler
     const responseType = this.extractResponseTypeFromHandler(element);
@@ -406,7 +408,7 @@ export class ReonoASTParser {
     // - z.number() -> number
     // - etc.
 
-  if (t.isCallExpression(node)) {
+    if (t.isCallExpression(node)) {
       // Handle schemaRef.partial()
       if (
         t.isMemberExpression(node.callee) &&
@@ -417,7 +419,12 @@ export class ReonoASTParser {
         if (t.isIdentifier(obj)) {
           const imp = importMap.get(obj.name);
           if (imp) {
-            return { kind: "schemaRef", name: obj.name, importPath: imp, partial: true };
+            return {
+              kind: "schemaRef",
+              name: obj.name,
+              importPath: imp,
+              partial: true,
+            };
           }
         }
       }
@@ -441,7 +448,7 @@ export class ReonoASTParser {
             return "any";
         }
       }
-  }
+    }
 
     // Identifier referencing an imported schema
     if (t.isIdentifier(node)) {
@@ -601,6 +608,10 @@ export class ReonoASTParser {
       if (expr.arguments.length > 0) {
         return this.analyzeJsonArgument(expr.arguments[0] as t.Expression);
       }
+    }
+    // Direct function call like createUser(...), updateUser(...), deleteUser(...)
+    if (t.isCallExpression(expr) && t.isIdentifier(expr.callee)) {
+      return this.inferTypeFromFunctionName(expr.callee.name);
     }
 
     return "any";

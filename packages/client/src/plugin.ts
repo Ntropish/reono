@@ -1,7 +1,5 @@
 import type { Plugin } from "vite";
-import { readFile, writeFile, mkdir } from "fs/promises";
-import { resolve, dirname, relative } from "path";
-import { existsSync } from "fs";
+// Node.js modules will be required only inside functions to avoid browser build issues
 import {
   ReonoASTParser,
   type RouteInfo as ASTRouteInfo,
@@ -68,10 +66,15 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
   // Define the generateClient function outside the plugin object
   async function generateClient() {
     try {
-      const serverFilePath = resolve(root, serverFile);
-      const outputDirPath = resolve(root, outputDir);
+      // Dynamically import Node.js modules
+      const path = await import("path");
+      const fsPromises = await import("fs/promises");
+      const fs = await import("fs");
 
-      if (!existsSync(serverFilePath)) {
+      const serverFilePath = path.resolve(root, serverFile);
+      const outputDirPath = path.resolve(root, outputDir);
+
+      if (!fs.existsSync(serverFilePath)) {
         console.warn(`[reono-client] Server file not found: ${serverFile}`);
         return;
       }
@@ -86,7 +89,7 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
       });
 
       // Generate the client code
-      const clientCode = generateClientCode(
+      const clientCode = await generateClientCode(
         routes,
         clientName,
         baseUrl,
@@ -94,14 +97,14 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
       );
 
       // Ensure output directory exists
-      await mkdir(outputDirPath, { recursive: true });
+      await fsPromises.mkdir(outputDirPath, { recursive: true });
 
       // Write the client file
-      const clientFilePath = resolve(outputDirPath, `${clientName}.ts`);
-      await writeFile(clientFilePath, clientCode, "utf-8");
+      const clientFilePath = path.resolve(outputDirPath, `${clientName}.ts`);
+      await fsPromises.writeFile(clientFilePath, clientCode, "utf-8");
 
       console.log(
-        `[reono-client] Generated client: ${relative(root, clientFilePath)}`
+        `[reono-client] Generated client: ${path.relative(root, clientFilePath)}`
       );
     } catch (error) {
       console.error("[reono-client] Failed to generate client:", error);
@@ -121,19 +124,25 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
 
     configureServer(server: any) {
       if (watch) {
-        const serverFilePath = resolve(root, serverFile);
-        server.watcher.add(serverFilePath);
+        // Use dynamic import for path
+        (async () => {
+          const path = await import("path");
+          const serverFilePath = path.resolve(root, serverFile);
+          server.watcher.add(serverFilePath);
 
-        server.watcher.on("change", (file: string) => {
-          if (file === serverFilePath) {
-            generateClient();
-          }
-        });
+          server.watcher.on("change", (file: string) => {
+            if (file === serverFilePath) {
+              generateClient();
+            }
+          });
+        })();
       }
     },
   };
 
   async function analyzeServerFile(filePath: string): Promise<RouteInfo[]> {
+    // If you need path functions here, require them
+    // const { resolve } = require("path");
     const parser = new ReonoASTParser();
     const astRoutes = await parser.parseServerFile(filePath);
 
@@ -174,12 +183,12 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
     return deduplicatedRoutes;
   }
 
-  function generateClientCode(
+  async function generateClientCode(
     routes: RouteInfo[],
     clientName: string,
     baseUrl: string,
     outputDirPath: string
-  ): string {
+  ): Promise<string> {
     // Group routes by method to generate proper interface
     const methodGroups = new Map<string, RouteInfo[]>();
     routes.forEach((route) => {
@@ -196,7 +205,7 @@ export function reonoClient(options: ReonoClientOptions): Plugin {
       )
       .join("\n");
 
-    const { typeImports, aliasMap, needsZodInfer } = generateTypeImports(
+    const { typeImports, aliasMap, needsZodInfer } = await generateTypeImports(
       routes,
       outputDirPath
     );
@@ -444,7 +453,11 @@ ${methodInterfaces}
 }`;
   }
 
-  function generateTypeImports(routes: RouteInfo[], outputDirPath: string) {
+  async function generateTypeImports(
+    routes: RouteInfo[],
+    outputDirPath: string
+  ) {
+    const path = await import("path");
     const bodySchemaRefs = routes
       .map((r) => r.validation?.body)
       .filter(Boolean) as any[];
@@ -458,7 +471,9 @@ ${methodInterfaces}
     let counter = 0;
     for (const ref of schemaRefs) {
       if (!uniqueByPath.has(ref.importPath)) {
-        const rel = relative(outputDirPath, ref.importPath).replace(/\\/g, "/");
+        const rel = path
+          .relative(outputDirPath, ref.importPath)
+          .replace(/\\/g, "/");
         const spec = rel.startsWith(".") ? rel : `./${rel}`;
         const alias = `Schema_${counter++}`;
         uniqueByPath.set(ref.importPath, { importPath: spec, alias });

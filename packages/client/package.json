@@ -1,27 +1,27 @@
 {
   "name": "@reono/client",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/Ntropish/reono.git"
   },
   "description": "Vite plugin for generating type-safe REST clients from Reono JSX APIs",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/index.mjs",
+  "types": "dist/src/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "types": "./dist/src/index.d.ts",
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.js"
     },
     "./plugin": {
       "import": "./dist/plugin.mjs",
-      "types": "./dist/src/plugin.d.ts",
+      "types": "./dist/plugin.d.ts",
       "require": "./dist/plugin.js"
     },
     "./runtime": {
       "import": "./dist/runtime.mjs",
-      "types": "./dist/src/runtime.d.ts",
+      "types": "./dist/runtime.d.ts",
       "require": "./dist/runtime.js"
     }
   },

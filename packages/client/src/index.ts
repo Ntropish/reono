@@ -7,7 +7,7 @@ export {
   createClient,
   renderClient,
   createTypedClient,
-  type ReonoClientError,
+  // type ReonoClientError,
 } from "./runtime.js";
 
 export type {

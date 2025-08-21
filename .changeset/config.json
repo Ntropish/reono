@@ -4,8 +4,17 @@
   "commit": true,
   "fixed": [],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [
+    "scenario-0",
+    "scenario-1",
+    "scenario-2",
+    "docs",
+    "web",
+    "@reono/eslint-config",
+    "@reono/typescript-config",
+    "@reono/ui"
+  ]
 }

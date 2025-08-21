@@ -1,6 +1,7 @@
 {
   "name": "scenario-2",
   "version": "1.0.0",
+  "private": true,
   "description": "Multi-Tenant SaaS API Gateway - Reono Integration Scenario 2",
   "main": "index.js",
   "scripts": {
@@ -9,10 +10,9 @@
     "dev:serve": "wait-on dist/index.js && nodemon --watch dist --delay 500ms dist/index.js",
     "build": "vite build",
     "start": "node dist/index.js",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:integration": "vitest run src/__tests__/integration.test.tsx",
-    "test:watch": "vitest --watch"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "vitest run src/__tests__/integration.test.tsx"
   },
   "keywords": [],
   "author": "",

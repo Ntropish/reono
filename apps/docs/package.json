@@ -7,7 +7,7 @@
     "start": "vite --port 3000",
     "build": "vite build && tsc",
     "serve": "vite preview",
-  "lint": "eslint --config eslint.config.js",
+    "lint": "eslint --config eslint.config.js",
     "format": "prettier",
     "check": "prettier --write . && eslint --fix"
   },

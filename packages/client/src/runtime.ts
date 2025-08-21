@@ -14,13 +14,15 @@ export interface ClientResponse<T = any> extends Response {
 }
 
 export interface ReonoClientError<T = any> extends Error {
+  // RFC9457
+  type?: string;
+  title?: string;
   status?: number;
+  detail?: string;
+  instance?: string;
+  // Expose source fields
   response?: Response;
   data?: T;
-  // Convenience properties populated from Problem Details when available
-  title?: string;
-  type?: string;
-  detail?: string;
 }
 export function isReonoClientError<T = any>(
   e: unknown
@@ -213,7 +215,11 @@ export function createClient(options: CreateClientOptions = {}): ApiClient {
     } else {
       // Default to JSON
       const contentType = response.headers.get("content-type") || "";
-      if (contentType.includes("application/json")) {
+      if (
+        contentType.includes("application/json") ||
+        contentType.includes("text/json") ||
+        contentType.includes("application/problem+json")
+      ) {
         data = await response.json();
       } else {
         data = await response.text();
@@ -228,6 +234,7 @@ export function createClient(options: CreateClientOptions = {}): ApiClient {
       err.status = response.status;
       err.response = response;
       err.data = data;
+
       // If server sent Problem Details, project common fields in a public-safe way
       const ct = response.headers.get("content-type") || "";
       if (
@@ -236,9 +243,10 @@ export function createClient(options: CreateClientOptions = {}): ApiClient {
         typeof data === "object"
       ) {
         const pd: any = data;
-        if (typeof pd.title === "string") err.title = pd.title;
         if (typeof pd.type === "string") err.type = pd.type;
+        if (typeof pd.title === "string") err.title = pd.title;
         if (typeof pd.detail === "string") err.detail = pd.detail;
+        if (typeof pd.instance === "string") err.instance = pd.instance;
         // message prefers problem title
         if (err.title) err.message = `${response.status} ${err.title}`;
       }
